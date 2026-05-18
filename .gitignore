@@ -1,0 +1,27 @@
+.DS_Store
+*.log
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Private learning data
+calendar/
+curriculum/
+knowledge-points/
+memory/
+mistakes/
+records/
+weak-points/
+worksheets/
+textbooks/
+ocr-output/
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.heic
+
+# Allow sanitized examples
+!examples/
+!examples/**

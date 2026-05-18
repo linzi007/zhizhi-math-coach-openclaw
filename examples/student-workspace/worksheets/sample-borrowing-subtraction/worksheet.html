@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>两位数退位减法小练</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 12mm;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 18px;
+      line-height: 1.32;
+      color: #111;
+      background: #fff;
+    }
+
+    .sheet {
+      max-width: 186mm;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 5px;
+      text-align: center;
+      font-size: 25px;
+      line-height: 1.15;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 5px;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .line {
+      display: inline-block;
+      min-width: 25mm;
+      border-bottom: 1px solid #222;
+      height: 17px;
+      vertical-align: bottom;
+    }
+
+    .tip {
+      border: 1px solid #222;
+      padding: 4px 8px;
+      margin-bottom: 5px;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      margin: 5px 0 3px;
+      font-size: 17px;
+      line-height: 1.2;
+    }
+
+    .read-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .read-card {
+      border: 1px solid #bbb;
+      min-height: 20mm;
+      padding: 4px 6px;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .mental-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3px 10px;
+      margin-bottom: 4px;
+    }
+
+    .compact-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px 10px;
+      margin-bottom: 4px;
+    }
+
+    .item {
+      white-space: nowrap;
+      min-height: 20px;
+      line-height: 1.25;
+    }
+
+    .blank {
+      display: inline-block;
+      width: 15mm;
+      border-bottom: 1px solid #222;
+      height: 18px;
+      vertical-align: bottom;
+    }
+
+    .blank-wide {
+      display: inline-block;
+      width: 24mm;
+      border-bottom: 1px solid #222;
+      height: 18px;
+      vertical-align: bottom;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 5px 10px;
+    }
+
+    .geometry-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 7px;
+      margin-bottom: 4px;
+    }
+
+    .problem {
+      border: 1px solid #bbb;
+      min-height: 24mm;
+      padding: 5px 6px;
+      break-inside: avoid;
+    }
+
+    .problem.tall {
+      min-height: 30mm;
+    }
+
+    .geometry-diagram {
+      display: block;
+      width: 100%;
+      max-width: 78mm;
+      height: auto;
+      margin: 5px auto 3px;
+    }
+
+    .geometry-diagram text {
+      font-size: 12px;
+      dominant-baseline: middle;
+      text-anchor: middle;
+    }
+
+    .prompt {
+      font-size: 16px;
+      line-height: 1.25;
+    }
+
+    .work-line {
+      display: block;
+      margin-top: 4px;
+      height: 15px;
+      border-bottom: 1px solid #222;
+    }
+
+    .answer-line {
+      margin-top: 4px;
+      font-size: 16px;
+      line-height: 1.25;
+    }
+
+    .choice {
+      display: inline-block;
+      min-width: 11mm;
+      margin-right: 3mm;
+      border: 1px solid #999;
+      text-align: center;
+      line-height: 1.35;
+    }
+
+    .chain {
+      margin-top: 3px;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .dash {
+      display: block;
+      margin-top: 2px;
+      height: 17px;
+      border-bottom: 1px dashed #888;
+    }
+
+    .check-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 5px 10px;
+    }
+
+    .check-card {
+      border: 1px solid #bbb;
+      min-height: 22mm;
+      padding: 5px 6px;
+      line-height: 1.3;
+    }
+
+    .footer {
+      margin-top: 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main class="sheet">
+    <h1>两位数退位减法小练</h1>
+    <section class="meta">
+      <div>姓名：<span class="line"></span></div>
+      <div>日期：<span class="line"></span></div>
+      <div>用时：<span class="line"></span></div>
+      <div>正确题数：<span class="line"></span></div>
+    </section>
+    <section class="tip">先看个位够不够；两位数横式先写规范竖式或清楚标记退位；做完选1题检查。</section>
+    <h2>先圈一圈：要退位吗？</h2>
+    <section class="compact-grid">
+      <div class="problem">
+        <div class="prompt">1. 43 - 18：圈 要 / 不要</div>
+        <div class="chain">圈可填的数：<span class="choice">要</span> <span class="choice">不要</span></div>
+      </div>
+      <div class="problem">
+        <div class="prompt">2. 56 - 24：圈 要 / 不要</div>
+        <div class="chain">圈可填的数：<span class="choice">要</span> <span class="choice">不要</span></div>
+      </div>
+      <div class="problem">
+        <div class="prompt">3. 70 - 35：圈 要 / 不要</div>
+        <div class="chain">圈可填的数：<span class="choice">要</span> <span class="choice">不要</span></div>
+      </div>
+    </section>
+    <h2>再计算：写小竖式或清楚标记退位</h2>
+    <section class="problem-grid">
+      <div class="problem">
+        4. 42 - 18 = <span class="blank"></span>
+        <span class="work-line"></span>
+        <span class="work-line"></span>
+        <div class="chain">检查：<span class="blank"></span> + 18 = 42</div>
+      </div>
+      <div class="problem">
+        5. 63 - 27 = <span class="blank"></span>
+        <span class="work-line"></span>
+        <span class="work-line"></span>
+        <div class="chain">检查：<span class="blank"></span> + 27 = 63</div>
+      </div>
+      <div class="problem">
+        6. 50 - 16 = <span class="blank"></span>
+        <span class="work-line"></span>
+        <span class="work-line"></span>
+        <div class="chain">检查：<span class="blank"></span> + 16 = 50</div>
+      </div>
+      <div class="problem">
+        7. 81 - 45 = <span class="blank"></span>
+        <span class="work-line"></span>
+        <span class="work-line"></span>
+        <div class="chain">检查：<span class="blank"></span> + 45 = 81</div>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>

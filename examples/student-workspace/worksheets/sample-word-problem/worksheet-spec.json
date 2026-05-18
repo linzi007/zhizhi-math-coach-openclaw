@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "title": "条件取舍应用题小练",
+  "date": "2026-05-18",
+  "school_year": "2025-2026",
+  "semester": "一年级下学期",
+  "term_phase": "in_semester",
+  "topic": "condition-filtering-word-problem",
+  "grade": "sample",
+  "strategy": "diagnostic_probe",
+  "diagnostic_target": "判断孩子是否会回看最终问法，并区分有用条件和干扰条件。",
+  "review_status": "model_reviewed",
+  "target": "先圈最终问题，再选择有用条件。",
+  "fields": ["姓名", "日期", "用时", "正确题数"],
+  "reminder": "先读最后问什么，再圈有用条件；没用到的信息不要急着算。",
+  "sections": [
+    {
+      "title": "先圈问法，再列式",
+      "layout": "problem-grid-2",
+      "items": [
+        {
+          "type": "condition_filtering_problem",
+          "prompt": "小明有18张贴纸，小红有12张贴纸，小刚有9张贴纸。小明比小红多多少张？",
+          "answer_prompt": "多",
+          "answer_suffix": "张",
+          "work_lines": 2,
+          "used_conditions": ["小明18张", "小红12张"],
+          "unused_conditions": ["小刚9张"],
+          "review_status": "model_reviewed",
+          "answer_detail": "用小明和小红的数据，`18 - 12 = 6`。小刚的9张是干扰条件。答：多6张。"
+        },
+        {
+          "type": "compare_after_intermediate_problem",
+          "prompt": "盒子里有15个红球，蓝球比红球少6个。蓝球有多少个？红球和蓝球一共有多少个？",
+          "answer_prompt": "一共",
+          "answer_suffix": "个",
+          "work_lines": 3,
+          "intermediate_quantity": "先求蓝球数量",
+          "review_status": "model_reviewed",
+          "answer_detail": "先求蓝球：`15 - 6 = 9`；再求一共：`15 + 9 = 24`。答：一共24个。"
+        }
+      ]
+    }
+  ],
+  "grading": {
+    "error_labels": [
+      {
+        "name": "问法未识别",
+        "description": "没有先看最后问什么，算了相关但不是最终问题的量。"
+      },
+      {
+        "name": "条件误用",
+        "description": "把干扰条件也拿来计算，或漏掉必要条件。"
+      }
+    ],
+    "reassessment": [
+      "能圈出最终问法并说出不用哪些条件：可进入迁移验证。",
+      "仍误用干扰条件：下次做对比辨析卷。"
+    ],
+    "next": [
+      "若能做同型题，下次改变场景和问法测试迁移。"
+    ]
+  }
+}

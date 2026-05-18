@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "title": "长方形周长图形小练",
+  "date": "2026-05-18",
+  "school_year": "2025-2026",
+  "semester": "sample",
+  "term_phase": "in_semester",
+  "topic": "rectangle-perimeter",
+  "grade": "sample",
+  "strategy": "geometry_drill",
+  "diagnostic_target": "理解长方形周长是四条边长度总和。",
+  "review_status": "model_reviewed",
+  "target": "看清图形标注，写出周长计算过程。",
+  "fields": ["姓名", "日期", "用时", "正确题数"],
+  "reminder": "先找长和宽，再想一圈有几条边。",
+  "sections": [
+    {
+      "title": "看图求周长",
+      "layout": "geometry-grid-1",
+      "items": [
+        {
+          "type": "geometry_problem",
+          "prompt": "求下面长方形的周长。",
+          "geometry_spec": {
+            "type": "rectangle",
+            "width_label": "8 cm",
+            "height_label": "5 cm",
+            "aria_label": "长方形，长8厘米，宽5厘米"
+          },
+          "answer_prompt": "周长是",
+          "answer_suffix": "cm",
+          "work_lines": 2,
+          "review_status": "model_reviewed",
+          "answer_detail": "`(8 + 5) × 2 = 26`，周长是26 cm。"
+        }
+      ]
+    }
+  ],
+  "grading": {
+    "error_labels": [
+      {
+        "name": "公式理解不稳",
+        "description": "只算了一条长加一条宽，没有理解周长是一圈。"
+      },
+      {
+        "name": "图形标注误读",
+        "description": "没有看清长和宽的标注。"
+      }
+    ],
+    "reassessment": [
+      "能说出一圈有两条长、两条宽，并列式正确：可做变式图形。",
+      "若只会套公式不会解释：回到描一圈和数边。"
+    ],
+    "next": [
+      "下次加入正方形或组合图形前，先确认长方形周长稳定。"
+    ]
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "title": "两位数退位减法小练",
+  "date": "2026-05-18",
+  "school_year": "2025-2026",
+  "semester": "一年级下学期",
+  "term_phase": "in_semester",
+  "topic": "borrowing-subtraction",
+  "grade": "sample",
+  "strategy": "weak_point_drill",
+  "diagnostic_target": "判断是否需要退位，并正确执行退位步骤。",
+  "review_status": "approved",
+  "target": "判断是否需要退位，并用规范草稿完成两位数减法。",
+  "fields": ["姓名", "日期", "用时", "正确题数"],
+  "reminder": "先看个位够不够；两位数横式先写规范竖式或清楚标记退位；做完选1题检查。",
+  "sections": [
+    {
+      "title": "先圈一圈：要退位吗？",
+      "layout": "compact-3",
+      "items": [
+        {
+          "type": "fill_condition",
+          "prompt": "43 - 18：圈 要 / 不要",
+          "choices": ["要", "不要"],
+          "answer_detail": "要退位，因为3不够减8。"
+        },
+        {
+          "type": "fill_condition",
+          "prompt": "56 - 24：圈 要 / 不要",
+          "choices": ["要", "不要"],
+          "answer_detail": "不要退位，因为6够减4。"
+        },
+        {
+          "type": "fill_condition",
+          "prompt": "70 - 35：圈 要 / 不要",
+          "choices": ["要", "不要"],
+          "answer_detail": "要退位，因为0不够减5。"
+        }
+      ]
+    },
+    {
+      "title": "再计算：写小竖式或清楚标记退位",
+      "layout": "problem-grid-2",
+      "items": [
+        {
+          "type": "scratch_equation",
+          "expr": "42 - 18",
+          "answer": "24",
+          "check": "+ 18 = 42",
+          "answer_detail": "`42 - 18 = 24`，检查：`24 + 18 = 42`。"
+        },
+        {
+          "type": "scratch_equation",
+          "expr": "63 - 27",
+          "answer": "36",
+          "check": "+ 27 = 63",
+          "answer_detail": "`63 - 27 = 36`，检查：`36 + 27 = 63`。"
+        },
+        {
+          "type": "scratch_equation",
+          "expr": "50 - 16",
+          "answer": "34",
+          "check": "+ 16 = 50",
+          "answer_detail": "`50 - 16 = 34`，检查：`34 + 16 = 50`。"
+        },
+        {
+          "type": "scratch_equation",
+          "expr": "81 - 45",
+          "answer": "36",
+          "check": "+ 45 = 81",
+          "answer_detail": "`81 - 45 = 36`，检查：`36 + 45 = 81`。"
+        }
+      ]
+    }
+  ],
+  "grading": {
+    "error_labels": [
+      {
+        "name": "退位判断错",
+        "description": "个位不够减时没有判断出要退位，或不用退位时误退位。"
+      },
+      {
+        "name": "退位执行错",
+        "description": "知道要退位，但十位忘记少1或个位没有加10。"
+      },
+      {
+        "name": "口算事实慢/错",
+        "description": "退位步骤正确，但基本减法事实不熟导致慢或错。"
+      }
+    ],
+    "reassessment": [
+      "7题全对且能说清退位原因：可标记为待巩固。",
+      "退位执行错超过1题：继续短练，不扩大题量。",
+      "只慢不怎么错：转为每日5分钟口算事实训练。"
+    ],
+    "next": [
+      "若横式仍漏退位，下次要求全部写小竖式。",
+      "若正确但慢，下次减少书写，做口算速度练习。"
+    ]
+  }
+}
