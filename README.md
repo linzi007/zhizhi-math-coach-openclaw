@@ -24,6 +24,7 @@ skills/zhizhi-math-coach/
   scripts/generate_worksheet.py
   scripts/validate_worksheet_spec.py
   scripts/publish_html_site.py
+  scripts/check_git_sync.py
   assets/worksheet/
 docs/
 scripts/smoke_check.py
@@ -199,7 +200,37 @@ git remote add origin git@github.com:<user>/zhizhi-math-learning-data.git
 git push -u origin main
 ```
 
-The generated `.gitignore` ignores `skills/` by default so downloaded ClawHub bundles are not committed into the personal learning repository. Reinstall the skill on another machine when needed.
+The generated `.gitignore` ignores `skills/` by default so downloaded ClawHub bundles are not committed into the personal learning repository. Reinstall the skill on another machine when needed. If the first `git push` fails, the local learning workspace is still usable; configure GitHub authorization on the current machine and retry sync later.
+
+## GitHub Authorization For Sync
+
+OpenClaw may run on a machine that has no GitHub CLI and no saved GitHub credentials. GitHub sync only needs plain `git`, a remote, and push authorization. GitHub CLI `gh` is optional.
+
+Preferred setup is SSH:
+
+```bash
+git --version
+ssh -T git@github.com
+git remote set-url origin git@github.com:<user>/zhizhi-math-learning-data.git
+python3 skills/zhizhi-math-coach/scripts/check_git_sync.py --workspace . --check-push
+```
+
+If SSH is not available, create a fine-grained GitHub personal access token for the personal learning repository only:
+
+- Create path: GitHub web -> profile photo -> Settings -> Developer settings -> Personal access tokens -> Fine-grained tokens -> Generate new token.
+- Repository access: select only `zhizhi-math-learning-data` or the user's personal learning repository.
+- Normal sync permission: `Contents: Read and write`.
+- Optional workflow setup permission: add `Workflows: Read and write` only if committing `.github/workflows/pages.yml`.
+- Optional Pages API permission: add `Pages: Read and write` only if automation will configure Pages through the GitHub API. It is not needed when Pages is enabled manually in GitHub Settings.
+
+For HTTPS token use:
+
+```bash
+git remote set-url origin https://github.com/<user>/zhizhi-math-learning-data.git
+git push --dry-run origin HEAD
+```
+
+When Git prompts, enter the GitHub username and use the token as the password. Do not paste tokens into OpenClaw chat and do not store tokens in repository files or remote URLs.
 
 ## What Triggers Local Updates And Sync
 
@@ -219,7 +250,15 @@ Typical write triggers:
 - publishing updates `site/` and `worksheets/<date-topic>/publish.json`;
 - scheduled OpenClaw tasks only remind or suggest by default, unless the parent explicitly asks them to write records or generate worksheets.
 
-GitHub sync happens only when the user commits and pushes from the personal learning repository. For a private personal repository, this can archive the full learning state:
+GitHub sync happens only when the user explicitly asks to sync/push/publish or manually commits and pushes from the personal learning repository. Before OpenClaw commits or pushes, it should run:
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/check_git_sync.py --workspace . --check-push
+```
+
+If the preflight fails, the generated local files remain valid and sync can be retried after SSH or token authorization is configured.
+
+For a private personal repository, sync can archive the full learning state:
 
 ```bash
 git add curriculum knowledge-points memory mistakes records weak-points worksheets site

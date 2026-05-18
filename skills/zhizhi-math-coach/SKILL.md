@@ -94,7 +94,7 @@ Do not assume background sync. Local files are changed by the current task only:
 - worksheet generation may write `worksheets/<date-topic>/worksheet-spec.json`, `worksheet.html`, and `answer-key.md`;
 - publishing may write `site/` and `worksheets/<date-topic>/publish.json`.
 
-Do not run `git add`, `git commit`, or `git push` unless the parent explicitly asks to sync the personal repository. If the personal repository is public, warn before committing sensitive learning records or answer keys.
+Do not run `git add`, `git commit`, or `git push` unless the parent explicitly asks to sync, publish, push, commit to GitHub, or send a public link. When sync is requested, read `references/github-sync-authorization.md` first and run the bundled preflight before committing or pushing. Do not require GitHub CLI; plain `git` with SSH or HTTPS token authorization is enough. If authorization is missing, return the local file paths and setup guidance instead of treating generation as failed. If the personal repository is public, warn before committing sensitive learning records or answer keys.
 
 Skill resources are relative to `{baseDir}`:
 
@@ -111,9 +111,11 @@ Skill resources are relative to `{baseDir}`:
 - `references/geometry-generation.md`: deterministic SVG geometry rules.
 - `references/automation-openclaw.md`: scheduled reminders, channels, and automation boundaries.
 - `references/github-pages-publishing.md`: public child-facing HTML worksheet publishing rules.
+- `references/github-sync-authorization.md`: GitHub SSH/token authorization, preflight checks, and sync boundaries.
 - `references/worksheet-standards.md`: child-facing printable worksheet rules.
 - `references/student-profile-template.md`: starter profile format.
 - `scripts/generate_worksheet.py`: generate worksheet HTML and answer key from JSON.
+- `scripts/check_git_sync.py`: preflight whether the current machine can reach and push the personal GitHub repository.
 - `scripts/init_learning_workspace.py`: initialize a personal learning repository after the skill is installed.
 - `scripts/validate_worksheet_spec.py`: validate worksheet JSON without writing outputs.
 - `scripts/publish_html_site.py`: publish child-facing worksheet HTML into a GitHub Pages `site/` directory.

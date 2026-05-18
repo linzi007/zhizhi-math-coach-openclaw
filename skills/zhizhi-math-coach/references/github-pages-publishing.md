@@ -24,6 +24,8 @@ The publisher writes:
 - `site/.nojekyll`: disables Jekyll processing.
 - `worksheets/YYYY-MM-DD-topic/publish.json`: publication manifest.
 
+This only produces local `site/` files. A public URL requires the personal learning repository to be pushed to GitHub and GitHub Pages to be configured for that repository.
+
 ## Public Content Rule
 
 Allowed in `site/`:
@@ -42,3 +44,5 @@ Forbidden in `site/`:
 ## OpenClaw Output Rule
 
 When Pages is configured, return the Pages URL to the parent and use it in Feishu notifications. Keep answer keys and diagnosis links outside published `site/` output.
+
+If the parent asks OpenClaw to sync, push, publish to GitHub, or send a public link, read `github-sync-authorization.md` first. Do not assume GitHub CLI is installed or authenticated. Use the Git preflight before committing or pushing, and if authorization is missing, return the local `site/` paths plus setup guidance.

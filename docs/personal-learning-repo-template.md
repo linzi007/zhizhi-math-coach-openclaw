@@ -44,6 +44,35 @@ git push -u origin main
 
 Open this personal repository as the OpenClaw workspace. The generated `.gitignore` ignores `skills/` by default, so downloaded ClawHub bundles are not committed into the personal learning repository.
 
+## GitHub Authorization On The OpenClaw Machine
+
+Do not assume the OpenClaw machine has GitHub CLI or saved credentials. Sync requires ordinary `git` plus either SSH authorization or an HTTPS personal access token.
+
+Preferred SSH setup:
+
+```bash
+git --version
+ssh -T git@github.com
+git remote set-url origin git@github.com:<user>/zhizhi-math-learning-data.git
+python3 skills/zhizhi-math-coach/scripts/check_git_sync.py --workspace . --check-push
+```
+
+HTTPS token setup, when SSH is unavailable:
+
+1. Create a fine-grained personal access token in GitHub: profile photo -> Settings -> Developer settings -> Personal access tokens -> Fine-grained tokens -> Generate new token.
+2. Select only the personal learning repository under repository access.
+3. Grant `Contents: Read and write` for normal commit/push sync.
+4. Grant `Workflows: Read and write` only if committing `.github/workflows/pages.yml`.
+5. Grant `Pages: Read and write` only if automation will manage GitHub Pages through the API.
+6. Set the remote to HTTPS and test push authorization:
+
+```bash
+git remote set-url origin https://github.com/<user>/zhizhi-math-learning-data.git
+git push --dry-run origin HEAD
+```
+
+When Git prompts for credentials, enter the GitHub username and use the token as the password. Never paste tokens into OpenClaw chat, commit them into files, or embed them in remote URLs.
+
 ## Working Directory Rules
 
 Use this personal repository for daily learning work:
@@ -80,7 +109,13 @@ The skill may write:
 - `worksheets/<date-topic>/` after worksheet generation;
 - `site/` and `worksheets/<date-topic>/publish.json` after publishing child-facing HTML.
 
-GitHub sync is explicit. In a private personal repository, use:
+GitHub sync is explicit. Before OpenClaw commits or pushes, run:
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/check_git_sync.py --workspace . --check-push
+```
+
+If authorization is missing, keep the generated local files and retry sync after SSH or token setup. In a private personal repository, use:
 
 ```bash
 git add curriculum knowledge-points memory mistakes records weak-points worksheets site

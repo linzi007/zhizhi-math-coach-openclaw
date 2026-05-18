@@ -17,6 +17,8 @@ V1 is a Skill-first release. It supports:
 - curriculum and textbook-scope references;
 - personal learning repository initialization;
 - recommended model capability guidance for vision, long-context records, structured output, and reasoning effort;
+- GitHub sync authorization guidance for SSH and fine-grained HTTPS tokens;
+- Git preflight checks that do not require GitHub CLI;
 - worksheet generation from JSON specs;
 - deterministic geometry SVG rendering for simple diagrams;
 - GitHub Pages publisher script for personal learning repositories;
@@ -55,3 +57,5 @@ For ClawHub publication, package only reusable skill files, docs, scripts, and s
 ## GitHub Pages
 
 This public skill repository should not commit generated `site/` output. Use `publish_html_site.py` from a personal learning repository, then enable Pages in that repository if public child-facing worksheet links are acceptable. The personal learning repository may be public or private; the user chooses.
+
+OpenClaw machines may not have GitHub CLI or credentials. Before any OpenClaw-initiated commit or push, run `scripts/check_git_sync.py` from the installed skill against the personal learning repository. If SSH is not configured, use a fine-grained token scoped only to the personal learning repository with `Contents: Read and write`; add `Workflows: Read and write` only for committing workflow files, and `Pages: Read and write` only for Pages API automation.

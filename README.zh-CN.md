@@ -23,6 +23,7 @@ skills/zhizhi-math-coach/
   scripts/generate_worksheet.py
   scripts/validate_worksheet_spec.py
   scripts/publish_html_site.py
+  scripts/check_git_sync.py
   assets/worksheet/
 docs/
 scripts/smoke_check.py
@@ -196,7 +197,37 @@ git remote add origin git@github.com:<user>/zhizhi-math-learning-data.git
 git push -u origin main
 ```
 
-生成的 `.gitignore` 默认忽略 `skills/`，避免把 ClawHub 下载的 skill bundle 提交到个人学习仓库。换机器使用时重新安装 skill 即可。
+生成的 `.gitignore` 默认忽略 `skills/`，避免把 ClawHub 下载的 skill bundle 提交到个人学习仓库。换机器使用时重新安装 skill 即可。如果第一次 `git push` 失败，本地学习工作区仍然可以正常使用；先在当前 OpenClaw 机器上完成 GitHub 授权，再重试同步。
+
+## GitHub 授权与同步
+
+OpenClaw 运行的机器不一定安装了 GitHub CLI，也不一定已经登录 GitHub。同步只依赖普通 `git`、正确的 remote，以及当前机器具备 push 权限。`gh` 命令是可选项，不是必需项。
+
+优先推荐 SSH：
+
+```bash
+git --version
+ssh -T git@github.com
+git remote set-url origin git@github.com:<user>/zhizhi-math-learning-data.git
+python3 skills/zhizhi-math-coach/scripts/check_git_sync.py --workspace . --check-push
+```
+
+如果不能使用 SSH，可以为个人学习仓库创建 fine-grained GitHub personal access token：
+
+- 创建入口：GitHub 网页 -> 头像 -> Settings -> Developer settings -> Personal access tokens -> Fine-grained tokens -> Generate new token。
+- Repository access：只选择个人学习仓库，例如 `zhizhi-math-learning-data`。
+- 日常同步权限：`Contents: Read and write`。
+- 可选 workflow 权限：只有需要提交 `.github/workflows/pages.yml` 时，才额外授予 `Workflows: Read and write`。
+- 可选 Pages API 权限：只有自动化要通过 GitHub API 配置 Pages 时，才额外授予 `Pages: Read and write`。如果家长在 GitHub Settings 页面手动开启 Pages，不需要这个权限。
+
+HTTPS token 使用方式：
+
+```bash
+git remote set-url origin https://github.com/<user>/zhizhi-math-learning-data.git
+git push --dry-run origin HEAD
+```
+
+当 Git 提示输入凭据时，用户名填 GitHub 用户名，密码位置填 token。不要把 token 粘贴到 OpenClaw 对话里，也不要写入仓库文件或 remote URL。
 
 ## 本地更新和同步如何触发
 
@@ -216,7 +247,15 @@ $zhizhi-math-coach 根据最近错题生成变式练习。
 - 发布学生版页面会更新 `site/` 和 `worksheets/<date-topic>/publish.json`；
 - OpenClaw 定时任务默认只提醒或建议，不自动写学习记录，也不自动出卷，除非家长明确要求。
 
-同步到 GitHub 只在个人学习仓库里执行 Git 提交和推送时发生。若个人学习仓库是 private，可以同步完整学习状态：
+同步到 GitHub 只在用户明确要求同步、push、发布、发链接，或用户自己在个人学习仓库里执行 Git 提交和推送时发生。OpenClaw 提交或推送前应先运行：
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/check_git_sync.py --workspace . --check-push
+```
+
+如果预检失败，本地生成文件仍然有效；完成 SSH 或 token 授权后可以重试同步。
+
+若个人学习仓库是 private，可以同步完整学习状态：
 
 ```bash
 git add curriculum knowledge-points memory mistakes records weak-points worksheets site

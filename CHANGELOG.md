@@ -11,3 +11,4 @@
 - Added complex word-problem item types and worksheet spec validation.
 - Added OpenClaw automation and plugin-tool roadmap docs.
 - Added GitHub Pages publishing for child-facing worksheet HTML.
+- Added GitHub sync authorization guidance and a plain-git preflight checker.
