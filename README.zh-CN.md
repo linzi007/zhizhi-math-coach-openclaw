@@ -128,6 +128,34 @@ git push -u origin main
 
 之后在这个个人学习仓库中打开 OpenClaw，同时从本公开仓库安装或引用 `zhizhi-math-coach` skill。
 
+## 本地更新和同步如何触发
+
+默认没有后台自动同步。
+
+当 OpenClaw 在个人学习仓库中工作，并且用户触发 skill 时，才会读写本地学习文件。例如：
+
+```text
+$zhizhi-math-coach 批改这张练习卷，记录薄弱项。
+$zhizhi-math-coach 根据最近错题生成变式练习。
+```
+
+常见写入触发点：
+
+- 批改或诊断会更新 `records/`、`mistakes/`、`weak-points/`，必要时更新 `memory/`；
+- 出卷会更新 `worksheets/<date-topic>/worksheet-spec.json`、`worksheet.html` 和 `answer-key.md`；
+- 发布学生版页面会更新 `site/` 和 `worksheets/<date-topic>/publish.json`；
+- OpenClaw 定时任务默认只提醒或建议，不自动写学习记录，也不自动出卷，除非家长明确要求。
+
+同步到 GitHub 只在个人学习仓库里执行 Git 提交和推送时发生。若个人学习仓库是 private，可以同步完整学习状态：
+
+```bash
+git add curriculum knowledge-points memory mistakes records weak-points worksheets site
+git commit -m "Update learning records"
+git push
+```
+
+若个人学习仓库是 public，只提交适合公开的文件。多数情况下只提交 `site/`，或提交已脱敏、无答案、无学生身份信息的练习卷文件。
+
 ## 出卷方式
 
 当前支持的出卷策略包括：

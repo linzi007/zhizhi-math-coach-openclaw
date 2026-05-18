@@ -34,6 +34,33 @@ git push -u origin main
 
 Open this personal repository as the OpenClaw workspace. Install or reference the reusable `zhizhi-math-coach` skill from the public repository.
 
+## Trigger Model
+
+OpenClaw does not automatically sync this repository in the background.
+
+Local updates happen when OpenClaw is opened in this personal repository and the user invokes the reusable skill:
+
+```text
+$zhizhi-math-coach 批改这张练习卷，记录薄弱项。
+$zhizhi-math-coach 根据最近错题生成变式练习。
+```
+
+The skill may write:
+
+- `records/`, `mistakes/`, `weak-points/`, and `memory/` after grading or diagnosis;
+- `worksheets/<date-topic>/` after worksheet generation;
+- `site/` and `worksheets/<date-topic>/publish.json` after publishing child-facing HTML.
+
+GitHub sync is explicit. In a private personal repository, use:
+
+```bash
+git add curriculum knowledge-points memory mistakes records weak-points worksheets site
+git commit -m "Update learning records"
+git push
+```
+
+In a public personal repository, only commit files that are safe to expose. Usually that means `site/` only, or sanitized worksheet files without answers, student identifiers, photos, uploads, or textbook-derived raw material.
+
 ## Suggested `.gitignore`
 
 ```gitignore

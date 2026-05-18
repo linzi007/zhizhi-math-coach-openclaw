@@ -40,6 +40,18 @@ Use these paths in the user's personal learning project unless they provide diff
 - `worksheets/YYYY-MM-DD-<topic-slug>/worksheet.html`: child-facing printable worksheet.
 - `worksheets/YYYY-MM-DD-<topic-slug>/answer-key.md`: answers, grading, and next-step rules.
 
+## Trigger And Sync Boundary
+
+This skill is triggered by the user's OpenClaw request, such as `$zhizhi-math-coach 批改...` or `$zhizhi-math-coach 出一张...`, while the working directory is the personal learning project.
+
+Do not assume background sync. Local files are changed by the current task only:
+
+- grading or diagnosis may write `records/`, `mistakes/`, `weak-points/`, and evidence-backed `memory/` updates;
+- worksheet generation may write `worksheets/<date-topic>/worksheet-spec.json`, `worksheet.html`, and `answer-key.md`;
+- publishing may write `site/` and `worksheets/<date-topic>/publish.json`.
+
+Do not run `git add`, `git commit`, or `git push` unless the parent explicitly asks to sync the personal repository. If the personal repository is public, warn before committing sensitive learning records or answer keys.
+
 Skill resources are relative to `{baseDir}`:
 
 - `references/grading-diagnosis-rubric.md`: grading and diagnosis fields.

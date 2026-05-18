@@ -129,6 +129,34 @@ git push -u origin main
 
 Open this personal repository as the OpenClaw workspace, while keeping the reusable skill installed from this public repository.
 
+## What Triggers Local Updates And Sync
+
+There is no background sync by default.
+
+Local learning files are updated when OpenClaw is working inside the personal learning repository and the user invokes the skill, for example:
+
+```text
+$zhizhi-math-coach 批改这张练习卷，记录薄弱项。
+$zhizhi-math-coach 根据最近错题生成变式练习。
+```
+
+Typical write triggers:
+
+- grading or diagnosis updates `records/`, `mistakes/`, `weak-points/`, and sometimes `memory/`;
+- worksheet generation updates `worksheets/<date-topic>/worksheet-spec.json`, `worksheet.html`, and `answer-key.md`;
+- publishing updates `site/` and `worksheets/<date-topic>/publish.json`;
+- scheduled OpenClaw tasks only remind or suggest by default, unless the parent explicitly asks them to write records or generate worksheets.
+
+GitHub sync happens only when the user commits and pushes from the personal learning repository. For a private personal repository, this can archive the full learning state:
+
+```bash
+git add curriculum knowledge-points memory mistakes records weak-points worksheets site
+git commit -m "Update learning records"
+git push
+```
+
+For a public personal repository, commit only files that are safe to expose. In most cases that means `site/` only, or sanitized worksheet files without answers or student identifiers.
+
 ## Publish Child-Facing HTML From The Personal Repository
 
 When public worksheet links are acceptable, run the publisher in the personal learning repository. It publishes only child-facing HTML into that repository's `site/` directory:
