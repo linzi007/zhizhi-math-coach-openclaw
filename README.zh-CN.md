@@ -21,9 +21,12 @@ skills/zhizhi-math-coach/
   references/
   scripts/generate_worksheet.py
   scripts/validate_worksheet_spec.py
+  scripts/publish_html_site.py
   assets/worksheet/
+.github/workflows/pages.yml
 docs/
 scripts/smoke_check.py
+site/
 examples/student-workspace/
   curriculum/
   knowledge-points/
@@ -134,6 +137,29 @@ python3 scripts/smoke_check.py
 ```
 
 如果需要校验打印页数，可在生成命令中添加 `--verify-print`，并确保本机安装 Chrome 或 Chromium。
+
+## 发布学生版 HTML 到 GitHub Pages
+
+如果你接受练习卷公开访问，可以只把学生版 HTML 发布到 `site/`：
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
+  examples/student-workspace/worksheets \
+  --base-url https://linzi007.github.io/zhizhi-math-coach-openclaw
+```
+
+脚本会生成：
+
+- `site/index.html`：公开练习卷列表。
+- `site/worksheets/<slug>/index.html`：可查看和打印的学生版练习卷。
+- `site/.nojekyll`：GitHub Pages 静态站点标记。
+- `worksheets/<date-topic>/publish.json`：在私有学习工作区运行时记录发布信息。
+
+`site/` 只放学生可见内容。不要把答案、批改记录、长短期记忆、薄弱项历史、上传试卷、教材 PDF 或 OCR 内容放进去。
+
+飞书里建议发送 GitHub Pages 链接，答案和批改标准仍保存在私有仓库。
+
+要在线访问这些页面，需要在 GitHub 仓库 Settings -> Pages 中启用 Pages，并选择 **GitHub Actions** 作为部署来源。本仓库自带的 workflow 会发布已提交的 `site/` 目录。
 
 ## 教材使用边界
 

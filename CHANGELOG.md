@@ -10,3 +10,4 @@
 - Added deterministic `geometry_problem` rendering through structured SVG specs.
 - Added complex word-problem item types and worksheet spec validation.
 - Added OpenClaw automation and plugin-tool roadmap docs.
+- Added GitHub Pages publishing for child-facing worksheet HTML.

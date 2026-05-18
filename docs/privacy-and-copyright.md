@@ -8,6 +8,7 @@ The public repository may include:
 - generators and validators;
 - empty or sanitized templates;
 - synthetic sample mistakes and worksheets;
+- public child-facing worksheet HTML without answers or student identifiers;
 - external source links.
 
 The public repository must not include:
@@ -21,6 +22,20 @@ The public repository must not include:
 - textbook screenshots or scans;
 - OCR dumps from textbooks;
 - copied textbook problem sets.
+
+## Public GitHub Pages
+
+GitHub Pages may be used for child-facing worksheet HTML when public access is acceptable.
+
+The Pages `site/` directory must not include:
+
+- answer keys;
+- grading or diagnosis records;
+- memory files;
+- weak-point history;
+- real student names or school names;
+- uploaded school papers or completed worksheet photos;
+- textbook PDFs, screenshots, scans, or OCR output.
 
 ## Private Learning Workspace
 

@@ -54,10 +54,12 @@ Skill resources are relative to `{baseDir}`:
 - `references/complex-problem-generation.md`: complex word-problem and review safeguards.
 - `references/geometry-generation.md`: deterministic SVG geometry rules.
 - `references/automation-openclaw.md`: scheduled reminders, channels, and automation boundaries.
+- `references/github-pages-publishing.md`: public child-facing HTML worksheet publishing rules.
 - `references/worksheet-standards.md`: child-facing printable worksheet rules.
 - `references/student-profile-template.md`: starter profile format.
 - `scripts/generate_worksheet.py`: generate worksheet HTML and answer key from JSON.
 - `scripts/validate_worksheet_spec.py`: validate worksheet JSON without writing outputs.
+- `scripts/publish_html_site.py`: publish child-facing worksheet HTML into a GitHub Pages `site/` directory.
 - `assets/worksheet/question-types.json`: reusable worksheet item types.
 - `assets/worksheet/a4-single.html`: printable HTML template.
 
@@ -123,7 +125,16 @@ python3 {baseDir}/scripts/generate_worksheet.py \
   worksheets/YYYY-MM-DD-topic/worksheet-spec.json
 ```
 
-Reply with file paths, item count, target weak point, and page count only if checked. Do not paste full worksheet HTML or full answer keys unless asked.
+If the parent wants a Feishu-clickable page and accepts public worksheet links, publish only the child-facing worksheet HTML:
+
+```bash
+python3 {baseDir}/scripts/publish_html_site.py \
+  worksheets/YYYY-MM-DD-topic \
+  --workspace <private-learning-workspace> \
+  --base-url https://<github-user>.github.io/<repo>
+```
+
+Reply with file paths, item count, target weak point, and Pages URL when available. Do not paste full worksheet HTML or full answer keys unless asked.
 
 ## Teaching Defaults
 
@@ -195,12 +206,15 @@ Scheduled OpenClaw tasks should default to reminders and suggestions:
 
 Do not let scheduled tasks automatically change weak-point status, memory, or generate new worksheets unless the parent explicitly asked for that behavior.
 
+Feishu notifications should prefer GitHub Pages worksheet links when configured; keep answer keys and diagnosis records private.
+
 ## Output Rules
 
 When generating worksheets:
 
 - Keep `worksheet.html` child-facing and answer-free.
 - Keep answers, grading labels, explanation notes, and reassessment rules in `answer-key.md`.
+- Only child-facing `worksheet.html` may be published to GitHub Pages. Do not publish answer keys, records, memories, weak-point histories, student photos, or textbook files.
 - Use `worksheet-spec.json` as the source of truth.
 - Add new stable item types to `assets/worksheet/question-types.json` and `scripts/generate_worksheet.py`.
 - Include name/date/time/score fields and enough working space.

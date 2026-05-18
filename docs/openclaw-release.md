@@ -17,6 +17,7 @@ V1 is a Skill-first release. It supports:
 - curriculum and textbook-scope references;
 - worksheet generation from JSON specs;
 - deterministic geometry SVG rendering for simple diagrams;
+- GitHub Pages publishing for public child-facing worksheet HTML;
 - validation and smoke checks.
 
 V1 does not ship an OpenClaw plugin tool package. Plugin interfaces are documented in `docs/plugin-tools-roadmap.md`.
@@ -48,3 +49,7 @@ $zhizhi-math-coach 给家长一份周长知识点讲解稿。
 ```
 
 For ClawHub publication, package only reusable skill files, docs, scripts, and sanitized examples.
+
+## GitHub Pages
+
+To publish the public demo worksheets, enable Pages in repository settings and choose GitHub Actions as the source. The workflow deploys the committed `site/` directory only.

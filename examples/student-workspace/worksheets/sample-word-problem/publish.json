@@ -1,0 +1,12 @@
+{
+  "title": "条件取舍应用题小练",
+  "date": "2026-05-18",
+  "topic": "condition-filtering-word-problem",
+  "strategy": "diagnostic_probe",
+  "source_worksheet": "examples/student-workspace/worksheets/sample-word-problem/worksheet.html",
+  "source_spec": "examples/student-workspace/worksheets/sample-word-problem/worksheet-spec.json",
+  "site_path": "site/worksheets/sample-word-problem/index.html",
+  "url": "https://linzi007.github.io/zhizhi-math-coach-openclaw/worksheets/sample-word-problem/",
+  "visibility": "public-child-facing",
+  "published_at": "2026-05-18T08:27:29+00:00"
+}

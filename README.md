@@ -22,9 +22,12 @@ skills/zhizhi-math-coach/
   references/
   scripts/generate_worksheet.py
   scripts/validate_worksheet_spec.py
+  scripts/publish_html_site.py
   assets/worksheet/
+.github/workflows/pages.yml
 docs/
 scripts/smoke_check.py
+site/
 examples/student-workspace/
   curriculum/
   knowledge-points/
@@ -90,6 +93,27 @@ python3 scripts/smoke_check.py
 
 If browser print verification is needed, add `--verify-print` to generation and make sure Chrome or Chromium is installed.
 
+## Publish Child-Facing HTML To GitHub Pages
+
+When public worksheet links are acceptable, publish only the child-facing HTML into `site/`:
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
+  examples/student-workspace/worksheets \
+  --base-url https://linzi007.github.io/zhizhi-math-coach-openclaw
+```
+
+The publisher writes:
+
+- `site/index.html`: public worksheet list.
+- `site/worksheets/<slug>/index.html`: printable child-facing worksheet page.
+- `site/.nojekyll`: GitHub Pages static-site marker.
+- `worksheets/<date-topic>/publish.json`: publication manifest when run in a private learning workspace.
+
+Do not publish answer keys, grading records, memory files, weak-point history, uploaded papers, or textbook files to `site/`.
+
+To publish on GitHub, enable Pages in the repository settings and choose **GitHub Actions** as the build/deploy source. The bundled workflow deploys the committed `site/` directory.
+
 ## Supported Worksheet Strategies
 
 - `wrong_question_variant`: create variants from known wrong questions.
@@ -104,6 +128,8 @@ If browser print verification is needed, add `--verify-print` to generation and 
 - `geometry_drill`: render deterministic SVG/HTML geometry items from structured specs.
 
 When a parent only says "出一张练习卷", confirm purpose, content scope, length, and output format before generating.
+
+For Feishu delivery, prefer sending the GitHub Pages worksheet URL when the page is public-safe. Keep `answer-key.md` private.
 
 ## Curriculum Boundary
 

@@ -16,11 +16,14 @@ The generator writes:
 - `worksheet.html`: child-facing practice.
 - `answer-key.md`: parent-facing answers and grading rules.
 
+If the worksheet is published to GitHub Pages, publish only the child-facing worksheet. Do not put answers, diagnosis records, memory files, or source photos under `site/`.
+
 ## Child-Facing Page
 
 - Title names the target topic directly.
 - Include `姓名`、`日期`、`用时`、`正确题数`.
 - Keep reminders short; never put answers on the worksheet.
+- Do not include student names, school names, source-file names, or diagnosis labels when the page will be public.
 - Use section names such as `先判断`、`再计算`、`挑战一下`.
 - Leave visible working space for drawing, vertical forms, or equations.
 - For classification tasks, prefer `圈一圈`、`打勾`、`连线` or printed choices over writing difficult Chinese characters.

@@ -15,7 +15,27 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SKILL_DIR = REPO_ROOT / "skills" / "zhizhi-math-coach"
 GENERATOR_PATH = SKILL_DIR / "scripts" / "generate_worksheet.py"
 VALIDATOR_PATH = SKILL_DIR / "scripts" / "validate_worksheet_spec.py"
+PUBLISHER_PATH = SKILL_DIR / "scripts" / "publish_html_site.py"
 FORBIDDEN_PUBLIC_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".heic"}
+FORBIDDEN_SITE_PARTS = {
+    "answer-key.md",
+    "records",
+    "mistakes",
+    "memory",
+    "weak-points",
+    "knowledge-points",
+    "curriculum",
+    "uploads",
+    "textbooks",
+    "ocr-output",
+}
+FORBIDDEN_SITE_MARKERS = {
+    "answer_detail",
+    "答案与批改标准",
+    "## 答案",
+    "批改重点",
+    "复评标准",
+}
 
 
 def fail(message: str) -> None:
@@ -84,10 +104,30 @@ def check_worksheet_specs() -> None:
                 fail(f"child-facing worksheet leaked answer_detail field for {spec_path}")
 
 
+def check_site_public_boundary() -> None:
+    site_dir = REPO_ROOT / "site"
+    if not site_dir.exists():
+        return
+    for path in site_dir.rglob("*"):
+        if set(path.parts) & FORBIDDEN_SITE_PARTS:
+            fail(f"forbidden path in public site: {path.relative_to(REPO_ROOT)}")
+        if path.is_file() and path.suffix.lower() == ".html":
+            text = path.read_text(encoding="utf-8")
+            for marker in FORBIDDEN_SITE_MARKERS:
+                if marker in text:
+                    fail(f"public site html contains forbidden marker {marker!r}: {path.relative_to(REPO_ROOT)}")
+
+
+def check_publisher_loads() -> None:
+    load_module(PUBLISHER_PATH, "worksheet_publisher")
+
+
 def main() -> int:
     check_skill_identity()
     check_no_public_binary_sources()
     check_worksheet_specs()
+    check_site_public_boundary()
+    check_publisher_loads()
     print("ok: repository smoke check passed")
     return 0
 

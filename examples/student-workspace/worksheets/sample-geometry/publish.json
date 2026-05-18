@@ -1,0 +1,12 @@
+{
+  "title": "长方形周长图形小练",
+  "date": "2026-05-18",
+  "topic": "rectangle-perimeter",
+  "strategy": "geometry_drill",
+  "source_worksheet": "examples/student-workspace/worksheets/sample-geometry/worksheet.html",
+  "source_spec": "examples/student-workspace/worksheets/sample-geometry/worksheet-spec.json",
+  "site_path": "site/worksheets/sample-geometry/index.html",
+  "url": "https://linzi007.github.io/zhizhi-math-coach-openclaw/worksheets/sample-geometry/",
+  "visibility": "public-child-facing",
+  "published_at": "2026-05-18T08:27:29+00:00"
+}
