@@ -44,6 +44,10 @@ Use these paths in the user's personal learning project unless they provide diff
 
 This skill is triggered by the user's OpenClaw request, such as `$zhizhi-math-coach 批改...` or `$zhizhi-math-coach 出一张...`, while the working directory is the personal learning project.
 
+Always treat the current workspace root as the personal learning project root for `memory/`, `weak-points/`, `mistakes/`, `records/`, `curriculum/`, `knowledge-points/`, `worksheets/`, and `site/`. The reusable skill repository only provides instructions, scripts, references, templates, and sanitized examples.
+
+If the current workspace appears to be `zhizhi-math-coach-openclaw` or otherwise contains `skills/zhizhi-math-coach` as the reusable skill source, warn before writing student learning data. Only write there when the user explicitly says this repository is the intended personal learning workspace or the task is skill development with sanitized examples.
+
 Do not assume background sync. Local files are changed by the current task only:
 
 - grading or diagnosis may write `records/`, `mistakes/`, `weak-points/`, and evidence-backed `memory/` updates;

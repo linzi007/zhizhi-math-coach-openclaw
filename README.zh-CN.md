@@ -60,6 +60,46 @@ $zhizhi-math-coach 针对退位减法薄弱项出专项练习，并给答案和�
 $zhizhi-math-coach 生成一年级下册人教版当前范围的期末错因复习卷。
 ```
 
+## 两个目录如何协作
+
+正常使用时有两个不同目录：
+
+```text
+zhizhi-math-coach-openclaw/        # 通用 skill 仓库
+  skills/zhizhi-math-coach/        # SKILL.md、references、scripts、templates
+  examples/student-workspace/      # 初始化模板和脱敏示例
+
+zhizhi-math-learning-data/         # 个人学习仓库，作为 OpenClaw workspace 打开
+  curriculum/
+  knowledge-points/
+  memory/
+  mistakes/
+  records/
+  weak-points/
+  worksheets/
+  site/
+```
+
+`zhizhi-math-coach-openclaw` 提供能力，`zhizhi-math-learning-data` 保存真实学习数据和生成结果。
+
+OpenClaw 运行 `$zhizhi-math-coach` 时，可以从 `zhizhi-math-coach-openclaw/skills/zhizhi-math-coach` 加载 skill 指令，但学习文件会从当前 OpenClaw workspace 读取，并写回当前 workspace。正常使用时，这个 workspace 应该是 `zhizhi-math-learning-data/`。
+
+工作目录规则：
+
+- 日常批改、诊断、讲解、出卷、发布学生版页面、同步个人学习数据：在 `zhizhi-math-learning-data/` 中工作。
+- 修改 skill、更新模板、生成脱敏示例、运行 smoke check、改 README、准备 GitHub/ClawHub 发布：切到 `zhizhi-math-coach-openclaw/`。
+- 不要在学生日常学习会话中把 `zhizhi-math-coach-openclaw/` 当 workspace 使用。
+- 不确定当前目录时，先看 `pwd`。如果路径结尾是 `zhizhi-math-coach-openclaw`，说明你在维护通用 skill，不是在维护学生学习档案。
+
+输出位置：
+
+- 批改或诊断会写入个人仓库的 `records/`、`mistakes/`、`weak-points/`，必要时更新 `memory/`；
+- 知识点讲解会写入或更新个人仓库的 `knowledge-points/`；
+- 出卷会写入个人仓库的 `worksheets/<date-topic>/worksheet-spec.json`、`worksheet.html` 和 `answer-key.md`；
+- 发布学生版页面会写入个人仓库的 `site/` 和 `worksheets/<date-topic>/publish.json`。
+
+脚本仍然可以从 skill 仓库路径调用，但输入和 workspace 参数要指向个人学习仓库。例如在 `zhizhi-math-learning-data/` 目录中运行 `publish_html_site.py` 时，`--workspace .` 才表示发布到个人学习仓库。
+
 ## 学习工作区
 
 建议在个人学习项目中使用以下结构：

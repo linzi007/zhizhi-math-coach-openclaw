@@ -63,6 +63,48 @@ $zhizhi-math-coach 针对退位减法薄弱项出专项练习，并给答案和�
 $zhizhi-math-coach 生成一年级下册人教版当前范围的期末错因复习卷。
 ```
 
+## Two Folder Model
+
+There are two different folders in normal use:
+
+```text
+zhizhi-math-coach-openclaw/        # reusable skill repository
+  skills/zhizhi-math-coach/        # SKILL.md, references, scripts, templates
+  examples/student-workspace/      # starter template and sanitized examples
+
+zhizhi-math-learning-data/         # personal learning repository, opened as the OpenClaw workspace
+  curriculum/
+  knowledge-points/
+  memory/
+  mistakes/
+  records/
+  weak-points/
+  worksheets/
+  site/
+```
+
+The skill repository provides the capability. The personal learning repository stores the data and generated outputs.
+
+When OpenClaw runs `$zhizhi-math-coach`, the skill instructions may be loaded from `zhizhi-math-coach-openclaw/skills/zhizhi-math-coach`, but learning files are read from and written to the current OpenClaw workspace. In normal use, that workspace should be `zhizhi-math-learning-data/`.
+
+Working directory rules:
+
+- Daily grading, diagnosis, explanation, worksheet generation, worksheet publishing, and Git sync: work inside `zhizhi-math-learning-data/`.
+- Skill development, template changes, sample generation, smoke checks, README updates, and ClawHub/GitHub release work: work inside `zhizhi-math-coach-openclaw/`.
+- Do not switch to `zhizhi-math-coach-openclaw/` for a student's normal learning session.
+- When in doubt, run `pwd` first. If the path ends in `zhizhi-math-coach-openclaw`, you are editing the reusable skill repository, not the student's learning archive.
+
+Output locations:
+
+- grading or diagnosis writes `records/`, `mistakes/`, `weak-points/`, and sometimes `memory/` in the personal repository;
+- explanation cards write or update `knowledge-points/` in the personal repository;
+- worksheet generation writes `worksheets/<date-topic>/worksheet-spec.json`, `worksheet.html`, and `answer-key.md` in the personal repository;
+- publishing writes `site/` and `worksheets/<date-topic>/publish.json` in the personal repository.
+
+Scripts can still be executed from the skill repository path, but their input and workspace arguments should point to the personal repository. For example, run `publish_html_site.py` from `zhizhi-math-coach-openclaw`, with `--workspace .` only when the shell is currently inside `zhizhi-math-learning-data/`.
+
+Do not run regular student learning sessions with `zhizhi-math-coach-openclaw` as the workspace. If you do, generated learning data may be written into the reusable skill repository, which is only appropriate for development or sanitized examples.
+
 ## Generate A Sample Worksheet
 
 From the repository root:

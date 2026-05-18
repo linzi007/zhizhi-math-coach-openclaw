@@ -34,6 +34,25 @@ git push -u origin main
 
 Open this personal repository as the OpenClaw workspace. Install or reference the reusable `zhizhi-math-coach` skill from the public repository.
 
+## Working Directory Rules
+
+Use this personal repository for daily learning work:
+
+- grading and diagnosis;
+- explanation cards;
+- worksheet generation;
+- publishing child-facing pages;
+- committing and pushing learning data.
+
+Use `zhizhi-math-coach-openclaw/` only for reusable skill maintenance:
+
+- editing `skills/zhizhi-math-coach/`;
+- updating templates or sanitized examples;
+- running `scripts/smoke_check.py`;
+- preparing GitHub or ClawHub releases.
+
+If the current directory is `zhizhi-math-coach-openclaw/`, do not run a normal student learning session there. Generated student data would be written into the reusable skill repository instead of this personal learning repository.
+
 ## Trigger Model
 
 OpenClaw does not automatically sync this repository in the background.
