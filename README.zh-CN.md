@@ -108,6 +108,20 @@ OpenClaw 运行 `$zhizhi-math-coach` 时，会从 `skills/zhizhi-math-coach` 加
 
 脚本可以从已安装的 skill 路径调用，但输入和 workspace 参数要指向个人学习仓库。例如在 `zhizhi-math-learning-data/` 目录中运行 `skills/zhizhi-math-coach/scripts/publish_html_site.py` 时，`--workspace .` 才表示发布到个人学习仓库。
 
+## 推荐模型和原因
+
+建议使用支持图片理解的前沿推理模型。如果使用 OpenAI API，建议使用 `gpt-5.2` 或更新的 GPT-5.x 前沿模型；日常使用从 medium reasoning 起步，复杂场景再提高 reasoning。
+
+原因是这个 skill 不只是文本问答，经常需要：
+
+- 读取练习卷照片、孩子手写答案、老师批改痕迹和几何图形；
+- 判断手写不清、照片裁切、题目缺失等情况，并标记 `need-confirmation`，而不是硬猜；
+- 跨 `memory/`、`records/`、`mistakes/`、`weak-points/` 对比历史薄弱项和复发情况；
+- 稳定生成 `worksheet-spec.json`、可打印 HTML、答案、批改标准和诊断记录；
+- 处理复杂应用题、几何题、期中/期末复习规划，以及“会做同类题但换问法就错”的迁移失败。
+
+不建议用小型纯文本模型做拍照批改、几何图形题、复杂应用题或长期记忆更新。小模型可以用于提醒、整理格式、更新清单这类低风险任务。
+
 ## 学习工作区
 
 建议在个人学习项目中使用以下结构：

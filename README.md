@@ -113,6 +113,20 @@ Scripts can be executed from the installed skill path, and their input and works
 
 Do not run regular student learning sessions with `zhizhi-math-coach-openclaw` as the workspace. If you do, generated learning data may be written into the reusable skill repository, which is only appropriate for development or sanitized examples.
 
+## Recommended Model
+
+Use a vision-capable frontier reasoning model. For OpenAI API setups, use `gpt-5.2` or a newer GPT-5.x frontier model when available; start with medium reasoning for daily use and raise reasoning for hard cases.
+
+This is recommended because the skill often needs to:
+
+- read worksheet photos, handwritten answers, teacher marks, and geometry diagrams;
+- identify unclear handwriting or cropped photos and ask for confirmation instead of guessing;
+- compare new mistakes with long-term `memory/`, `records/`, `mistakes/`, and `weak-points/`;
+- create valid `worksheet-spec.json`, printable HTML, answer keys, and dated diagnosis records;
+- reason through multi-step word problems, geometry, exam review plans, and transfer-failure patterns.
+
+Avoid small text-only models for photo grading, geometry, complex word problems, or memory updates. They may be acceptable for simple reminders or formatting existing records.
+
 ## Generate A Sample Worksheet
 
 From the repository root:

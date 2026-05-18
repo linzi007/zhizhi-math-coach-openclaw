@@ -1,6 +1,6 @@
 ---
 name: zhizhi-math-coach
-description: "Use when coaching Chinese primary-school math with persistent local records: grade worksheets or wrong questions, infer causes and weak points, update learning memory, align with China grade/semester and textbook scope, explain knowledge points for parents or students, and generate targeted printable HTML worksheets from compact specs."
+description: "Use when coaching Chinese primary-school math with persistent local records: grade worksheet photos or wrong questions, infer causes and weak points, update learning memory, align with China grade/semester and textbook scope, explain knowledge points, and generate targeted printable HTML worksheets. Recommended with a vision-capable reasoning model."
 ---
 
 # Zhizhi Math Coach
@@ -54,6 +54,31 @@ python3 {baseDir}/scripts/init_learning_workspace.py \
 ```
 
 The initializer creates missing files only by default. Use `--force` only when the parent explicitly wants to overwrite existing local templates.
+
+## Recommended Model Capability
+
+Prefer a frontier multimodal reasoning model for this skill. The model should support:
+
+- image understanding for worksheet photos, handwritten answers, and teacher-marked papers;
+- long-context reading across local `memory/`, `weak-points/`, `records/`, `curriculum/`, and worksheet files;
+- reliable tool use and local file edits;
+- structured JSON/text output for worksheet specs, diagnosis records, and progress updates;
+- configurable reasoning effort.
+
+Why this matters:
+
+- Photo grading is common: parents will upload exercise sheets, teacher corrections, or handwritten answers. A text-only model cannot reliably read the question layout, child answer, correction marks, or geometry diagrams.
+- Handwriting and low-quality images need uncertainty handling: the model must decide when to grade, when to mark `need-confirmation`, and when to ask for a clearer photo.
+- Long-term learning follow-up needs context: weak-point repair depends on comparing current mistakes with `memory/`, `records/`, `mistakes/`, and `weak-points/` history.
+- Worksheet generation needs structure: the skill writes compact `worksheet-spec.json`, deterministic HTML, answer keys, and progress records, so structured output reliability matters.
+- Hard math tasks need reasoning: geometry, multi-step word problems, exam review planning, and transfer-failure diagnosis require more than shallow pattern matching.
+
+Recommended settings:
+
+- Default daily use: balanced reasoning, such as OpenAI `gpt-5.2` or a newer frontier GPT-5.x model with medium reasoning.
+- Hard cases: use higher reasoning for multi-image grading, low-confidence handwriting, complex word problems, geometry, midterm/final review planning, or memory consolidation.
+- Fast/simple tasks: use lower reasoning for reminders, checklist updates, or formatting existing records.
+- Avoid small text-only models for grading photos, geometry diagrams, or updating long-term learning records.
 
 ## Trigger And Sync Boundary
 

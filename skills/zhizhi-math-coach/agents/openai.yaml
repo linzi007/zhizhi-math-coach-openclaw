@@ -1,4 +1,4 @@
 interface:
   display_name: "Zhizhi Math Coach"
-  short_description: "Grade, explain, track, and print math practice"
-  default_prompt: "Use $zhizhi-math-coach to grade math work, infer weak points and causes, update progress records, explain knowledge points, and generate targeted printable practice."
+  short_description: "Vision-capable math grading and practice"
+  default_prompt: "Use $zhizhi-math-coach with a vision-capable reasoning model to grade math work, infer weak points, update progress records, explain knowledge points, and generate targeted printable practice."
