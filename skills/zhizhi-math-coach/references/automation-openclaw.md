@@ -27,7 +27,7 @@ For push delivery, use a channel adapter. Feishu/Lark is the default v1 recommen
 
 ## Safety
 
-- Do not send private student files to public channels.
+- Do not send sensitive student files to public channels.
 - Do not push full answer keys into a child-facing chat.
 - Do not infer new mastery status from time alone.
 - Do not schedule automatic worksheet generation by default.

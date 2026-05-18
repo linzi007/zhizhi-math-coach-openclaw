@@ -17,7 +17,7 @@ V1 is a Skill-first release. It supports:
 - curriculum and textbook-scope references;
 - worksheet generation from JSON specs;
 - deterministic geometry SVG rendering for simple diagrams;
-- GitHub Pages publishing for public child-facing worksheet HTML;
+- GitHub Pages publisher script for personal learning repositories;
 - validation and smoke checks.
 
 V1 does not ship an OpenClaw plugin tool package. Plugin interfaces are documented in `docs/plugin-tools-roadmap.md`.
@@ -52,4 +52,4 @@ For ClawHub publication, package only reusable skill files, docs, scripts, and s
 
 ## GitHub Pages
 
-To publish the public demo worksheets, enable Pages in repository settings and choose GitHub Actions as the source. The workflow deploys the committed `site/` directory only.
+This public skill repository should not commit generated `site/` output. Use `publish_html_site.py` from a personal learning repository, then enable Pages in that repository if public child-facing worksheet links are acceptable. The personal learning repository may be public or private; the user chooses.

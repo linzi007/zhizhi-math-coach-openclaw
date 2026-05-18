@@ -76,6 +76,6 @@ Output:
 ## Guardrails
 
 - Tools should operate on explicit local paths only.
-- Tools should not upload private student files.
+- Tools should not upload sensitive student files.
 - Tools should never write learning records unless the caller explicitly asks.
 - Tools should return structured warnings instead of silently fixing ambiguous math.

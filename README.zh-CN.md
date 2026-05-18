@@ -10,7 +10,7 @@
 - 根据错题、薄弱项或考前复习需求生成可打印 HTML 练习卷；
 - 保持学生版练习卷无答案，家长版答案和批改标准单独保存。
 
-本仓库只包含通用模板、脚本和脱敏示例。真实学生记录、试卷照片、学校作业、教材 PDF 和私有学习数据应放在单独的私有学习工作区。
+本仓库只包含通用模板、脚本和脱敏示例。真实学生记录、试卷照片、学校作业、教材 PDF 和学习过程中生成的数据应放在单独的个人学习仓库。
 
 ## 项目结构
 
@@ -23,10 +23,8 @@ skills/zhizhi-math-coach/
   scripts/validate_worksheet_spec.py
   scripts/publish_html_site.py
   assets/worksheet/
-.github/workflows/pages.yml
 docs/
 scripts/smoke_check.py
-site/
 examples/student-workspace/
   curriculum/
   knowledge-points/
@@ -47,10 +45,11 @@ skills/zhizhi-math-coach
 
 典型使用方式：
 
-1. 将本仓库作为 OpenClaw workspace 打开，或将 `skills/zhizhi-math-coach` 复制到你的 workspace/user skills 目录。
-2. 将 `examples/student-workspace` 复制到私有学习项目中。
-3. 替换示例中的学生信息、教材进度、记忆、知识点卡片和薄弱项记录。
-4. 在 OpenClaw 中使用 `$zhizhi-math-coach` 触发批改、讲解、学习跟进或出卷。
+1. 将 `skills/zhizhi-math-coach` 安装或复制到 OpenClaw。
+2. 为一个孩子或家庭创建单独的个人学习仓库。这个仓库可以是 public，也可以是 private，由用户自己决定。
+3. 将 `examples/student-workspace` 复制到这个个人仓库中。
+4. 替换示例中的学生信息、教材进度、记忆、知识点卡片和薄弱项记录。
+5. 在个人学习仓库中打开 OpenClaw，并使用 `$zhizhi-math-coach` 触发批改、讲解、学习跟进或出卷。
 
 示例：
 
@@ -63,7 +62,7 @@ $zhizhi-math-coach 生成一年级下册人教版当前范围的期末错因复�
 
 ## 学习工作区
 
-建议在私有学习项目中使用以下结构：
+建议在个人学习项目中使用以下结构：
 
 ```text
 curriculum/
@@ -91,6 +90,43 @@ worksheets/
 - `mistakes/`：学校错题和系统练习错题。
 - `records/learning-progress.md`：学习进度总览。
 - `worksheets/`：练习卷 spec、HTML 和答案。
+
+## 初始化个人学习仓库
+
+本仓库是通用 skill，不保存真实使用过程中产生的数据。每个家庭/学生应使用自己的个人学习仓库保存学习档案和练习卷产物。
+
+个人学习仓库可以是 public，也可以是 private。若选择 public，需要更严格地控制哪些内容进入 `site/`，并避免提交敏感原始资料。
+
+推荐结构：
+
+```text
+zhizhi-math-learning-data/
+  README.md
+  .gitignore
+  curriculum/
+  knowledge-points/
+  memory/
+  mistakes/
+  records/
+  weak-points/
+  worksheets/
+  site/
+```
+
+初始化示例：
+
+```bash
+mkdir zhizhi-math-learning-data
+cd zhizhi-math-learning-data
+git init
+cp -R /path/to/zhizhi-math-coach-openclaw/examples/student-workspace/* .
+git add .
+git commit -m "Initialize math learning workspace"
+git remote add origin git@github.com:<user>/zhizhi-math-learning-data.git
+git push -u origin main
+```
+
+之后在这个个人学习仓库中打开 OpenClaw，同时从本公开仓库安装或引用 `zhizhi-math-coach` skill。
 
 ## 出卷方式
 
@@ -138,32 +174,33 @@ python3 scripts/smoke_check.py
 
 如果需要校验打印页数，可在生成命令中添加 `--verify-print`，并确保本机安装 Chrome 或 Chromium。
 
-## 发布学生版 HTML 到 GitHub Pages
+## 从个人仓库发布学生版 HTML
 
-如果你接受练习卷公开访问，可以只把学生版 HTML 发布到 `site/`：
+如果你接受练习卷公开访问，应在个人学习仓库中运行发布脚本，只把学生版 HTML 发布到该仓库的 `site/`：
 
 ```bash
-python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
-  examples/student-workspace/worksheets \
-  --base-url https://linzi007.github.io/zhizhi-math-coach-openclaw
+python3 /path/to/zhizhi-math-coach-openclaw/skills/zhizhi-math-coach/scripts/publish_html_site.py \
+  worksheets \
+  --workspace . \
+  --base-url https://<user>.github.io/zhizhi-math-learning-data
 ```
 
 脚本会生成：
 
-- `site/index.html`：公开练习卷列表。
+- `site/index.html`：个人学习仓库中的公开练习卷列表。
 - `site/worksheets/<slug>/index.html`：可查看和打印的学生版练习卷。
 - `site/.nojekyll`：GitHub Pages 静态站点标记。
-- `worksheets/<date-topic>/publish.json`：在私有学习工作区运行时记录发布信息。
+- `worksheets/<date-topic>/publish.json`：记录发布信息。
 
 `site/` 只放学生可见内容。不要把答案、批改记录、长短期记忆、薄弱项历史、上传试卷、教材 PDF 或 OCR 内容放进去。
 
-飞书里建议发送 GitHub Pages 链接，答案和批改标准仍保存在私有仓库。
+飞书里建议发送 GitHub Pages 链接，答案和批改标准不要放进公开发布的 `site/` 目录。
 
-要在线访问这些页面，需要在 GitHub 仓库 Settings -> Pages 中启用 Pages，并选择 **GitHub Actions** 作为部署来源。本仓库自带的 workflow 会发布已提交的 `site/` 目录。
+要在线访问这些页面，需要在个人学习仓库 Settings -> Pages 中启用 Pages，可选择 `site/` 目录或复制 `docs/personal-learning-repo-template.md` 中的 workflow。
 
 ## 教材使用边界
 
-本项目可以使用教材信息帮助判断年级、册别、单元范围和知识点顺序。例如，私有学习工作区可以引用 `TapXWorld/ChinaTextbook` 中的人教版小学数学目录作为外部参考。
+本项目可以使用教材信息帮助判断年级、册别、单元范围和知识点顺序。例如，个人学习工作区可以引用 `TapXWorld/ChinaTextbook` 中的人教版小学数学目录作为外部参考。
 
 允许使用教材信息来做：
 
@@ -192,7 +229,7 @@ python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
 - 真实学生姓名或学校名称；
 - 已完成练习卷图片；
 - 学校试卷、作业或老师批改截图；
-- 私有错题本、学习记录、记忆文件、教材进度或知识点笔记；
+- 个人错题本、学习记录、记忆文件、教材进度或知识点笔记；
 - 下载的教材 PDF、截图、扫描件或 OCR 输出。
 
 本仓库用于复用 instruction、模板、脚本、校验器和脱敏示例。

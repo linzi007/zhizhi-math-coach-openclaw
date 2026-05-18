@@ -13,7 +13,7 @@ After generating a worksheet:
 ```bash
 python3 {baseDir}/scripts/publish_html_site.py \
   worksheets/YYYY-MM-DD-topic \
-  --workspace <private-learning-workspace> \
+  --workspace <personal-learning-workspace> \
   --base-url https://<github-user>.github.io/<repo>
 ```
 
@@ -41,4 +41,4 @@ Forbidden in `site/`:
 
 ## OpenClaw Output Rule
 
-When Pages is configured, return the Pages URL to the parent and use it in Feishu notifications. Keep answer keys and diagnosis links private.
+When Pages is configured, return the Pages URL to the parent and use it in Feishu notifications. Keep answer keys and diagnosis links outside published `site/` output.

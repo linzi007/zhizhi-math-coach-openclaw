@@ -37,9 +37,9 @@ The Pages `site/` directory must not include:
 - uploaded school papers or completed worksheet photos;
 - textbook PDFs, screenshots, scans, or OCR output.
 
-## Private Learning Workspace
+## Personal Learning Workspace
 
-Private workspaces may contain student records and parent-provided textbook references. Keep them outside this repository or under ignored paths.
+Personal learning workspaces may be public or private; the user chooses. They may contain student records and parent-provided textbook references, so keep them outside this reusable skill repository. If the personal repository is public, do not commit sensitive files, answers, memory, diagnosis history, uploads, or textbook-derived raw material.
 
 ## Textbook Use
 

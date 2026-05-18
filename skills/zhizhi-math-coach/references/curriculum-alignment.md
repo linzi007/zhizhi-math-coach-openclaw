@@ -4,7 +4,7 @@
 
 Use curriculum files to keep grading, explanations, and worksheets aligned with the student's real school scope.
 
-This project may reference external textbook indexes or private local PDF paths, but the public skill must not include textbook PDFs, screenshots, scans, OCR dumps, or copied problem sets.
+This project may reference external textbook indexes or local PDF paths in a personal learning workspace, but the public skill must not include textbook PDFs, screenshots, scans, OCR dumps, or copied problem sets.
 
 ## Workspace Files
 
@@ -15,7 +15,7 @@ This project may reference external textbook indexes or private local PDF paths,
 
 ## China Textbook Example
 
-For a first-grade student using 人教版 mathematics, the private profile can cite:
+For a first-grade student using 人教版 mathematics, the personal profile can cite:
 
 ```text
 Textbook source: https://github.com/TapXWorld/ChinaTextbook/tree/master/小学/数学/人教版

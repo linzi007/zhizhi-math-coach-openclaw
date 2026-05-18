@@ -11,7 +11,7 @@
 - generate parent-facing explanations, student-readable summaries, and targeted printable worksheets;
 - keep child-facing worksheets answer-free and parent-facing answer keys separate.
 
-The repository intentionally contains only generic templates and sanitized sample data. Keep real student records, photos, school papers, textbook PDFs, and private progress files in a separate private learning workspace.
+The repository intentionally contains only generic templates and sanitized sample data. Keep real student records, photos, school papers, textbook PDFs, and generated learning data in a separate personal learning repository.
 
 ## Project Layout
 
@@ -24,10 +24,8 @@ skills/zhizhi-math-coach/
   scripts/validate_worksheet_spec.py
   scripts/publish_html_site.py
   assets/worksheet/
-.github/workflows/pages.yml
 docs/
 scripts/smoke_check.py
-site/
 examples/student-workspace/
   curriculum/
   knowledge-points/
@@ -50,10 +48,11 @@ skills/zhizhi-math-coach
 
 Typical use:
 
-1. Open this repository as the OpenClaw workspace, or copy `skills/zhizhi-math-coach` into a workspace/user skills directory.
-2. Copy `examples/student-workspace` into a private learning project.
-3. Replace the sample profile, curriculum, memory, knowledge-point, and weak-point files with real local context.
-4. Ask OpenClaw to use `$zhizhi-math-coach` for grading, explanation, progress tracking, or worksheet generation.
+1. Install or copy `skills/zhizhi-math-coach` into OpenClaw.
+2. Create a separate personal learning repository for one child or family. The repository can be public or private; that choice belongs to the user.
+3. Copy `examples/student-workspace` into that personal repository.
+4. Replace the sample profile, curriculum, memory, knowledge-point, and weak-point files with real local context.
+5. Ask OpenClaw to use `$zhizhi-math-coach` while working inside the personal learning repository.
 
 Example prompts:
 
@@ -93,26 +92,64 @@ python3 scripts/smoke_check.py
 
 If browser print verification is needed, add `--verify-print` to generation and make sure Chrome or Chromium is installed.
 
-## Publish Child-Facing HTML To GitHub Pages
+## Personal Learning Repository
 
-When public worksheet links are acceptable, publish only the child-facing HTML into `site/`:
+This repository is the reusable skill. Real generated data belongs in a separate personal learning repository.
+
+The personal learning repository can be public or private. If it is public, keep sensitive learning records out of `site/` and avoid committing sensitive raw inputs.
+
+Recommended personal repository layout:
+
+```text
+zhizhi-math-learning-data/
+  README.md
+  .gitignore
+  curriculum/
+  knowledge-points/
+  memory/
+  mistakes/
+  records/
+  weak-points/
+  worksheets/
+  site/
+```
+
+Initialize a personal learning repository:
 
 ```bash
-python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
-  examples/student-workspace/worksheets \
-  --base-url https://linzi007.github.io/zhizhi-math-coach-openclaw
+mkdir zhizhi-math-learning-data
+cd zhizhi-math-learning-data
+git init
+cp -R /path/to/zhizhi-math-coach-openclaw/examples/student-workspace/* .
+git add .
+git commit -m "Initialize math learning workspace"
+git remote add origin git@github.com:<user>/zhizhi-math-learning-data.git
+git push -u origin main
+```
+
+Open this personal repository as the OpenClaw workspace, while keeping the reusable skill installed from this public repository.
+
+## Publish Child-Facing HTML From The Personal Repository
+
+When public worksheet links are acceptable, run the publisher in the personal learning repository. It publishes only child-facing HTML into that repository's `site/` directory:
+
+```bash
+python3 /path/to/zhizhi-math-coach-openclaw/skills/zhizhi-math-coach/scripts/publish_html_site.py \
+  worksheets \
+  --workspace . \
+  --base-url https://<user>.github.io/zhizhi-math-learning-data
 ```
 
 The publisher writes:
 
-- `site/index.html`: public worksheet list.
+- `site/index.html` in the personal repository: public worksheet list.
 - `site/worksheets/<slug>/index.html`: printable child-facing worksheet page.
 - `site/.nojekyll`: GitHub Pages static-site marker.
-- `worksheets/<date-topic>/publish.json`: publication manifest when run in a private learning workspace.
+- `worksheets/<date-topic>/publish.json`: publication manifest.
 
 Do not publish answer keys, grading records, memory files, weak-point history, uploaded papers, or textbook files to `site/`.
 
-To publish on GitHub, enable Pages in the repository settings and choose **GitHub Actions** as the build/deploy source. The bundled workflow deploys the committed `site/` directory.
+To publish on GitHub, enable Pages in the personal learning repository settings and choose the `site/` directory or a workflow copied from `docs/personal-learning-repo-template.md`.
 
 ## Supported Worksheet Strategies
 
@@ -129,11 +166,11 @@ To publish on GitHub, enable Pages in the repository settings and choose **GitHu
 
 When a parent only says "出一张练习卷", confirm purpose, content scope, length, and output format before generating.
 
-For Feishu delivery, prefer sending the GitHub Pages worksheet URL when the page is public-safe. Keep `answer-key.md` private.
+For Feishu delivery, prefer sending the GitHub Pages worksheet URL when the page is public-safe. Keep `answer-key.md` outside the published `site/` directory.
 
 ## Curriculum Boundary
 
-This skill can use textbook metadata and local curriculum files to avoid out-of-scope practice. For example, a private workspace may point to an external source such as `TapXWorld/ChinaTextbook` for the 人教版小学数学目录, but this public repository must not commit textbook PDFs, screenshots, or copied textbook problem sets.
+This skill can use textbook metadata and local curriculum files to avoid out-of-scope practice. For example, a personal workspace may point to an external source such as `TapXWorld/ChinaTextbook` for the 人教版小学数学目录, but this public repository must not commit textbook PDFs, screenshots, or copied textbook problem sets.
 
 Use textbook information for:
 
@@ -151,7 +188,7 @@ Do not commit:
 - real student names or school names;
 - completed worksheet images;
 - school papers or teacher feedback screenshots;
-- private mistake books, records, memory files, curriculum progress, or knowledge-point notes;
+- personal mistake books, records, memory files, curriculum progress, or knowledge-point notes;
 - downloaded textbook PDFs, screenshots, scans, or OCR output.
 
 Use this repository for reusable instructions, generators, templates, validators, and sanitized examples only.

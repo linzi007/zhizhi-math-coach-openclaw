@@ -20,7 +20,7 @@ Use a local evidence loop for every task:
 
 ## Expected Workspace
 
-Use these paths in the user's private learning project unless they provide different names:
+Use these paths in the user's personal learning project unless they provide different names. The project repository may be public or private; do not assume either.
 
 - `memory/long-term.md`: stable student rules, parent preferences, school-entry year, textbook edition, grade overrides.
 - `memory/short-term.md`: current observations, active priorities, pending checks.
@@ -81,7 +81,7 @@ Then create or update one diagnosis record under `records/`. Add every wrong or 
 
 ## Before Explaining A Knowledge Point
 
-Read the relevant `knowledge-points/<topic-slug>.md` when it exists. If it does not exist, create the explanation in the same structure and recommend saving it privately:
+Read the relevant `knowledge-points/<topic-slug>.md` when it exists. If it does not exist, create the explanation in the same structure and recommend saving it in the user's personal learning project:
 
 1. Parent explanation script.
 2. Student-facing short version.
@@ -130,7 +130,7 @@ If the parent wants a Feishu-clickable page and accepts public worksheet links, 
 ```bash
 python3 {baseDir}/scripts/publish_html_site.py \
   worksheets/YYYY-MM-DD-topic \
-  --workspace <private-learning-workspace> \
+  --workspace <personal-learning-workspace> \
   --base-url https://<github-user>.github.io/<repo>
 ```
 
@@ -206,7 +206,7 @@ Scheduled OpenClaw tasks should default to reminders and suggestions:
 
 Do not let scheduled tasks automatically change weak-point status, memory, or generate new worksheets unless the parent explicitly asked for that behavior.
 
-Feishu notifications should prefer GitHub Pages worksheet links when configured; keep answer keys and diagnosis records private.
+Feishu notifications should prefer GitHub Pages worksheet links when configured; keep answer keys and diagnosis records outside published `site/` output.
 
 ## Output Rules
 

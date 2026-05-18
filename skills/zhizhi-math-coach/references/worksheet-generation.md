@@ -30,7 +30,7 @@ python3 {baseDir}/scripts/generate_worksheet.py \
 ```bash
 python3 {baseDir}/scripts/publish_html_site.py \
   worksheets/YYYY-MM-DD-<topic-slug> \
-  --workspace <private-learning-workspace> \
+  --workspace <personal-learning-workspace> \
   --base-url https://<github-user>.github.io/<repo>
 ```
 
