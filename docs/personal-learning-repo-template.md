@@ -21,18 +21,28 @@ zhizhi-math-learning-data/
 
 ## Initialize
 
+Create or clone the personal GitHub repository first, then install the skill from ClawHub and run the initializer inside that repository:
+
 ```bash
 mkdir zhizhi-math-learning-data
 cd zhizhi-math-learning-data
 git init
-cp -R /path/to/zhizhi-math-coach-openclaw/examples/student-workspace/* .
+openclaw skills install zhizhi-math-coach
+python3 skills/zhizhi-math-coach/scripts/init_learning_workspace.py \
+  --workspace . \
+  --student-name "孩子" \
+  --school-entry-year 2025 \
+  --grade 一年级 \
+  --semester 下学期 \
+  --textbook-edition 人教版 \
+  --textbook-volume 一年级下册
 git add .
 git commit -m "Initialize math learning workspace"
 git remote add origin git@github.com:<user>/zhizhi-math-learning-data.git
 git push -u origin main
 ```
 
-Open this personal repository as the OpenClaw workspace. Install or reference the reusable `zhizhi-math-coach` skill from the public repository.
+Open this personal repository as the OpenClaw workspace. The generated `.gitignore` ignores `skills/` by default, so downloaded ClawHub bundles are not committed into the personal learning repository.
 
 ## Working Directory Rules
 
@@ -91,6 +101,9 @@ __pycache__/
 venv/
 .idea/
 
+# Installed skills can be reinstalled from ClawHub.
+skills/
+
 # Optional large or sensitive raw inputs
 uploads/raw/
 ocr-output/raw/
@@ -102,7 +115,7 @@ textbooks/*.pdf
 Run from the personal learning repository:
 
 ```bash
-python3 /path/to/zhizhi-math-coach-openclaw/skills/zhizhi-math-coach/scripts/publish_html_site.py \
+python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
   worksheets \
   --workspace . \
   --base-url https://<user>.github.io/zhizhi-math-learning-data

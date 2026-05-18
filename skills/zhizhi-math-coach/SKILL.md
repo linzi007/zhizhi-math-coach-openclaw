@@ -40,13 +40,28 @@ Use these paths in the user's personal learning project unless they provide diff
 - `worksheets/YYYY-MM-DD-<topic-slug>/worksheet.html`: child-facing printable worksheet.
 - `worksheets/YYYY-MM-DD-<topic-slug>/answer-key.md`: answers, grading, and next-step rules.
 
+If the personal learning project is not initialized yet, run the bundled initializer from the workspace root:
+
+```bash
+python3 {baseDir}/scripts/init_learning_workspace.py \
+  --workspace . \
+  --student-name <nickname> \
+  --school-entry-year <YYYY> \
+  --grade <一年级> \
+  --semester <上学期|下学期> \
+  --textbook-edition <人教版> \
+  --textbook-volume <一年级下册>
+```
+
+The initializer creates missing files only by default. Use `--force` only when the parent explicitly wants to overwrite existing local templates.
+
 ## Trigger And Sync Boundary
 
 This skill is triggered by the user's OpenClaw request, such as `$zhizhi-math-coach 批改...` or `$zhizhi-math-coach 出一张...`, while the working directory is the personal learning project.
 
 Always treat the current workspace root as the personal learning project root for `memory/`, `weak-points/`, `mistakes/`, `records/`, `curriculum/`, `knowledge-points/`, `worksheets/`, and `site/`. The reusable skill repository only provides instructions, scripts, references, templates, and sanitized examples.
 
-If the current workspace appears to be `zhizhi-math-coach-openclaw` or otherwise contains `skills/zhizhi-math-coach` as the reusable skill source, warn before writing student learning data. Only write there when the user explicitly says this repository is the intended personal learning workspace or the task is skill development with sanitized examples.
+If the current workspace appears to be the reusable source repository `zhizhi-math-coach-openclaw` (for example it contains `docs/openclaw-release.md` and `examples/student-workspace/`), warn before writing student learning data. Do not warn merely because a personal workspace has an installed `skills/zhizhi-math-coach/` bundle from ClawHub. Only write student data into the source repository when the user explicitly says it is the intended personal learning workspace or the task is skill development with sanitized examples.
 
 Do not assume background sync. Local files are changed by the current task only:
 
@@ -74,6 +89,7 @@ Skill resources are relative to `{baseDir}`:
 - `references/worksheet-standards.md`: child-facing printable worksheet rules.
 - `references/student-profile-template.md`: starter profile format.
 - `scripts/generate_worksheet.py`: generate worksheet HTML and answer key from JSON.
+- `scripts/init_learning_workspace.py`: initialize a personal learning repository after the skill is installed.
 - `scripts/validate_worksheet_spec.py`: validate worksheet JSON without writing outputs.
 - `scripts/publish_html_site.py`: publish child-facing worksheet HTML into a GitHub Pages `site/` directory.
 - `assets/worksheet/question-types.json`: reusable worksheet item types.

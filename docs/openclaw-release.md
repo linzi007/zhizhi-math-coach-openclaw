@@ -15,6 +15,7 @@ V1 is a Skill-first release. It supports:
 - parent explanations and student summaries;
 - China grade/semester/calendar alignment;
 - curriculum and textbook-scope references;
+- personal learning repository initialization;
 - worksheet generation from JSON specs;
 - deterministic geometry SVG rendering for simple diagrams;
 - GitHub Pages publisher script for personal learning repositories;

@@ -19,6 +19,7 @@ skills/zhizhi-math-coach/
   SKILL.md
   agents/openai.yaml
   references/
+  scripts/init_learning_workspace.py
   scripts/generate_worksheet.py
   scripts/validate_worksheet_spec.py
   scripts/publish_html_site.py
@@ -45,11 +46,12 @@ skills/zhizhi-math-coach
 
 典型使用方式：
 
-1. 将 `skills/zhizhi-math-coach` 安装或复制到 OpenClaw。
-2. 为一个孩子或家庭创建单独的个人学习仓库。这个仓库可以是 public，也可以是 private，由用户自己决定。
-3. 将 `examples/student-workspace` 复制到这个个人仓库中。
-4. 替换示例中的学生信息、教材进度、记忆、知识点卡片和薄弱项记录。
-5. 在个人学习仓库中打开 OpenClaw，并使用 `$zhizhi-math-coach` 触发批改、讲解、学习跟进或出卷。
+1. 为一个孩子或家庭创建单独的个人学习仓库。这个仓库可以是 public，也可以是 private，由用户自己决定。
+2. 将这个仓库作为 OpenClaw workspace 打开。
+3. 从 ClawHub 将 `zhizhi-math-coach` 安装到 workspace 或 user skills 位置。
+4. 使用 `skills/zhizhi-math-coach/scripts/init_learning_workspace.py` 初始化学习文件，或者直接让 `$zhizhi-math-coach` 初始化个人学习仓库。
+5. 替换生成的学生信息、教材进度、记忆、知识点卡片和薄弱项占位内容。
+6. 在个人学习仓库中使用 `$zhizhi-math-coach` 触发批改、讲解、学习跟进或出卷。
 
 示例：
 
@@ -60,16 +62,14 @@ $zhizhi-math-coach 针对退位减法薄弱项出专项练习，并给答案和�
 $zhizhi-math-coach 生成一年级下册人教版当前范围的期末错因复习卷。
 ```
 
-## 两个目录如何协作
+## Workspace 和 Skill 来源如何协作
 
-正常使用时有两个不同目录：
+普通 ClawHub 用户通常只有一个 Git 仓库：个人学习仓库。安装下来的 skill 可以放在这个 workspace 里，但它只是能力包，不是数据仓库。
 
 ```text
-zhizhi-math-coach-openclaw/        # 通用 skill 仓库
-  skills/zhizhi-math-coach/        # SKILL.md、references、scripts、templates
-  examples/student-workspace/      # 初始化模板和脱敏示例
-
 zhizhi-math-learning-data/         # 个人学习仓库，作为 OpenClaw workspace 打开
+  .git/
+  skills/zhizhi-math-coach/        # 从 ClawHub 安装，通常不提交
   curriculum/
   knowledge-points/
   memory/
@@ -80,9 +80,17 @@ zhizhi-math-learning-data/         # 个人学习仓库，作为 OpenClaw worksp
   site/
 ```
 
-`zhizhi-math-coach-openclaw` 提供能力，`zhizhi-math-learning-data` 保存真实学习数据和生成结果。
+如果是维护 skill 的开发者，才需要另一个源码仓库：
 
-OpenClaw 运行 `$zhizhi-math-coach` 时，可以从 `zhizhi-math-coach-openclaw/skills/zhizhi-math-coach` 加载 skill 指令，但学习文件会从当前 OpenClaw workspace 读取，并写回当前 workspace。正常使用时，这个 workspace 应该是 `zhizhi-math-learning-data/`。
+```text
+zhizhi-math-coach-openclaw/        # 通用 skill 源码仓库
+  skills/zhizhi-math-coach/        # SKILL.md、references、scripts、templates
+  examples/student-workspace/      # 初始化模板和脱敏示例
+```
+
+skill 源码仓库或已安装的 skill 提供能力，`zhizhi-math-learning-data` 保存真实学习数据和生成结果。
+
+OpenClaw 运行 `$zhizhi-math-coach` 时，会从 `skills/zhizhi-math-coach` 加载 skill 指令，但学习文件会从当前 OpenClaw workspace 读取，并写回当前 workspace。正常使用时，这个 workspace 应该是 `zhizhi-math-learning-data/`。
 
 工作目录规则：
 
@@ -98,7 +106,7 @@ OpenClaw 运行 `$zhizhi-math-coach` 时，可以从 `zhizhi-math-coach-openclaw
 - 出卷会写入个人仓库的 `worksheets/<date-topic>/worksheet-spec.json`、`worksheet.html` 和 `answer-key.md`；
 - 发布学生版页面会写入个人仓库的 `site/` 和 `worksheets/<date-topic>/publish.json`。
 
-脚本仍然可以从 skill 仓库路径调用，但输入和 workspace 参数要指向个人学习仓库。例如在 `zhizhi-math-learning-data/` 目录中运行 `publish_html_site.py` 时，`--workspace .` 才表示发布到个人学习仓库。
+脚本可以从已安装的 skill 路径调用，但输入和 workspace 参数要指向个人学习仓库。例如在 `zhizhi-math-learning-data/` 目录中运行 `skills/zhizhi-math-coach/scripts/publish_html_site.py` 时，`--workspace .` 才表示发布到个人学习仓库。
 
 ## 学习工作区
 
@@ -153,20 +161,28 @@ zhizhi-math-learning-data/
   site/
 ```
 
-初始化示例：
+从 ClawHub 安装 skill 后初始化个人学习仓库：
 
 ```bash
 mkdir zhizhi-math-learning-data
 cd zhizhi-math-learning-data
 git init
-cp -R /path/to/zhizhi-math-coach-openclaw/examples/student-workspace/* .
+openclaw skills install zhizhi-math-coach
+python3 skills/zhizhi-math-coach/scripts/init_learning_workspace.py \
+  --workspace . \
+  --student-name "孩子" \
+  --school-entry-year 2025 \
+  --grade 一年级 \
+  --semester 下学期 \
+  --textbook-edition 人教版 \
+  --textbook-volume 一年级下册
 git add .
 git commit -m "Initialize math learning workspace"
 git remote add origin git@github.com:<user>/zhizhi-math-learning-data.git
 git push -u origin main
 ```
 
-之后在这个个人学习仓库中打开 OpenClaw，同时从本公开仓库安装或引用 `zhizhi-math-coach` skill。
+生成的 `.gitignore` 默认忽略 `skills/`，避免把 ClawHub 下载的 skill bundle 提交到个人学习仓库。换机器使用时重新安装 skill 即可。
 
 ## 本地更新和同步如何触发
 
@@ -247,7 +263,7 @@ python3 scripts/smoke_check.py
 如果你接受练习卷公开访问，应在个人学习仓库中运行发布脚本，只把学生版 HTML 发布到该仓库的 `site/`：
 
 ```bash
-python3 /path/to/zhizhi-math-coach-openclaw/skills/zhizhi-math-coach/scripts/publish_html_site.py \
+python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
   worksheets \
   --workspace . \
   --base-url https://<user>.github.io/zhizhi-math-learning-data

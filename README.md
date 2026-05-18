@@ -20,6 +20,7 @@ skills/zhizhi-math-coach/
   SKILL.md
   agents/openai.yaml
   references/
+  scripts/init_learning_workspace.py
   scripts/generate_worksheet.py
   scripts/validate_worksheet_spec.py
   scripts/publish_html_site.py
@@ -48,11 +49,12 @@ skills/zhizhi-math-coach
 
 Typical use:
 
-1. Install or copy `skills/zhizhi-math-coach` into OpenClaw.
-2. Create a separate personal learning repository for one child or family. The repository can be public or private; that choice belongs to the user.
-3. Copy `examples/student-workspace` into that personal repository.
-4. Replace the sample profile, curriculum, memory, knowledge-point, and weak-point files with real local context.
-5. Ask OpenClaw to use `$zhizhi-math-coach` while working inside the personal learning repository.
+1. Create a separate personal learning repository for one child or family. The repository can be public or private; that choice belongs to the user.
+2. Open that repository as the OpenClaw workspace.
+3. Install `zhizhi-math-coach` from ClawHub into the workspace or user skills location.
+4. Initialize the learning files with `skills/zhizhi-math-coach/scripts/init_learning_workspace.py`, or ask `$zhizhi-math-coach` to initialize the personal learning repository.
+5. Replace the generated profile, curriculum, memory, knowledge-point, and weak-point placeholders with real local context.
+6. Ask OpenClaw to use `$zhizhi-math-coach` while working inside the personal learning repository.
 
 Example prompts:
 
@@ -63,16 +65,14 @@ $zhizhi-math-coach 针对退位减法薄弱项出专项练习，并给答案和�
 $zhizhi-math-coach 生成一年级下册人教版当前范围的期末错因复习卷。
 ```
 
-## Two Folder Model
+## Workspace And Skill Source Model
 
-There are two different folders in normal use:
+For normal ClawHub users, there is one Git repository: the personal learning repository. The installed skill may live inside that workspace, but it is just a downloaded capability bundle, not the data store.
 
 ```text
-zhizhi-math-coach-openclaw/        # reusable skill repository
-  skills/zhizhi-math-coach/        # SKILL.md, references, scripts, templates
-  examples/student-workspace/      # starter template and sanitized examples
-
 zhizhi-math-learning-data/         # personal learning repository, opened as the OpenClaw workspace
+  .git/
+  skills/zhizhi-math-coach/        # installed from ClawHub; usually not committed
   curriculum/
   knowledge-points/
   memory/
@@ -83,9 +83,17 @@ zhizhi-math-learning-data/         # personal learning repository, opened as the
   site/
 ```
 
-The skill repository provides the capability. The personal learning repository stores the data and generated outputs.
+For skill development, there may also be a separate source repository:
 
-When OpenClaw runs `$zhizhi-math-coach`, the skill instructions may be loaded from `zhizhi-math-coach-openclaw/skills/zhizhi-math-coach`, but learning files are read from and written to the current OpenClaw workspace. In normal use, that workspace should be `zhizhi-math-learning-data/`.
+```text
+zhizhi-math-coach-openclaw/        # reusable skill source repository
+  skills/zhizhi-math-coach/        # SKILL.md, references, scripts, templates
+  examples/student-workspace/      # starter template and sanitized examples
+```
+
+The skill source or installed skill provides the capability. The personal learning repository stores the data and generated outputs.
+
+When OpenClaw runs `$zhizhi-math-coach`, the skill instructions may be loaded from `skills/zhizhi-math-coach`, but learning files are read from and written to the current OpenClaw workspace. In normal use, that workspace should be `zhizhi-math-learning-data/`.
 
 Working directory rules:
 
@@ -101,7 +109,7 @@ Output locations:
 - worksheet generation writes `worksheets/<date-topic>/worksheet-spec.json`, `worksheet.html`, and `answer-key.md` in the personal repository;
 - publishing writes `site/` and `worksheets/<date-topic>/publish.json` in the personal repository.
 
-Scripts can still be executed from the skill repository path, but their input and workspace arguments should point to the personal repository. For example, run `publish_html_site.py` from `zhizhi-math-coach-openclaw`, with `--workspace .` only when the shell is currently inside `zhizhi-math-learning-data/`.
+Scripts can be executed from the installed skill path, and their input and workspace arguments should point to the personal repository. For example, run `skills/zhizhi-math-coach/scripts/publish_html_site.py` with `--workspace .` only when the shell is currently inside `zhizhi-math-learning-data/`.
 
 Do not run regular student learning sessions with `zhizhi-math-coach-openclaw` as the workspace. If you do, generated learning data may be written into the reusable skill repository, which is only appropriate for development or sanitized examples.
 
@@ -156,20 +164,28 @@ zhizhi-math-learning-data/
   site/
 ```
 
-Initialize a personal learning repository:
+Initialize a personal learning repository after installing the skill from ClawHub:
 
 ```bash
 mkdir zhizhi-math-learning-data
 cd zhizhi-math-learning-data
 git init
-cp -R /path/to/zhizhi-math-coach-openclaw/examples/student-workspace/* .
+openclaw skills install zhizhi-math-coach
+python3 skills/zhizhi-math-coach/scripts/init_learning_workspace.py \
+  --workspace . \
+  --student-name "孩子" \
+  --school-entry-year 2025 \
+  --grade 一年级 \
+  --semester 下学期 \
+  --textbook-edition 人教版 \
+  --textbook-volume 一年级下册
 git add .
 git commit -m "Initialize math learning workspace"
 git remote add origin git@github.com:<user>/zhizhi-math-learning-data.git
 git push -u origin main
 ```
 
-Open this personal repository as the OpenClaw workspace, while keeping the reusable skill installed from this public repository.
+The generated `.gitignore` ignores `skills/` by default so downloaded ClawHub bundles are not committed into the personal learning repository. Reinstall the skill on another machine when needed.
 
 ## What Triggers Local Updates And Sync
 
@@ -204,7 +220,7 @@ For a public personal repository, commit only files that are safe to expose. In 
 When public worksheet links are acceptable, run the publisher in the personal learning repository. It publishes only child-facing HTML into that repository's `site/` directory:
 
 ```bash
-python3 /path/to/zhizhi-math-coach-openclaw/skills/zhizhi-math-coach/scripts/publish_html_site.py \
+python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
   worksheets \
   --workspace . \
   --base-url https://<user>.github.io/zhizhi-math-learning-data

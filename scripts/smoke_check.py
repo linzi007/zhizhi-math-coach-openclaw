@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import importlib.util
+import contextlib
+import io
 import json
 import shutil
 import sys
@@ -16,6 +18,7 @@ SKILL_DIR = REPO_ROOT / "skills" / "zhizhi-math-coach"
 GENERATOR_PATH = SKILL_DIR / "scripts" / "generate_worksheet.py"
 VALIDATOR_PATH = SKILL_DIR / "scripts" / "validate_worksheet_spec.py"
 PUBLISHER_PATH = SKILL_DIR / "scripts" / "publish_html_site.py"
+INIT_WORKSPACE_PATH = SKILL_DIR / "scripts" / "init_learning_workspace.py"
 FORBIDDEN_PUBLIC_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".heic"}
 FORBIDDEN_SITE_PARTS = {
     "answer-key.md",
@@ -122,12 +125,62 @@ def check_publisher_loads() -> None:
     load_module(PUBLISHER_PATH, "worksheet_publisher")
 
 
+def check_init_workspace_script() -> None:
+    module = load_module(INIT_WORKSPACE_PATH, "learning_workspace_init")
+    with tempfile.TemporaryDirectory() as tmp:
+        target = Path(tmp) / "learning-data"
+        cmd_args = [
+            "--workspace",
+            str(target),
+            "--student-name",
+            "Smoke Test",
+            "--school-entry-year",
+            "2025",
+            "--school-year",
+            "2025-2026",
+            "--grade",
+            "一年级",
+            "--semester",
+            "下学期",
+        ]
+        old_argv = sys.argv[:]
+        try:
+            sys.argv = ["init_learning_workspace.py", *cmd_args]
+            with contextlib.redirect_stdout(io.StringIO()):
+                result = module.main()
+        finally:
+            sys.argv = old_argv
+        if result != 0:
+            fail("init_learning_workspace.py returned non-zero")
+
+        required = [
+            "README.md",
+            "memory/long-term.md",
+            "memory/local-memory-rules.md",
+            "curriculum/profile.md",
+            "curriculum/school-calendar.md",
+            "mistakes/index.md",
+            "records/learning-progress.md",
+            "weak-points/README.md",
+            "worksheets/README.md",
+            "site/README.md",
+        ]
+        for rel_path in required:
+            if not (target / rel_path).exists():
+                fail(f"init script did not create {rel_path}")
+
+        long_term = (target / "memory/long-term.md").read_text(encoding="utf-8")
+        if "Smoke Test" not in long_term or "一年级下学期" not in long_term:
+            fail("init script did not apply student profile arguments")
+
+
 def main() -> int:
     check_skill_identity()
     check_no_public_binary_sources()
     check_worksheet_specs()
     check_site_public_boundary()
     check_publisher_loads()
+    check_init_workspace_script()
     print("ok: repository smoke check passed")
     return 0
 
