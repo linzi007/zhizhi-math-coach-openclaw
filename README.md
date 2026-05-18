@@ -1,5 +1,7 @@
 # Zhizhi Math Coach OpenClaw Skill
 
+[中文说明](README.zh-CN.md)
+
 `zhizhi-math-coach` is an OpenClaw skill for an evidence-based primary-school math learning loop:
 
 - grade completed worksheets, school papers, photos, or copied wrong questions;
