@@ -86,6 +86,34 @@ git commit -m "Update learning records"
 git push
 ```
 
+## GitHub Sync Setup
+
+OpenClaw may not have GitHub CLI, saved credentials, or a provider-level token setting. Prefer a repository-scoped GitHub Deploy key:
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/prepare_github_deploy_key.py \
+  --workspace . \
+  --configure-remote
+```
+
+If `origin` is not configured yet, add the repository explicitly:
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/prepare_github_deploy_key.py \
+  --workspace . \
+  --github-owner <user> \
+  --repo {repo_name} \
+  --configure-remote
+```
+
+Send only the printed public key to the parent. The parent adds it in GitHub repository Settings -> Deploy keys -> Add deploy key, with `Allow write access` enabled.
+
+After the key is added:
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/check_git_sync.py --workspace . --check-push
+```
+
 If this repository is public, commit only files that are safe to expose.
 """
 

@@ -204,18 +204,44 @@ The generated `.gitignore` ignores `skills/` by default so downloaded ClawHub bu
 
 ## GitHub Authorization For Sync
 
-OpenClaw may run on a machine that has no GitHub CLI and no saved GitHub credentials. GitHub sync only needs plain `git`, a remote, and push authorization. GitHub CLI `gh` is optional.
+OpenClaw may run on a machine that has no GitHub CLI and no saved GitHub credentials. Some OpenClaw providers may also have no safe GitHub token environment-variable setup. GitHub sync only needs plain `git`, a remote, and push authorization. GitHub CLI `gh` is optional.
 
-Preferred setup is SSH:
+Prefer a GitHub Deploy key. The expected interaction is: OpenClaw generates an SSH public key for the personal learning repository, sends that public key to the parent through Lark/Feishu or the OpenClaw reply, and the parent adds it in the target repository Settings -> Deploy keys with `Allow write access` enabled.
 
 ```bash
-git --version
-ssh -T git@github.com
-git remote set-url origin git@github.com:<user>/zhizhi-math-learning-data.git
+python3 skills/zhizhi-math-coach/scripts/prepare_github_deploy_key.py \
+  --workspace . \
+  --configure-remote
+```
+
+If the personal learning repository has no `origin` remote yet, pass the target repository explicitly:
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/prepare_github_deploy_key.py \
+  --workspace . \
+  --github-owner <user> \
+  --repo zhizhi-math-learning-data \
+  --configure-remote
+```
+
+OpenClaw should send only the public key, never the private key. Suggested Lark/Feishu message:
+
+```text
+Please add this OpenClaw public key to the GitHub repository:
+Location: Settings -> Deploy keys -> Add deploy key
+Permission: enable Allow write access
+After adding it, reply "added" and I will check again and continue publishing.
+```
+
+After the parent adds the key, run:
+
+```bash
 python3 skills/zhizhi-math-coach/scripts/check_git_sync.py --workspace . --check-push
 ```
 
-If SSH is not available, create a fine-grained GitHub personal access token for the personal learning repository only:
+On the first use inside a personal learning repository, if GitHub sync is not ready, the skill should briefly mention this Deploy key setup. Later, when the parent asks to publish a worksheet, send a link, push, or sync, a failed preflight should return the local file paths and repeat the Deploy key guidance instead of failing worksheet generation.
+
+If Deploy keys or SSH are not available, create a fine-grained GitHub personal access token for the personal learning repository only:
 
 - Create path: GitHub web -> profile photo -> Settings -> Developer settings -> Personal access tokens -> Fine-grained tokens -> Generate new token.
 - Repository access: select only `zhizhi-math-learning-data` or the user's personal learning repository.

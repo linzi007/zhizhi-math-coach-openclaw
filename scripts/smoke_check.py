@@ -20,6 +20,7 @@ VALIDATOR_PATH = SKILL_DIR / "scripts" / "validate_worksheet_spec.py"
 PUBLISHER_PATH = SKILL_DIR / "scripts" / "publish_html_site.py"
 INIT_WORKSPACE_PATH = SKILL_DIR / "scripts" / "init_learning_workspace.py"
 GIT_SYNC_CHECK_PATH = SKILL_DIR / "scripts" / "check_git_sync.py"
+DEPLOY_KEY_PREP_PATH = SKILL_DIR / "scripts" / "prepare_github_deploy_key.py"
 FORBIDDEN_PUBLIC_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".heic"}
 FORBIDDEN_SITE_PARTS = {
     "answer-key.md",
@@ -130,6 +131,10 @@ def check_git_sync_checker_loads() -> None:
     load_module(GIT_SYNC_CHECK_PATH, "git_sync_checker")
 
 
+def check_deploy_key_preparer_loads() -> None:
+    load_module(DEPLOY_KEY_PREP_PATH, "github_deploy_key_preparer")
+
+
 def check_init_workspace_script() -> None:
     module = load_module(INIT_WORKSPACE_PATH, "learning_workspace_init")
     with tempfile.TemporaryDirectory() as tmp:
@@ -186,6 +191,7 @@ def main() -> int:
     check_site_public_boundary()
     check_publisher_loads()
     check_git_sync_checker_loads()
+    check_deploy_key_preparer_loads()
     check_init_workspace_script()
     print("ok: repository smoke check passed")
     return 0

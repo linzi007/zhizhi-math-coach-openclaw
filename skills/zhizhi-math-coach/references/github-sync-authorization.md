@@ -16,13 +16,87 @@ GitHub sync requires standard `git` access from the OpenClaw machine:
 - `git` installed;
 - the personal learning workspace is a Git repository;
 - `origin` points to the target GitHub repository;
-- current machine has push authorization through SSH key or HTTPS token.
+- current machine has push authorization through a repository-scoped SSH deploy key, another SSH key, or an HTTPS token.
 
 GitHub CLI `gh` is optional. Do not require it.
 
 ClawHub login is not GitHub repository authorization. Model provider login is not GitHub repository authorization.
 
-## Recommended Authorization: SSH
+## Recommended Authorization: Repository Deploy Key
+
+Prefer a GitHub repository Deploy key for OpenClaw-hosted machines. Many OpenClaw providers do not expose a safe place for user-managed GitHub token environment variables, while SSH deploy keys only require the public key to be added in the target repository settings.
+
+Rules:
+
+- Generate one key per personal learning repository.
+- Keep the private key on the OpenClaw machine only.
+- Send only the `.pub` public key to the parent.
+- The parent adds the public key to the target repository: GitHub repository -> Settings -> Deploy keys -> Add deploy key.
+- The parent must enable `Allow write access` if OpenClaw should push commits.
+- Use Deploy keys only for the personal learning repository, not for the reusable skill source repository.
+- GitHub reference: https://docs.github.com/developers/overview/managing-deploy-keys/
+
+OpenClaw setup command:
+
+```bash
+python3 {baseDir}/scripts/prepare_github_deploy_key.py \
+  --workspace <personal-learning-workspace> \
+  --configure-remote
+```
+
+If `origin` is not configured yet, pass the target repository explicitly:
+
+```bash
+python3 {baseDir}/scripts/prepare_github_deploy_key.py \
+  --workspace <personal-learning-workspace> \
+  --github-owner <user> \
+  --repo <repo> \
+  --configure-remote
+```
+
+After the command prints `public-key-start` and `public-key-end`, send only that public key block to the parent. If a Lark/Feishu channel is available, send a message like:
+
+```text
+请把下面这个 OpenClaw 公钥加入 GitHub 仓库：
+
+仓库：<user>/<repo>
+位置：Settings -> Deploy keys -> Add deploy key
+Title：OpenClaw zhizhi-math-coach <repo>
+Key：<public-key>
+权限：勾选 Allow write access
+
+添加后回复“已添加”，我会再次检查并继续发布。
+```
+
+If no Lark/Feishu channel is available, return the same guidance in the OpenClaw reply. Never send the private key.
+
+After the parent confirms the key has been added, run:
+
+```bash
+python3 {baseDir}/scripts/check_git_sync.py --workspace <personal-learning-workspace> --check-push
+```
+
+If the preflight succeeds, commit and push only the requested scope.
+
+## First Reply And Publish-Time Guidance
+
+On the first meaningful reply in a personal learning workspace, check whether GitHub sync appears ready when it is cheap to do so. If the workspace is missing `.git`, `origin`, or push authorization, include a short guidance note without blocking grading or worksheet generation:
+
+- local learning files will still be generated;
+- public links require GitHub sync and Pages setup;
+- OpenClaw can generate a repository-specific SSH public key;
+- the parent should add it to GitHub Deploy keys with write access.
+
+When the parent later asks to publish a worksheet, send a public link, sync, push, or commit:
+
+1. Generate the worksheet and local `site/` output first.
+2. Run the Git preflight.
+3. If preflight fails, run or suggest `prepare_github_deploy_key.py`, send the public key and Deploy key steps through Lark/Feishu when available, and return the local file paths.
+4. After the parent adds the key, rerun preflight and then push.
+
+Do not treat missing GitHub authorization as worksheet-generation failure.
+
+## Alternative Authorization: Existing SSH
 
 Use SSH when possible because it does not require storing a token in commands.
 
@@ -38,9 +112,9 @@ git push --dry-run origin HEAD
 
 If `ssh -T git@github.com` fails, the parent must add an SSH public key to GitHub on that machine/account.
 
-## Alternative Authorization: HTTPS Token
+## Last Resort: HTTPS Token
 
-Use HTTPS only when SSH is not available. The parent should create a fine-grained GitHub personal access token (PAT) scoped to the personal learning repository only.
+Use HTTPS tokens only when deploy keys or SSH are not available. The parent should create a fine-grained GitHub personal access token (PAT) scoped to the personal learning repository only.
 
 Recommended token settings:
 

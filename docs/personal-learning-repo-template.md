@@ -46,18 +46,35 @@ Open this personal repository as the OpenClaw workspace. The generated `.gitigno
 
 ## GitHub Authorization On The OpenClaw Machine
 
-Do not assume the OpenClaw machine has GitHub CLI or saved credentials. Sync requires ordinary `git` plus either SSH authorization or an HTTPS personal access token.
+Do not assume the OpenClaw machine has GitHub CLI, saved credentials, or a provider-level GitHub token environment-variable setup. Sync requires ordinary `git` plus push authorization.
 
-Preferred SSH setup:
+Preferred setup is a repository-scoped GitHub Deploy key. OpenClaw generates the public key and sends it to the parent through Lark/Feishu or the OpenClaw reply. The parent adds it in GitHub repository Settings -> Deploy keys -> Add deploy key, with `Allow write access` enabled.
 
 ```bash
-git --version
-ssh -T git@github.com
-git remote set-url origin git@github.com:<user>/zhizhi-math-learning-data.git
+python3 skills/zhizhi-math-coach/scripts/prepare_github_deploy_key.py \
+  --workspace . \
+  --configure-remote
+```
+
+If `origin` is not configured yet:
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/prepare_github_deploy_key.py \
+  --workspace . \
+  --github-owner <user> \
+  --repo zhizhi-math-learning-data \
+  --configure-remote
+```
+
+Send only the public key text to the parent. Never send or commit the private key. After the parent confirms the key is added:
+
+```bash
 python3 skills/zhizhi-math-coach/scripts/check_git_sync.py --workspace . --check-push
 ```
 
-HTTPS token setup, when SSH is unavailable:
+On the first OpenClaw message in this workspace, if sync is not ready, the assistant should include a short Deploy key setup note. When publishing a worksheet or sending a public link, if the preflight fails, keep the generated local files and send the same authorization guidance.
+
+HTTPS token setup, when Deploy keys or SSH are unavailable:
 
 1. Create a fine-grained personal access token in GitHub: profile photo -> Settings -> Developer settings -> Personal access tokens -> Fine-grained tokens -> Generate new token.
 2. Select only the personal learning repository under repository access.

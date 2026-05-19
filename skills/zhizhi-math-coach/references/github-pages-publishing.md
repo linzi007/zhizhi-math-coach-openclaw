@@ -45,4 +45,4 @@ Forbidden in `site/`:
 
 When Pages is configured, return the Pages URL to the parent and use it in Feishu notifications. Keep answer keys and diagnosis links outside published `site/` output.
 
-If the parent asks OpenClaw to sync, push, publish to GitHub, or send a public link, read `github-sync-authorization.md` first. Do not assume GitHub CLI is installed or authenticated. Use the Git preflight before committing or pushing, and if authorization is missing, return the local `site/` paths plus setup guidance.
+If the parent asks OpenClaw to sync, push, publish to GitHub, or send a public link, read `github-sync-authorization.md` first. Do not assume GitHub CLI, GitHub token environment variables, or saved credentials are available. Use the Git preflight before committing or pushing. If authorization is missing, keep the local `site/` output, generate or suggest a repository Deploy key, send the public key and GitHub Settings -> Deploy keys guidance through Lark/Feishu when available, and return the local `site/` paths.

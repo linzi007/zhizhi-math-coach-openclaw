@@ -201,18 +201,44 @@ git push -u origin main
 
 ## GitHub 授权与同步
 
-OpenClaw 运行的机器不一定安装了 GitHub CLI，也不一定已经登录 GitHub。同步只依赖普通 `git`、正确的 remote，以及当前机器具备 push 权限。`gh` 命令是可选项，不是必需项。
+OpenClaw 运行的机器不一定安装了 GitHub CLI，也不一定已经登录 GitHub。有些 OpenClaw 供应商也不一定提供 GitHub token 环境变量配置入口。同步只依赖普通 `git`、正确的 remote，以及当前机器具备 push 权限。`gh` 命令是可选项，不是必需项。
 
-优先推荐 SSH：
+优先推荐使用 GitHub Deploy key。交互方式是：OpenClaw 生成当前个人学习仓库专用的 SSH 公钥，通过飞书或 OpenClaw 回复发给家长；家长把公钥添加到对应 GitHub 仓库的 Settings -> Deploy keys，并勾选 `Allow write access`。
 
 ```bash
-git --version
-ssh -T git@github.com
-git remote set-url origin git@github.com:<user>/zhizhi-math-learning-data.git
+python3 skills/zhizhi-math-coach/scripts/prepare_github_deploy_key.py \
+  --workspace . \
+  --configure-remote
+```
+
+如果个人学习仓库还没有配置 `origin`，可以显式传入目标仓库：
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/prepare_github_deploy_key.py \
+  --workspace . \
+  --github-owner <user> \
+  --repo zhizhi-math-learning-data \
+  --configure-remote
+```
+
+OpenClaw 应只发送脚本输出中的公钥，不发送私钥。飞书消息建议写清楚：
+
+```text
+请把下面这个 OpenClaw 公钥加入 GitHub 仓库：
+位置：Settings -> Deploy keys -> Add deploy key
+权限：勾选 Allow write access
+添加后回复“已添加”，我会继续检查并发布。
+```
+
+家长添加后，再运行：
+
+```bash
 python3 skills/zhizhi-math-coach/scripts/check_git_sync.py --workspace . --check-push
 ```
 
-如果不能使用 SSH，可以为个人学习仓库创建 fine-grained GitHub personal access token：
+第一次在个人学习仓库中使用 skill 时，如果发现还没有 GitHub 同步能力，回复里应该简短提示这个 Deploy key 授权流程。后续生成试卷并要求发布、发链接、push 或同步时，如果预检发现没有权限，也应该先返回本地文件路径，并再次发送 Deploy key 授权引导，而不是把出卷任务判定为失败。
+
+如果不能使用 Deploy key 或 SSH，可以为个人学习仓库创建 fine-grained GitHub personal access token：
 
 - 创建入口：GitHub 网页 -> 头像 -> Settings -> Developer settings -> Personal access tokens -> Fine-grained tokens -> Generate new token。
 - Repository access：只选择个人学习仓库，例如 `zhizhi-math-learning-data`。
