@@ -73,6 +73,17 @@ Open this repository as the OpenClaw workspace for daily grading, diagnosis, wor
 
 If this repository is public for GitHub Pages, every tracked file is viewable on GitHub, not only `site/`. Non-collaborators cannot push by default, so public viewing does not let others edit `main`. Keep collaborators empty, protect `main` against force pushes and deletion, and avoid required-pull-request rules if OpenClaw should push directly.
 
+Recommended ruleset: `main protect`, Active, bypass `Deploy keys` and `Repository admin` as `Always allow`, target `main` or `Default`, enable `Restrict updates`, `Restrict deletions`, and `Block force pushes`, and leave PR/status/signed-commit/deployment requirements disabled.
+
+After Pages and the writable Deploy key are configured, new generated worksheets should be automatically published:
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/publish_and_wait_pages.py \
+  worksheets/<date-topic> \
+  --workspace . \
+  --base-url https://<user>.github.io/{repo_name}
+```
+
 ## Daily Use
 
 Run OpenClaw in this repository and invoke:

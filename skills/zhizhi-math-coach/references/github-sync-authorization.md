@@ -166,7 +166,7 @@ If the check fails, do not treat worksheet generation as failed. Return:
 
 ## Sync Policy
 
-Do not run `git add`, `git commit`, or `git push` for ordinary generation. Sync only when the parent says "同步", "发布", "push", "提交到 GitHub", "发链接", or equivalent.
+Do not run `git add`, `git commit`, or `git push` for ordinary grading or local-only generation. Sync when the parent says "同步", "发布", "push", "提交到 GitHub", "发链接", or equivalent, or when the personal workspace is already configured for automatic Pages publishing of generated worksheets.
 
 If sync is requested:
 

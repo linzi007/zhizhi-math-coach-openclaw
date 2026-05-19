@@ -157,6 +157,26 @@ Recommended GitHub Pages setting:
 2. Build and deployment -> Source: `GitHub Actions`.
 3. Add `.github/workflows/pages.yml`, then push. The workflow below deploys `site/`.
 
+Recommended ruleset for keeping direct OpenClaw publishing:
+
+- Ruleset name: `main protect`.
+- Enforcement status: `Active`.
+- Bypass list:
+  - `Deploy keys`: `Always allow`.
+  - `Repository admin`: `Always allow`.
+- Target branches: `main`, or `Default` if the default branch is `main`.
+- Enable:
+  - `Restrict updates`.
+  - `Restrict deletions`.
+  - `Block force pushes`.
+- Do not enable:
+  - `Require a pull request before merging`.
+  - `Require status checks to pass`.
+  - `Require signed commits`.
+  - `Require deployments to succeed`.
+
+This means viewers can read the public repository and Pages site, but only the deploy key and repository admin can update `main`. OpenClaw can still push directly, so worksheet publishing does not require manual PR merging.
+
 ## Suggested `.gitignore`
 
 ```gitignore
@@ -189,6 +209,19 @@ python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
 ```
 
 Only child-facing `worksheet.html` files are copied into `site/`. Answers, records, memories, weak-point histories, uploaded papers, and textbook files must stay out of `site/`. If the repository is public, treat everything outside `site/` as potentially visible too and only commit data you are comfortable publishing.
+
+The generated `site/index.html` scans all public-safe worksheets under `worksheets/`, sorts them by date descending, and shows date, practice status, title, topic, grade, item count, and completion summary. Practice status comes from `worksheets/status.md` when available; otherwise generated worksheets are shown as `未练习`.
+
+After public Pages, `.github/workflows/pages.yml`, and a writable Deploy key are configured, worksheet generation should auto-publish:
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/publish_and_wait_pages.py \
+  worksheets/<date-topic> \
+  --workspace . \
+  --base-url https://<user>.github.io/zhizhi-math-learning-data
+```
+
+This refreshes `site/`, commits and pushes public-safe publishing files, waits for the GitHub Actions Pages workflow to complete, and then returns the Pages index and worksheet URLs. If deployment fails or times out, local worksheet files still remain valid.
 
 ## GitHub Pages Workflow
 

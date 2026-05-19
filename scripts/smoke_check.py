@@ -22,6 +22,7 @@ INIT_WORKSPACE_PATH = SKILL_DIR / "scripts" / "init_learning_workspace.py"
 GIT_SYNC_CHECK_PATH = SKILL_DIR / "scripts" / "check_git_sync.py"
 DEPLOY_KEY_PREP_PATH = SKILL_DIR / "scripts" / "prepare_github_deploy_key.py"
 PAGES_WORKFLOW_SETUP_PATH = SKILL_DIR / "scripts" / "setup_github_pages_workflow.py"
+PUBLISH_AND_WAIT_PATH = SKILL_DIR / "scripts" / "publish_and_wait_pages.py"
 FORBIDDEN_PUBLIC_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".heic"}
 FORBIDDEN_SITE_PARTS = {
     "answer-key.md",
@@ -140,6 +141,10 @@ def check_pages_workflow_setup_loads() -> None:
     load_module(PAGES_WORKFLOW_SETUP_PATH, "github_pages_workflow_setup")
 
 
+def check_publish_and_wait_loads() -> None:
+    load_module(PUBLISH_AND_WAIT_PATH, "github_pages_publish_and_wait")
+
+
 def check_init_workspace_script() -> None:
     module = load_module(INIT_WORKSPACE_PATH, "learning_workspace_init")
     with tempfile.TemporaryDirectory() as tmp:
@@ -198,6 +203,7 @@ def main() -> int:
     check_git_sync_checker_loads()
     check_deploy_key_preparer_loads()
     check_pages_workflow_setup_loads()
+    check_publish_and_wait_loads()
     check_init_workspace_script()
     print("ok: repository smoke check passed")
     return 0

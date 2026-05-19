@@ -14,3 +14,5 @@
 - Added GitHub sync authorization guidance and a plain-git preflight checker.
 - Added repository Deploy key setup guidance for OpenClaw environments without GitHub token configuration.
 - Added public-repository GitHub Pages guidance and a workflow setup helper.
+- Updated the public worksheet index to list all worksheets by date with practice status and summary columns.
+- Added automatic Pages publish/push/wait helper for generated worksheets.

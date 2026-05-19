@@ -8,7 +8,25 @@ Do not publish answers, diagnosis records, long-term memory, weak-point history,
 
 ## Default Flow
 
-After generating a worksheet:
+After generating a worksheet in a Pages-enabled public personal repository, publish and wait:
+
+```bash
+python3 {baseDir}/scripts/publish_and_wait_pages.py \
+  worksheets/YYYY-MM-DD-topic \
+  --workspace <personal-learning-workspace> \
+  --base-url https://<github-user>.github.io/<repo>
+```
+
+The script:
+
+1. Copies public-safe worksheet HTML into `site/`.
+2. Rebuilds `site/index.html` from all worksheets.
+3. Stages only public-safe publishing files: `site/`, `.github/workflows/pages.yml` when present, and `worksheets/*/publish.json`.
+4. Commits and pushes to the current branch.
+5. Waits for the GitHub Actions Pages workflow for that commit.
+6. Checks the Pages index and worksheet URLs before reporting `pages-ready`.
+
+Use local-only publishing when GitHub sync is unavailable or the parent asks only for files:
 
 ```bash
 python3 {baseDir}/scripts/publish_html_site.py \
@@ -24,6 +42,8 @@ The publisher writes:
 - `site/.nojekyll`: disables Jekyll processing.
 - `worksheets/YYYY-MM-DD-topic/publish.json`: publication manifest.
 
+The index is rebuilt from all public-safe worksheet HTML files under `worksheets/`, even when publishing a single worksheet path. It sorts worksheets by date descending and shows date, practice status, title, topic, grade, item count, and completion summary. Practice status is inferred from `worksheets/status.md` when available; otherwise a generated worksheet is shown as `未练习`.
+
 This only produces local `site/` files. A public URL requires the personal learning repository to be pushed to GitHub and GitHub Pages to be configured for that repository.
 
 ## Public Repository Mode
@@ -35,7 +55,7 @@ If the parent chooses to make the personal learning repository public to avoid p
 - Do not add collaborators unless they should be able to push.
 - For `main`, public GitHub repositories are read-only to non-collaborators by default. Recommend branch protection/rulesets to block force pushes and branch deletion. Do not enable a rule that requires pull requests or blocks direct pushes if OpenClaw is expected to push `site/` and workflow updates directly.
 
-Recommended manual GitHub setting:
+Recommended GitHub Pages setting:
 
 1. Repository Settings -> Pages.
 2. Build and deployment -> Source: `GitHub Actions`.
@@ -55,6 +75,34 @@ git push
 ```
 
 The push triggers the GitHub Actions Pages deployment. Return the expected URL `https://<github-user>.github.io/<repo>/` and tell the parent that the first deployment may take a short time.
+
+In normal worksheet generation, if Pages mode is already configured and Git preflight passes, run `publish_and_wait_pages.py` automatically after `generate_worksheet.py`. Reply only after deployment succeeds, with:
+
+- the public index URL;
+- the newly generated worksheet URL;
+- local paths for `worksheet.html` and `answer-key.md`.
+
+If deployment fails or times out, do not hide the local result. Return local paths, pushed commit if known, and the Actions run URL or next setup step.
+
+Recommended ruleset for direct OpenClaw publishing:
+
+- Ruleset name: `main protect`.
+- Enforcement status: `Active`.
+- Bypass list:
+  - `Deploy keys`: `Always allow`.
+  - `Repository admin`: `Always allow`.
+- Target branches: `main`, or `Default` if the default branch is `main`.
+- Enabled rules:
+  - `Restrict updates`.
+  - `Restrict deletions`.
+  - `Block force pushes`.
+- Disabled rules:
+  - `Require a pull request before merging`.
+  - `Require status checks to pass`.
+  - `Require signed commits`.
+  - `Require deployments to succeed`.
+
+This keeps the repository public-readable while allowing only the deploy key and repository admin to update `main`. It also avoids turning every OpenClaw update into a manual PR/merge flow.
 
 ## Public Content Rule
 

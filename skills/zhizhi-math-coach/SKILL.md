@@ -95,7 +95,11 @@ Do not assume background sync. Local files are changed by the current task only:
 - publishing may write `site/` and `worksheets/<date-topic>/publish.json`.
 - GitHub Pages setup may write `.github/workflows/pages.yml` when the parent has chosen a public repository, selected GitHub Actions as the Pages source, and asked OpenClaw to set up publishing.
 
-Do not run `git add`, `git commit`, or `git push` unless the parent explicitly asks to sync, publish, push, commit to GitHub, or send a public link. When sync is requested, read `references/github-sync-authorization.md` first and run the bundled preflight before committing or pushing. Do not require GitHub CLI or provider-level token configuration; a repository-scoped SSH deploy key is the preferred setup. If authorization is missing, return the local file paths and setup guidance instead of treating generation as failed. If the personal repository is public, warn before committing sensitive learning records or answer keys.
+When publishing, rebuild `site/index.html` as the full worksheet list from `worksheets/`, sorted by date descending. Include only public-safe metadata: date, practice status, title, topic, grade, item count, and completion summary. Infer status from `worksheets/status.md` when available; do not expose answers or diagnosis details in `site/`.
+
+If a worksheet is generated in a workspace that already has public Pages mode configured (`.github/workflows/pages.yml`, GitHub Pages source set to Actions, and Git preflight passes), automatically publish to Pages: run `publish_and_wait_pages.py`, wait for GitHub Actions deployment to finish, then reply with the index URL and worksheet URL. If the Actions run fails or times out, return the local paths, pushed commit if available, and Actions/setup guidance.
+
+Do not run `git add`, `git commit`, or `git push` unless the parent explicitly asks to sync, publish, push, commit to GitHub, send a public link, or has enabled automatic Pages publishing for generated worksheets. When sync is requested, read `references/github-sync-authorization.md` first and run the bundled preflight before committing or pushing. Do not require GitHub CLI or provider-level token configuration; a repository-scoped SSH deploy key is the preferred setup. If authorization is missing, return the local file paths and setup guidance instead of treating generation as failed. If the personal repository is public, warn before committing sensitive learning records or answer keys.
 
 On the first meaningful reply in a personal learning workspace, if GitHub sync is not ready or cannot be confirmed, include a short setup note: OpenClaw can generate a repository-specific public key, send it to the parent through Lark/Feishu when available, and the parent should add it in GitHub repository Settings -> Deploy keys with write access. Do not repeat the full setup on every ordinary grading reply; repeat it when the parent asks to sync/publish or a publish preflight fails.
 
@@ -124,6 +128,7 @@ Skill resources are relative to `{baseDir}`:
 - `scripts/init_learning_workspace.py`: initialize a personal learning repository after the skill is installed.
 - `scripts/validate_worksheet_spec.py`: validate worksheet JSON without writing outputs.
 - `scripts/publish_html_site.py`: publish child-facing worksheet HTML into a GitHub Pages `site/` directory.
+- `scripts/publish_and_wait_pages.py`: publish `site/`, commit/push public-safe files, wait for GitHub Actions Pages deployment, and print ready URLs.
 - `assets/worksheet/question-types.json`: reusable worksheet item types.
 - `assets/worksheet/a4-single.html`: printable HTML template.
 
@@ -189,7 +194,16 @@ python3 {baseDir}/scripts/generate_worksheet.py \
   worksheets/YYYY-MM-DD-topic/worksheet-spec.json
 ```
 
-If the parent wants a Feishu-clickable page and accepts public worksheet links, publish only the child-facing worksheet HTML:
+If the workspace has public Pages mode configured and the parent accepts public worksheet links, publish only the child-facing worksheet HTML and wait for deployment:
+
+```bash
+python3 {baseDir}/scripts/publish_and_wait_pages.py \
+  worksheets/YYYY-MM-DD-topic \
+  --workspace <personal-learning-workspace> \
+  --base-url https://<github-user>.github.io/<repo>
+```
+
+If the parent wants a local-only preview or GitHub sync is not ready, publish local `site/` files without pushing:
 
 ```bash
 python3 {baseDir}/scripts/publish_html_site.py \
@@ -198,7 +212,7 @@ python3 {baseDir}/scripts/publish_html_site.py \
   --base-url https://<github-user>.github.io/<repo>
 ```
 
-Reply with file paths, item count, target weak point, and Pages URL when available. Do not paste full worksheet HTML or full answer keys unless asked.
+When Pages auto-publishing succeeds, reply with the Pages index URL and worksheet URL. Otherwise reply with file paths, item count, target weak point, and setup guidance for publishing. Do not paste full worksheet HTML or full answer keys unless asked.
 
 ## Teaching Defaults
 

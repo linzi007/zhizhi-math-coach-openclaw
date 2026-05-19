@@ -23,6 +23,7 @@ V1 is a Skill-first release. It supports:
 - deterministic geometry SVG rendering for simple diagrams;
 - GitHub Pages publisher script for personal learning repositories;
 - GitHub Actions Pages workflow setup for public personal repositories;
+- automatic Pages publishing with GitHub Actions deployment waiting;
 - validation and smoke checks.
 
 V1 does not ship an OpenClaw plugin tool package. Plugin interfaces are documented in `docs/plugin-tools-roadmap.md`.
@@ -62,3 +63,5 @@ This public skill repository should not commit generated `site/` output. Use `pu
 OpenClaw machines may not have GitHub CLI, credentials, or a provider-level GitHub token environment-variable setup. Prefer a repository-scoped Deploy key: generate it with `scripts/prepare_github_deploy_key.py`, send only the public key to the parent through Lark/Feishu or the OpenClaw reply, and ask the parent to add it to the personal learning repository under Settings -> Deploy keys with write access. Before any OpenClaw-initiated commit or push, run `scripts/check_git_sync.py` from the installed skill against the personal learning repository. Use a fine-grained token scoped only to the personal learning repository as a fallback.
 
 For free GitHub Pages on a public personal repository, instruct the parent to choose Settings -> Pages -> Build and deployment -> Source: GitHub Actions. OpenClaw may create `.github/workflows/pages.yml` with `scripts/setup_github_pages_workflow.py` and push it after Git sync authorization is ready. Clarify that a public repository exposes all tracked files, not only the Pages site, while non-collaborators cannot push by default.
+
+After worksheet generation in a configured public Pages workspace, OpenClaw should run `scripts/publish_and_wait_pages.py`, wait for the GitHub Actions deployment to complete, and then reply with the Pages index URL and worksheet URL. This helper uses plain git and the public GitHub Actions API; it does not require GitHub CLI.

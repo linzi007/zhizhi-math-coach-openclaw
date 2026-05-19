@@ -355,6 +355,8 @@ python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
 - `site/.nojekyll`：GitHub Pages 静态站点标记。
 - `worksheets/<date-topic>/publish.json`：记录发布信息。
 
+`site/index.html` 会扫描 `worksheets/` 下所有可公开的学生版练习卷，按日期倒序展示，不会只展示本次发布的一张。索引列包括日期、练习状态、练习卷标题、主题、年级、题量和完成情况。练习状态优先从 `worksheets/status.md` 推断；没有记录时默认显示为 `未练习`。
+
 `site/` 只放学生可见内容。不要把答案、批改记录、长短期记忆、薄弱项历史、上传试卷、教材 PDF 或 OCR 内容放进去。
 
 飞书里建议发送 GitHub Pages 链接，答案和批改标准不要放进公开发布的 `site/` 目录。
@@ -374,6 +376,42 @@ python3 skills/zhizhi-math-coach/scripts/setup_github_pages_workflow.py --worksp
 git add .github/workflows/pages.yml site
 git commit -m "Configure GitHub Pages publishing"
 git push
+```
+
+推荐 ruleset 配置：
+
+- Ruleset name：`main protect`
+- Enforcement status：`Active`
+- Bypass list：
+  - `Deploy keys`：`Always allow`
+  - `Repository admin`：`Always allow`
+- Target branches：`main`，或者默认分支就是 `main` 时选择 `Default`
+- 勾选：
+  - `Restrict updates`
+  - `Restrict deletions`
+  - `Block force pushes`
+- 不勾选：
+  - `Require a pull request before merging`
+  - `Require status checks to pass`
+  - `Require signed commits`
+  - `Require deployments to succeed`
+
+这样 public 仓库仍然可以被查看，但只有 deploy key 和仓库管理员能更新 `main`；OpenClaw 仍然可以直接 push，不需要每次开 PR、人工合并。
+
+自动发布流程：
+
+- 当个人学习仓库已经配置 public Pages、`.github/workflows/pages.yml` 和可写 Deploy key 后，skill 生成新练习卷时会自动发布学生版页面。
+- OpenClaw 会先生成本地 `worksheet.html` 和 `answer-key.md`，再刷新 `site/`，提交并 push public-safe 文件。
+- GitHub Actions 执行完成后，OpenClaw 再回复 Pages 首页链接和本次练习卷链接。
+- 如果 Actions 失败或超时，本地文件仍然有效，OpenClaw 会返回本地路径和 Actions/授权排查信息。
+
+可手动运行同一流程：
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/publish_and_wait_pages.py \
+  worksheets/<date-topic> \
+  --workspace . \
+  --base-url https://<user>.github.io/zhizhi-math-learning-data
 ```
 
 ## 教材使用边界

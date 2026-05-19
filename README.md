@@ -312,6 +312,8 @@ The publisher writes:
 - `site/.nojekyll`: GitHub Pages static-site marker.
 - `worksheets/<date-topic>/publish.json`: publication manifest.
 
+`site/index.html` scans all public-safe child-facing worksheets under `worksheets/`, sorts them by date descending, and shows date, practice status, title, topic, grade, item count, and completion summary. Practice status is inferred from `worksheets/status.md` when available; otherwise generated worksheets are shown as `未练习`.
+
 Do not publish answer keys, grading records, memory files, weak-point history, uploaded papers, or textbook files to `site/`.
 
 To publish on GitHub, enable Pages in the personal learning repository settings and choose the `site/` directory or a workflow copied from `docs/personal-learning-repo-template.md`.
@@ -329,6 +331,42 @@ python3 skills/zhizhi-math-coach/scripts/setup_github_pages_workflow.py --worksp
 git add .github/workflows/pages.yml site
 git commit -m "Configure GitHub Pages publishing"
 git push
+```
+
+Recommended ruleset:
+
+- Ruleset name: `main protect`
+- Enforcement status: `Active`
+- Bypass list:
+  - `Deploy keys`: `Always allow`
+  - `Repository admin`: `Always allow`
+- Target branches: `main`, or `Default` if the default branch is `main`
+- Enable:
+  - `Restrict updates`
+  - `Restrict deletions`
+  - `Block force pushes`
+- Do not enable:
+  - `Require a pull request before merging`
+  - `Require status checks to pass`
+  - `Require signed commits`
+  - `Require deployments to succeed`
+
+This keeps the public repository viewable but lets only the deploy key and repository admin update `main`. OpenClaw can still push directly, so publishing does not require manual PR merges.
+
+Automatic publishing flow:
+
+- After public Pages, `.github/workflows/pages.yml`, and a writable Deploy key are configured, the skill auto-publishes new generated worksheets.
+- OpenClaw generates local `worksheet.html` and `answer-key.md`, refreshes `site/`, then commits and pushes public-safe files.
+- After GitHub Actions completes, OpenClaw replies with the Pages index URL and the generated worksheet URL.
+- If Actions fails or times out, local files remain valid and OpenClaw returns local paths plus Actions/auth setup guidance.
+
+Manual equivalent:
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/publish_and_wait_pages.py \
+  worksheets/<date-topic> \
+  --workspace . \
+  --base-url https://<user>.github.io/zhizhi-math-learning-data
 ```
 
 ## Supported Worksheet Strategies
