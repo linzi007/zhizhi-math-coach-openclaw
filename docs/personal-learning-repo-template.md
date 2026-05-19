@@ -142,6 +142,21 @@ git push
 
 In a public personal repository, only commit files that are safe to expose. Usually that means `site/` only, or sanitized worksheet files without answers, student identifiers, photos, uploads, or textbook-derived raw material.
 
+## Public Repository Mode
+
+If you make this repository public to use free GitHub Pages, understand the visibility boundary:
+
+- The Pages URL shows `site/`, but the GitHub repository itself exposes every tracked file to viewers.
+- Non-collaborators cannot push to your public repository by default, so making it public does not let other people edit `main`.
+- Keep collaborators empty unless someone should be able to modify the repository.
+- Add branch protection or a repository ruleset for `main` to block force pushes and branch deletion. Avoid rules that require pull requests or block direct pushes if OpenClaw should push worksheet/site updates directly.
+
+Recommended GitHub Pages setting:
+
+1. Repository Settings -> Pages.
+2. Build and deployment -> Source: `GitHub Actions`.
+3. Add `.github/workflows/pages.yml`, then push. The workflow below deploys `site/`.
+
 ## Suggested `.gitignore`
 
 ```gitignore
@@ -175,9 +190,18 @@ python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
 
 Only child-facing `worksheet.html` files are copied into `site/`. Answers, records, memories, weak-point histories, uploaded papers, and textbook files must stay out of `site/`. If the repository is public, treat everything outside `site/` as potentially visible too and only commit data you are comfortable publishing.
 
-## Optional GitHub Pages Workflow
+## GitHub Pages Workflow
 
-If you want GitHub Actions to deploy `site/`, add this to the personal learning repository as `.github/workflows/pages.yml`:
+If you want GitHub Actions to deploy `site/`, OpenClaw can create the file:
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/setup_github_pages_workflow.py --workspace .
+git add .github/workflows/pages.yml site
+git commit -m "Configure GitHub Pages publishing"
+git push
+```
+
+Or add this to the personal learning repository as `.github/workflows/pages.yml`:
 
 ```yaml
 name: Deploy GitHub Pages

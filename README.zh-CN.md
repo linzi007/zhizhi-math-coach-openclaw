@@ -361,6 +361,21 @@ python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
 
 要在线访问这些页面，需要在个人学习仓库 Settings -> Pages 中启用 Pages，可选择 `site/` 目录或复制 `docs/personal-learning-repo-template.md` 中的 workflow。
 
+如果你的 GitHub Pages 页面提示 private repo 需要升级，可以把个人学习仓库改成 public 使用免费 Pages，但要明确：public 仓库里所有已提交文件都可被查看，不只是 `site/`。非协作者默认不能编辑 public 仓库，所以“别人可以看试卷”不等于“别人可以改 main”。建议不要添加协作者，并在 Settings -> Branches 或 Rulesets 中保护 `main`，至少禁止 force push 和删除分支；如果希望 OpenClaw 直接 push `site/` 和 workflow，不要启用会阻断 direct push 的强制 PR 规则。
+
+推荐 GitHub Pages 设置：
+
+1. Settings -> Pages -> Build and deployment -> Source 选择 `GitHub Actions`。
+2. 在个人学习仓库新增 `.github/workflows/pages.yml`。
+3. 如果 OpenClaw 已经通过 Deploy key 获得写权限，可以直接创建、提交并 push：
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/setup_github_pages_workflow.py --workspace .
+git add .github/workflows/pages.yml site
+git commit -m "Configure GitHub Pages publishing"
+git push
+```
+
 ## 教材使用边界
 
 本项目可以使用教材信息帮助判断年级、册别、单元范围和知识点顺序。例如，个人学习工作区可以引用 `TapXWorld/ChinaTextbook` 中的人教版小学数学目录作为外部参考。

@@ -26,6 +26,36 @@ The publisher writes:
 
 This only produces local `site/` files. A public URL requires the personal learning repository to be pushed to GitHub and GitHub Pages to be configured for that repository.
 
+## Public Repository Mode
+
+If the parent chooses to make the personal learning repository public to avoid paid private Pages:
+
+- Clarify that the whole public repository is viewable, not only the Pages site. Public Pages makes `site/` easy to open, but GitHub users can also browse tracked files outside `site/`.
+- Use this mode only when the parent accepts public visibility of committed files, or when the repository commits only public-safe files.
+- Do not add collaborators unless they should be able to push.
+- For `main`, public GitHub repositories are read-only to non-collaborators by default. Recommend branch protection/rulesets to block force pushes and branch deletion. Do not enable a rule that requires pull requests or blocks direct pushes if OpenClaw is expected to push `site/` and workflow updates directly.
+
+Recommended manual GitHub setting:
+
+1. Repository Settings -> Pages.
+2. Build and deployment -> Source: `GitHub Actions`.
+3. If not present, create `.github/workflows/pages.yml` with the bundled setup script:
+
+```bash
+python3 {baseDir}/scripts/setup_github_pages_workflow.py \
+  --workspace <personal-learning-workspace>
+```
+
+If GitHub sync is already authorized through the Deploy key, OpenClaw may commit and push this workflow after the parent asks it to set up Pages:
+
+```bash
+git add .github/workflows/pages.yml site
+git commit -m "Configure GitHub Pages publishing"
+git push
+```
+
+The push triggers the GitHub Actions Pages deployment. Return the expected URL `https://<github-user>.github.io/<repo>/` and tell the parent that the first deployment may take a short time.
+
 ## Public Content Rule
 
 Allowed in `site/`:

@@ -69,6 +69,10 @@ Open this repository as the OpenClaw workspace for daily grading, diagnosis, wor
 - `worksheets/`: generated worksheet specs, printable HTML, and answer keys.
 - `site/`: optional child-facing public pages only.
 
+## Public Repository Mode
+
+If this repository is public for GitHub Pages, every tracked file is viewable on GitHub, not only `site/`. Non-collaborators cannot push by default, so public viewing does not let others edit `main`. Keep collaborators empty, protect `main` against force pushes and deletion, and avoid required-pull-request rules if OpenClaw should push directly.
+
 ## Daily Use
 
 Run OpenClaw in this repository and invoke:

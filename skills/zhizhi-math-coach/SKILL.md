@@ -93,6 +93,7 @@ Do not assume background sync. Local files are changed by the current task only:
 - grading or diagnosis may write `records/`, `mistakes/`, `weak-points/`, and evidence-backed `memory/` updates;
 - worksheet generation may write `worksheets/<date-topic>/worksheet-spec.json`, `worksheet.html`, and `answer-key.md`;
 - publishing may write `site/` and `worksheets/<date-topic>/publish.json`.
+- GitHub Pages setup may write `.github/workflows/pages.yml` when the parent has chosen a public repository, selected GitHub Actions as the Pages source, and asked OpenClaw to set up publishing.
 
 Do not run `git add`, `git commit`, or `git push` unless the parent explicitly asks to sync, publish, push, commit to GitHub, or send a public link. When sync is requested, read `references/github-sync-authorization.md` first and run the bundled preflight before committing or pushing. Do not require GitHub CLI or provider-level token configuration; a repository-scoped SSH deploy key is the preferred setup. If authorization is missing, return the local file paths and setup guidance instead of treating generation as failed. If the personal repository is public, warn before committing sensitive learning records or answer keys.
 
@@ -119,6 +120,7 @@ Skill resources are relative to `{baseDir}`:
 - `scripts/generate_worksheet.py`: generate worksheet HTML and answer key from JSON.
 - `scripts/check_git_sync.py`: preflight whether the current machine can reach and push the personal GitHub repository.
 - `scripts/prepare_github_deploy_key.py`: generate a repository-scoped SSH deploy key and public-key setup instructions for GitHub Deploy keys.
+- `scripts/setup_github_pages_workflow.py`: create `.github/workflows/pages.yml` for publishing `site/` through GitHub Actions.
 - `scripts/init_learning_workspace.py`: initialize a personal learning repository after the skill is installed.
 - `scripts/validate_worksheet_spec.py`: validate worksheet JSON without writing outputs.
 - `scripts/publish_html_site.py`: publish child-facing worksheet HTML into a GitHub Pages `site/` directory.

@@ -13,3 +13,4 @@
 - Added GitHub Pages publishing for child-facing worksheet HTML.
 - Added GitHub sync authorization guidance and a plain-git preflight checker.
 - Added repository Deploy key setup guidance for OpenClaw environments without GitHub token configuration.
+- Added public-repository GitHub Pages guidance and a workflow setup helper.

@@ -316,6 +316,21 @@ Do not publish answer keys, grading records, memory files, weak-point history, u
 
 To publish on GitHub, enable Pages in the personal learning repository settings and choose the `site/` directory or a workflow copied from `docs/personal-learning-repo-template.md`.
 
+If GitHub says private repositories require an upgrade for Pages, you can make the personal learning repository public for free Pages, but be explicit about the visibility boundary: every tracked file in a public repository is viewable, not only `site/`. Non-collaborators cannot push to a public repository by default, so public visibility does not let other people edit `main`. Keep collaborators empty unless they should be able to modify the repository, and protect `main` in Settings -> Branches or Rulesets at least by blocking force pushes and deletion. Do not enable required-pull-request rules if OpenClaw should push `site/` and workflow updates directly.
+
+Recommended GitHub Pages setup:
+
+1. Settings -> Pages -> Build and deployment -> Source: choose `GitHub Actions`.
+2. Add `.github/workflows/pages.yml` to the personal learning repository.
+3. If OpenClaw already has write access through the Deploy key, it can create, commit, and push the workflow:
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/setup_github_pages_workflow.py --workspace .
+git add .github/workflows/pages.yml site
+git commit -m "Configure GitHub Pages publishing"
+git push
+```
+
 ## Supported Worksheet Strategies
 
 - `wrong_question_variant`: create variants from known wrong questions.
