@@ -44,6 +44,17 @@ git push -u origin main
 
 Open this personal repository as the OpenClaw workspace. The generated `.gitignore` ignores `skills/` by default, so downloaded ClawHub bundles are not committed into the personal learning repository.
 
+## First-Use Checklist
+
+Use this checklist before the first real grading or worksheet-generation session:
+
+- Open `zhizhi-math-learning-data/` as the OpenClaw workspace, not the reusable `zhizhi-math-coach-openclaw/` repository.
+- Confirm `memory/`, `curriculum/`, `worksheets/`, `records/`, `mistakes/`, and `weak-points/` exist.
+- Run `check_git_sync.py --check-push` only when sync, public links, or auto-publishing are desired.
+- If sync is not ready, generate a deploy-key public key with `prepare_github_deploy_key.py` and add it to GitHub Deploy keys with write access.
+- For public worksheet links, set Settings -> Pages -> Build and deployment -> Source to `GitHub Actions`, then create `.github/workflows/pages.yml`.
+- For a public repository, configure the `main protect` ruleset described below before relying on automatic publishing.
+
 ## GitHub Authorization On The OpenClaw Machine
 
 Do not assume the OpenClaw machine has GitHub CLI, saved credentials, or a provider-level GitHub token environment-variable setup. Sync requires ordinary `git` plus push authorization.

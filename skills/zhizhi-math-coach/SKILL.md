@@ -101,7 +101,7 @@ If a worksheet is generated in a workspace that already has public Pages mode co
 
 Do not run `git add`, `git commit`, or `git push` unless the parent explicitly asks to sync, publish, push, commit to GitHub, send a public link, or has enabled automatic Pages publishing for generated worksheets. When sync is requested, read `references/github-sync-authorization.md` first and run the bundled preflight before committing or pushing. Do not require GitHub CLI or provider-level token configuration; a repository-scoped SSH deploy key is the preferred setup. If authorization is missing, return the local file paths and setup guidance instead of treating generation as failed. If the personal repository is public, warn before committing sensitive learning records or answer keys.
 
-On the first meaningful reply in a personal learning workspace, if GitHub sync is not ready or cannot be confirmed, include a short setup note: OpenClaw can generate a repository-specific public key, send it to the parent through Lark/Feishu when available, and the parent should add it in GitHub repository Settings -> Deploy keys with write access. Do not repeat the full setup on every ordinary grading reply; repeat it when the parent asks to sync/publish or a publish preflight fails.
+On the first meaningful reply in a personal learning workspace, use `references/openclaw-quickstart.md` for a short setup check. If GitHub sync is not ready or cannot be confirmed, include a short setup note: OpenClaw can generate a repository-specific public key, send it to the parent through Lark/Feishu when available, and the parent should add it in GitHub repository Settings -> Deploy keys with write access. Do not repeat the full setup on every ordinary grading reply; repeat it when the parent asks to sync/publish or a publish preflight fails.
 
 Skill resources are relative to `{baseDir}`:
 
@@ -117,6 +117,7 @@ Skill resources are relative to `{baseDir}`:
 - `references/complex-problem-generation.md`: complex word-problem and review safeguards.
 - `references/geometry-generation.md`: deterministic SVG geometry rules.
 - `references/automation-openclaw.md`: scheduled reminders, channels, and automation boundaries.
+- `references/openclaw-quickstart.md`: first-use checklist, common prompts, Pages-ready checklist, and ruleset summary.
 - `references/github-pages-publishing.md`: public child-facing HTML worksheet publishing rules.
 - `references/github-sync-authorization.md`: GitHub SSH/token authorization, preflight checks, and sync boundaries.
 - `references/worksheet-standards.md`: child-facing printable worksheet rules.

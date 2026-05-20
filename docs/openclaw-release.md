@@ -16,6 +16,7 @@ V1 is a Skill-first release. It supports:
 - China grade/semester/calendar alignment;
 - curriculum and textbook-scope references;
 - personal learning repository initialization;
+- first-use quickstart and setup checklist;
 - recommended model capability guidance for vision, long-context records, structured output, and reasoning effort;
 - GitHub sync authorization guidance for repository Deploy keys, SSH, and fine-grained HTTPS tokens;
 - Git preflight checks that do not require GitHub CLI;
@@ -40,6 +41,7 @@ Check manually:
 
 - `README.md` uses `zhizhi-math-coach`.
 - `SKILL.md` frontmatter name is `zhizhi-math-coach`.
+- `references/openclaw-quickstart.md` matches the current GitHub Pages and Deploy key flow.
 - no real student data, school papers, PDFs, images, screenshots, or OCR dumps are committed;
 - sample worksheets are sanitized;
 - examples do not copy textbook problem sets.

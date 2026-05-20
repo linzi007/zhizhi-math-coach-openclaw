@@ -12,6 +12,27 @@
 
 本仓库只包含通用模板、脚本和脱敏示例。真实学生记录、试卷照片、学校作业、教材 PDF 和学习过程中生成的数据应放在单独的个人学习仓库。
 
+## Quick Reference
+
+| 场景 | 用户动作 | OpenClaw/Skill 动作 |
+| --- | --- | --- |
+| 第一次使用 | 创建个人学习仓库并安装 `zhizhi-math-coach` | 初始化 `memory/`、`curriculum/`、`worksheets/`、`records/` |
+| 首次同步 | 让 OpenClaw 生成公钥 | 家长把公钥加入 GitHub Deploy keys，并勾选 `Allow write access` |
+| 开启公开试卷链接 | GitHub Pages 选择 `GitHub Actions` | 创建 `.github/workflows/pages.yml`，发布 `site/` |
+| 日常批改 | 上传练习卷/错题照片 | 写入 `records/`、`mistakes/`、`weak-points/`、必要时更新 `memory/` |
+| 日常出卷 | 说明错题变式、薄弱项专项或考前复习 | 生成 `worksheet.html` 和 `answer-key.md`；Pages 就绪时自动发布并返回链接 |
+
+常用触发语：
+
+```text
+$zhizhi-math-coach 批改这张练习卷，记录薄弱项。
+$zhizhi-math-coach 根据最近错题生成变式练习。
+$zhizhi-math-coach 针对退位减法薄弱项出专项练习。
+$zhizhi-math-coach 生成期末错因复习卷，并发布学生版链接。
+```
+
+首次配置可按 `skills/zhizhi-math-coach/references/openclaw-quickstart.md` 的检查清单执行。
+
 ## 项目结构
 
 ```text
@@ -23,6 +44,9 @@ skills/zhizhi-math-coach/
   scripts/generate_worksheet.py
   scripts/validate_worksheet_spec.py
   scripts/publish_html_site.py
+  scripts/publish_and_wait_pages.py
+  scripts/setup_github_pages_workflow.py
+  scripts/prepare_github_deploy_key.py
   scripts/check_git_sync.py
   assets/worksheet/
 docs/
@@ -466,5 +490,6 @@ python3 scripts/smoke_check.py
 更多发布说明见：
 
 - `docs/openclaw-release.md`
+- `skills/zhizhi-math-coach/references/openclaw-quickstart.md`
 - `docs/privacy-and-copyright.md`
 - `docs/plugin-tools-roadmap.md`

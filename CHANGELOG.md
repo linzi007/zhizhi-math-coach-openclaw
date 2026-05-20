@@ -16,3 +16,5 @@
 - Added public-repository GitHub Pages guidance and a workflow setup helper.
 - Updated the public worksheet index to list all worksheets by date with practice status and summary columns.
 - Added automatic Pages publish/push/wait helper for generated worksheets.
+- Added an OpenClaw quickstart reference and clearer README first-use guidance.
+- Clarified the future plugin roadmap as a stable execution layer around the Skill.

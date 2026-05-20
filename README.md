@@ -13,6 +13,27 @@
 
 The repository intentionally contains only generic templates and sanitized sample data. Keep real student records, photos, school papers, textbook PDFs, and generated learning data in a separate personal learning repository.
 
+## Quick Reference
+
+| Scenario | User action | OpenClaw/skill action |
+| --- | --- | --- |
+| First use | Create a personal learning repository and install `zhizhi-math-coach` | Initialize `memory/`, `curriculum/`, `worksheets/`, and `records/` |
+| First sync | Ask OpenClaw for a deploy-key public key | Parent adds it to GitHub Deploy keys with `Allow write access` |
+| Public worksheet links | Set GitHub Pages source to `GitHub Actions` | Create `.github/workflows/pages.yml` and publish `site/` |
+| Daily grading | Upload worksheet photos or wrong questions | Update `records/`, `mistakes/`, `weak-points/`, and evidence-backed memory |
+| Daily worksheet generation | Ask for variants, weak-point drills, or exam review | Generate `worksheet.html` and `answer-key.md`; auto-publish when Pages is ready |
+
+Common prompts:
+
+```text
+$zhizhi-math-coach 批改这张练习卷，记录薄弱项。
+$zhizhi-math-coach 根据最近错题生成变式练习。
+$zhizhi-math-coach 针对退位减法薄弱项出专项练习。
+$zhizhi-math-coach 生成期末错因复习卷，并发布学生版链接。
+```
+
+For first-use setup, follow `skills/zhizhi-math-coach/references/openclaw-quickstart.md`.
+
 ## Project Layout
 
 ```text
@@ -24,6 +45,9 @@ skills/zhizhi-math-coach/
   scripts/generate_worksheet.py
   scripts/validate_worksheet_spec.py
   scripts/publish_html_site.py
+  scripts/publish_and_wait_pages.py
+  scripts/setup_github_pages_workflow.py
+  scripts/prepare_github_deploy_key.py
   scripts/check_git_sync.py
   assets/worksheet/
 docs/
