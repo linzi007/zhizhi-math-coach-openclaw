@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate printable worksheet HTML and answer key from a compact JSON spec."""
+"""Generate printable worksheet PDF/HTML and answer key from a compact JSON spec."""
 
 from __future__ import annotations
 
@@ -350,32 +350,51 @@ def default_chrome() -> str | None:
     return shutil.which("google-chrome") or shutil.which("chromium") or shutil.which("chromium-browser")
 
 
-def verify_print_page_count(html_path: Path, expected_pages: int) -> int:
+def export_pdf(html_path: Path, pdf_path: Path) -> None:
     chrome = default_chrome()
     if not chrome:
-        raise RuntimeError("Chrome/Chromium not found; cannot verify browser print page count.")
-    with tempfile.TemporaryDirectory() as tmp:
-        pdf_path = Path(tmp) / "worksheet.pdf"
-        url = "file://" + pathname2url(str(html_path.resolve()))
-        cmd = [
-            chrome,
-            "--headless=new",
-            "--disable-gpu",
-            "--no-sandbox",
-            f"--print-to-pdf={pdf_path}",
-            url,
-        ]
-        subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        data = pdf_path.read_bytes()
-    pages = len(re.findall(rb"/Type\s*/Page\b", data))
+        raise RuntimeError("Chrome/Chromium not found; cannot export worksheet PDF.")
+    pdf_path.parent.mkdir(parents=True, exist_ok=True)
+    url = "file://" + pathname2url(str(html_path.resolve()))
+    cmd = [
+        chrome,
+        "--headless=new",
+        "--disable-gpu",
+        "--no-sandbox",
+        f"--print-to-pdf={pdf_path}",
+        url,
+    ]
+    result = subprocess.run(cmd, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if result.returncode != 0 or not pdf_path.exists():
+        detail = result.stderr.strip() or result.stdout.strip() or "Chrome did not create a PDF."
+        raise RuntimeError(f"PDF export failed: {detail}")
+
+
+def count_pdf_pages(pdf_path: Path) -> int:
+    data = pdf_path.read_bytes()
+    return len(re.findall(rb"/Type\s*/Page\b", data))
+
+
+def verify_pdf_page_count(pdf_path: Path, expected_pages: int) -> int:
+    pages = count_pdf_pages(pdf_path)
     if pages != expected_pages:
         raise RuntimeError(f"Print verification failed: expected {expected_pages} page(s), got {pages}.")
     return pages
 
 
+def verify_print_page_count(html_path: Path, expected_pages: int) -> int:
+    with tempfile.TemporaryDirectory() as tmp:
+        pdf_path = Path(tmp) / "worksheet.pdf"
+        export_pdf(html_path, pdf_path)
+        return verify_pdf_page_count(pdf_path, expected_pages)
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Generate worksheet HTML and answer key from JSON spec.")
+    parser = argparse.ArgumentParser(description="Generate worksheet PDF/HTML and answer key from JSON spec.")
     parser.add_argument("spec", type=Path, help="Path to worksheet-spec.json")
+    parser.add_argument("--pdf", action="store_true", help="Require student-facing PDF output. PDF is attempted by default.")
+    parser.add_argument("--no-pdf", action="store_true", help="Skip student-facing PDF output.")
+    parser.add_argument("--pdf-file", help="PDF filename relative to the worksheet directory. Defaults to worksheet.pdf.")
     parser.add_argument("--verify-print", action="store_true", help="Verify browser print page count with Chrome.")
     args = parser.parse_args()
 
@@ -387,6 +406,7 @@ def main() -> int:
     out_dir = spec_path.parent
     worksheet_file = spec.get("worksheet_file", "worksheet.html")
     answer_key_file = spec.get("answer_key_file", "answer-key.md")
+    pdf_file = args.pdf_file or spec.get("pdf_file", "worksheet.pdf")
     spec["worksheet_file"] = worksheet_file
     template_path = ROOT / spec.get("template", str(DEFAULT_TEMPLATE.relative_to(ROOT)))
 
@@ -402,9 +422,27 @@ def main() -> int:
     print(f"generated: {answer_key_path}")
     print(f"items: {count}")
 
-    if args.verify_print or spec.get("page", {}).get("verify_print"):
+    page_config = spec.get("page", {})
+    verify_requested = args.verify_print or page_config.get("verify_print")
+    pdf_requested = not args.no_pdf or args.pdf or args.pdf_file or spec.get("pdf_file") or page_config.get("pdf")
+    pdf_required = args.pdf or args.pdf_file or spec.get("pdf_file") or page_config.get("pdf_required") or verify_requested
+    pdf_path = out_dir / pdf_file
+
+    if pdf_requested:
+        try:
+            export_pdf(worksheet_path, pdf_path)
+            print(f"generated: {pdf_path}")
+        except RuntimeError as exc:
+            if pdf_required:
+                raise
+            print(f"warning: PDF export skipped: {exc}", file=sys.stderr)
+
+    if verify_requested:
         expected = int(spec.get("page", {}).get("expected_pages", 1))
-        pages = verify_print_page_count(worksheet_path, expected)
+        if pdf_path.exists():
+            pages = verify_pdf_page_count(pdf_path, expected)
+        else:
+            pages = verify_print_page_count(worksheet_path, expected)
         print(f"print_pages: {pages}")
 
     return 0

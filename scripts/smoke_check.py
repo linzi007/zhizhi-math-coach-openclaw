@@ -8,6 +8,7 @@ import contextlib
 import io
 import json
 import shutil
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -71,9 +72,19 @@ def check_skill_identity() -> None:
 
 
 def check_no_public_binary_sources() -> None:
-    for path in REPO_ROOT.rglob("*"):
-        if ".git" in path.parts:
-            continue
+    result = subprocess.run(
+        ["git", "ls-files", "-z"],
+        cwd=str(REPO_ROOT),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    if result.returncode == 0:
+        paths = [REPO_ROOT / item.decode("utf-8") for item in result.stdout.split(b"\0") if item]
+    else:
+        paths = [path for path in REPO_ROOT.rglob("*") if ".git" not in path.parts]
+
+    for path in paths:
         if path.is_file() and path.suffix.lower() in FORBIDDEN_PUBLIC_EXTENSIONS:
             fail(f"forbidden public binary/source file: {path.relative_to(REPO_ROOT)}")
 

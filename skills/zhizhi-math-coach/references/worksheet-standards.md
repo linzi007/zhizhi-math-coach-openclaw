@@ -2,7 +2,7 @@
 
 ## Format
 
-Generate printable worksheets as HTML unless the user asks for another format.
+Generate printable worksheets as HTML plus a student-facing PDF by default. The PDF is the primary file to send to the parent or student because it opens and prints consistently outside GitHub Pages.
 
 Use the bundled generator whenever possible:
 
@@ -14,9 +14,10 @@ python3 {baseDir}/scripts/generate_worksheet.py \
 The generator writes:
 
 - `worksheet.html`: child-facing practice.
+- `worksheet.pdf`: child-facing printable PDF when Chrome/Chromium is available.
 - `answer-key.md`: parent-facing answers and grading rules.
 
-If the worksheet is published to GitHub Pages, publish only the child-facing worksheet. Do not put answers, diagnosis records, memory files, or source photos under `site/`.
+If PDF export is skipped because Chrome/Chromium is unavailable, return the HTML path and mention the missing browser dependency. If the worksheet is published to GitHub Pages, publish only the child-facing worksheet HTML/PDF. Do not put answers, diagnosis records, memory files, or source photos under `site/`.
 
 ## Child-Facing Page
 

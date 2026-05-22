@@ -45,6 +45,7 @@ Output:
 ```json
 {
   "worksheet_path": "worksheets/YYYY-MM-DD-topic/worksheet.html",
+  "pdf_path": "worksheets/YYYY-MM-DD-topic/worksheet.pdf",
   "answer_key_path": "worksheets/YYYY-MM-DD-topic/answer-key.md",
   "items": 8
 }

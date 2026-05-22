@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publish worksheets to GitHub Pages, push, then wait for the Pages action."""
+"""Publish worksheet HTML/PDF to GitHub Pages, push, then wait for the Pages action."""
 
 from __future__ import annotations
 

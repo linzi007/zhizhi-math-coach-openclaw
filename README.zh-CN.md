@@ -7,7 +7,7 @@
 - 维护短期记忆、长期记忆、学习进度、错题本和薄弱项记录；
 - 结合中国年级、上下学期、期中期末、寒暑假、教材版本和实际教学进度规划练习；
 - 生成家长讲解稿、学生简版说明、做题技巧和掌握标准；
-- 根据错题、薄弱项或考前复习需求生成可打印 HTML 练习卷；
+- 根据错题、薄弱项或考前复习需求生成可打印 PDF/HTML 练习卷；
 - 保持学生版练习卷无答案，家长版答案和批改标准单独保存。
 
 本仓库只包含通用模板、脚本和脱敏示例。真实学生记录、试卷照片、学校作业、教材 PDF 和学习过程中生成的数据应放在单独的个人学习仓库。
@@ -16,11 +16,11 @@
 
 | 场景 | 用户动作 | OpenClaw/Skill 动作 |
 | --- | --- | --- |
-| 第一次使用 | 创建个人学习仓库并安装 `zhizhi-math-coach` | 初始化 `memory/`、`curriculum/`、`worksheets/`、`records/` |
-| 首次同步 | 让 OpenClaw 生成公钥 | 家长把公钥加入 GitHub Deploy keys，并勾选 `Allow write access` |
-| 开启公开试卷链接 | GitHub Pages 选择 `GitHub Actions` | 创建 `.github/workflows/pages.yml`，发布 `site/` |
+| 第一次使用 | 创建本地个人学习工作区并安装 `zhizhi-math-coach` | 初始化 `memory/`、`curriculum/`、`worksheets/`、`records/` |
 | 日常批改 | 上传练习卷/错题照片 | 写入 `records/`、`mistakes/`、`weak-points/`、必要时更新 `memory/` |
-| 日常出卷 | 说明错题变式、薄弱项专项或考前复习 | 生成 `worksheet.html` 和 `answer-key.md`；Pages 就绪时自动发布并返回链接 |
+| 日常出卷 | 说明错题变式、薄弱项专项或考前复习 | 生成并优先回复/发送 `worksheet.pdf`，同时保存 `worksheet.html` 和 `answer-key.md` |
+| 进阶云同步 | 明确要求同步、push 或云端备份 | 配置 GitHub remote 和 Deploy key 后同步 learning-data |
+| 进阶在线访问 | 明确要求公开链接或 GitHub Pages | 配置 Pages/Actions 后发布 `site/` 并返回链接 |
 
 常用触发语：
 
@@ -28,10 +28,17 @@
 $zhizhi-math-coach 批改这张练习卷，记录薄弱项。
 $zhizhi-math-coach 根据最近错题生成变式练习。
 $zhizhi-math-coach 针对退位减法薄弱项出专项练习。
-$zhizhi-math-coach 生成期末错因复习卷，并发布学生版链接。
+$zhizhi-math-coach 生成期末错因复习卷，并返回 PDF。
+$zhizhi-math-coach 进阶：配置 GitHub 云同步和 Pages 在线访问。
 ```
 
-首次配置可按 `skills/zhizhi-math-coach/references/openclaw-quickstart.md` 的检查清单执行。
+首次配置可按 `skills/zhizhi-math-coach/references/openclaw-quickstart.md` 的检查清单执行。默认不需要 GitHub；GitHub 同步和 Pages 是进阶能力。
+
+GitHub 进阶配置的公开说明文档：
+
+```text
+https://github.com/linzi007/zhizhi-math-coach-openclaw/blob/main/docs/github-advanced-setup.zh-CN.md
+```
 
 ## 项目结构
 
@@ -128,7 +135,7 @@ OpenClaw 运行 `$zhizhi-math-coach` 时，会从 `skills/zhizhi-math-coach` 加
 
 - 批改或诊断会写入个人仓库的 `records/`、`mistakes/`、`weak-points/`，必要时更新 `memory/`；
 - 知识点讲解会写入或更新个人仓库的 `knowledge-points/`；
-- 出卷会写入个人仓库的 `worksheets/<date-topic>/worksheet-spec.json`、`worksheet.html` 和 `answer-key.md`；
+- 出卷会写入个人仓库的 `worksheets/<date-topic>/worksheet-spec.json`、`worksheet.pdf`、`worksheet.html` 和 `answer-key.md`；
 - 发布学生版页面会写入个人仓库的 `site/` 和 `worksheets/<date-topic>/publish.json`。
 
 脚本可以从已安装的 skill 路径调用，但输入和 workspace 参数要指向个人学习仓库。例如在 `zhizhi-math-learning-data/` 目录中运行 `skills/zhizhi-math-coach/scripts/publish_html_site.py` 时，`--workspace .` 才表示发布到个人学习仓库。
@@ -142,7 +149,7 @@ OpenClaw 运行 `$zhizhi-math-coach` 时，会从 `skills/zhizhi-math-coach` 加
 - 读取练习卷照片、孩子手写答案、老师批改痕迹和几何图形；
 - 判断手写不清、照片裁切、题目缺失等情况，并标记 `need-confirmation`，而不是硬猜；
 - 跨 `memory/`、`records/`、`mistakes/`、`weak-points/` 对比历史薄弱项和复发情况；
-- 稳定生成 `worksheet-spec.json`、可打印 HTML、答案、批改标准和诊断记录；
+- 稳定生成 `worksheet-spec.json`、可打印 PDF/HTML、答案、批改标准和诊断记录；
 - 处理复杂应用题、几何题、期中/期末复习规划，以及“会做同类题但换问法就错”的迁移失败。
 
 不建议用小型纯文本模型做拍照批改、几何图形题、复杂应用题或长期记忆更新。小模型可以用于提醒、整理格式、更新清单这类低风险任务。
@@ -176,13 +183,13 @@ worksheets/
 - `weak-points/<topic>.md`：长期薄弱项记录。
 - `mistakes/`：学校错题和系统练习错题。
 - `records/learning-progress.md`：学习进度总览。
-- `worksheets/`：练习卷 spec、HTML 和答案。
+- `worksheets/`：练习卷 spec、学生版 PDF/HTML 和答案。
 
-## 初始化个人学习仓库
+## 初始化个人学习工作区
 
-本仓库是通用 skill，不保存真实使用过程中产生的数据。每个家庭/学生应使用自己的个人学习仓库保存学习档案和练习卷产物。
+本仓库是通用 skill，不保存真实使用过程中产生的数据。每个家庭/学生应使用自己的个人学习工作区保存学习档案和练习卷产物。默认可以完全本地使用：批改、记录和出卷都写入本地目录，练习卷通过 `worksheet.pdf` 直接回复或发送。
 
-个人学习仓库可以是 public，也可以是 private。若选择 public，需要更严格地控制哪些内容进入 `site/`，并避免提交敏感原始资料。
+如果需要云端备份或多端同步，可以把这个工作区变成 GitHub 个人学习仓库。个人学习仓库可以是 public，也可以是 private，由用户自己决定。
 
 推荐结构：
 
@@ -200,12 +207,11 @@ zhizhi-math-learning-data/
   site/
 ```
 
-从 ClawHub 安装 skill 后初始化个人学习仓库：
+从 ClawHub 安装 skill 后初始化本地个人学习工作区：
 
 ```bash
 mkdir zhizhi-math-learning-data
 cd zhizhi-math-learning-data
-git init
 openclaw skills install zhizhi-math-coach
 python3 skills/zhizhi-math-coach/scripts/init_learning_workspace.py \
   --workspace . \
@@ -215,6 +221,18 @@ python3 skills/zhizhi-math-coach/scripts/init_learning_workspace.py \
   --semester 下学期 \
   --textbook-edition 人教版 \
   --textbook-volume 一年级下册
+```
+
+日常默认流程到这里就可以使用，不需要 GitHub：
+
+```text
+$zhizhi-math-coach 根据最近错题生成变式练习，并返回 PDF。
+```
+
+如果要启用进阶云同步，再初始化 Git 并关联 GitHub：
+
+```bash
+git init
 git add .
 git commit -m "Initialize math learning workspace"
 git remote add origin git@github.com:<user>/zhizhi-math-learning-data.git
@@ -223,9 +241,9 @@ git push -u origin main
 
 生成的 `.gitignore` 默认忽略 `skills/`，避免把 ClawHub 下载的 skill bundle 提交到个人学习仓库。换机器使用时重新安装 skill 即可。如果第一次 `git push` 失败，本地学习工作区仍然可以正常使用；先在当前 OpenClaw 机器上完成 GitHub 授权，再重试同步。
 
-## GitHub 授权与同步
+## 进阶：GitHub 云同步与 Pages 在线访问
 
-OpenClaw 运行的机器不一定安装了 GitHub CLI，也不一定已经登录 GitHub。有些 OpenClaw 供应商也不一定提供 GitHub token 环境变量配置入口。同步只依赖普通 `git`、正确的 remote，以及当前机器具备 push 权限。`gh` 命令是可选项，不是必需项。
+GitHub 同步不是默认必需项。它用于把 `learning-data` 云端备份、多端同步，或配合 GitHub Pages 提供在线访问链接。OpenClaw 运行的机器不一定安装了 GitHub CLI，也不一定已经登录 GitHub。有些 OpenClaw 供应商也不一定提供 GitHub token 环境变量配置入口。同步只依赖普通 `git`、正确的 remote，以及当前机器具备 push 权限。`gh` 命令是可选项，不是必需项。
 
 优先推荐使用 GitHub Deploy key。交互方式是：OpenClaw 生成当前个人学习仓库专用的 SSH 公钥，通过飞书或 OpenClaw 回复发给家长；家长把公钥添加到对应 GitHub 仓库的 Settings -> Deploy keys，并勾选 `Allow write access`。
 
@@ -260,7 +278,7 @@ OpenClaw 应只发送脚本输出中的公钥，不发送私钥。飞书消息�
 python3 skills/zhizhi-math-coach/scripts/check_git_sync.py --workspace . --check-push
 ```
 
-第一次在个人学习仓库中使用 skill 时，如果发现还没有 GitHub 同步能力，回复里应该简短提示这个 Deploy key 授权流程。后续生成试卷并要求发布、发链接、push 或同步时，如果预检发现没有权限，也应该先返回本地文件路径，并再次发送 Deploy key 授权引导，而不是把出卷任务判定为失败。
+普通批改和出卷不需要提示 GitHub 授权。只有当用户要求同步、push、发布、发链接或配置云端备份时，如果预检发现没有权限，才先返回 PDF/本地文件路径，并发送 Deploy key 授权引导，而不是把出卷任务判定为失败。
 
 如果不能使用 Deploy key 或 SSH，可以为个人学习仓库创建 fine-grained GitHub personal access token：
 
@@ -293,7 +311,7 @@ $zhizhi-math-coach 根据最近错题生成变式练习。
 常见写入触发点：
 
 - 批改或诊断会更新 `records/`、`mistakes/`、`weak-points/`，必要时更新 `memory/`；
-- 出卷会更新 `worksheets/<date-topic>/worksheet-spec.json`、`worksheet.html` 和 `answer-key.md`；
+- 出卷会更新 `worksheets/<date-topic>/worksheet-spec.json`、`worksheet.pdf`、`worksheet.html` 和 `answer-key.md`；
 - 发布学生版页面会更新 `site/` 和 `worksheets/<date-topic>/publish.json`；
 - OpenClaw 定时任务默认只提醒或建议，不自动写学习记录，也不自动出卷，除非家长明确要求。
 
@@ -343,6 +361,7 @@ python3 skills/zhizhi-math-coach/scripts/generate_worksheet.py \
 
 输出：
 
+- `examples/student-workspace/worksheets/sample-borrowing-subtraction/worksheet.pdf`
 - `examples/student-workspace/worksheets/sample-borrowing-subtraction/worksheet.html`
 - `examples/student-workspace/worksheets/sample-borrowing-subtraction/answer-key.md`
 
@@ -359,11 +378,11 @@ python3 skills/zhizhi-math-coach/scripts/validate_worksheet_spec.py \
 python3 scripts/smoke_check.py
 ```
 
-如果需要校验打印页数，可在生成命令中添加 `--verify-print`，并确保本机安装 Chrome 或 Chromium。
+默认会尝试导出学生版 PDF，需要本机安装 Chrome 或 Chromium。如果需要校验打印页数，可在生成命令中添加 `--verify-print`。
 
-## 从个人仓库发布学生版 HTML
+## 从个人仓库发布学生版 PDF/HTML
 
-如果你接受练习卷公开访问，应在个人学习仓库中运行发布脚本，只把学生版 HTML 发布到该仓库的 `site/`：
+如果你接受练习卷公开访问，应在个人学习仓库中运行发布脚本，只把学生版 PDF/HTML 发布到该仓库的 `site/`：
 
 ```bash
 python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
@@ -376,14 +395,15 @@ python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
 
 - `site/index.html`：个人学习仓库中的公开练习卷列表。
 - `site/worksheets/<slug>/index.html`：可查看和打印的学生版练习卷。
+- `site/worksheets/<slug>/worksheet.pdf`：生成过 PDF 时的学生版可打印文件。
 - `site/.nojekyll`：GitHub Pages 静态站点标记。
 - `worksheets/<date-topic>/publish.json`：记录发布信息。
 
-`site/index.html` 会扫描 `worksheets/` 下所有可公开的学生版练习卷，按日期倒序展示，不会只展示本次发布的一张。索引列包括日期、练习状态、练习卷标题、主题、年级、题量和完成情况。练习状态优先从 `worksheets/status.md` 推断；没有记录时默认显示为 `未练习`。
+`site/index.html` 会扫描 `worksheets/` 下所有可公开的学生版练习卷，按日期倒序展示，不会只展示本次发布的一张。索引列包括日期、练习状态、练习卷标题、文件入口、主题、年级、题量和完成情况。练习状态优先从 `worksheets/status.md` 推断；没有记录时默认显示为 `未练习`。
 
 `site/` 只放学生可见内容。不要把答案、批改记录、长短期记忆、薄弱项历史、上传试卷、教材 PDF 或 OCR 内容放进去。
 
-飞书里建议发送 GitHub Pages 链接，答案和批改标准不要放进公开发布的 `site/` 目录。
+飞书里优先发送生成好的 `worksheet.pdf` 文件；如果 GitHub Pages 已经配置并部署完成，再补充 Pages 链接。答案和批改标准不要放进公开发布的 `site/` 目录。
 
 要在线访问这些页面，需要在个人学习仓库 Settings -> Pages 中启用 Pages，可选择 `site/` 目录或复制 `docs/personal-learning-repo-template.md` 中的 workflow。
 
@@ -425,7 +445,7 @@ git push
 自动发布流程：
 
 - 当个人学习仓库已经配置 public Pages、`.github/workflows/pages.yml` 和可写 Deploy key 后，skill 生成新练习卷时会自动发布学生版页面。
-- OpenClaw 会先生成本地 `worksheet.html` 和 `answer-key.md`，再刷新 `site/`，提交并 push public-safe 文件。
+- OpenClaw 会先生成本地 `worksheet.pdf`、`worksheet.html` 和 `answer-key.md`，优先返回或发送 PDF，再刷新 `site/`，提交并 push public-safe 文件。
 - GitHub Actions 执行完成后，OpenClaw 再回复 Pages 首页链接和本次练习卷链接。
 - 如果 Actions 失败或超时，本地文件仍然有效，OpenClaw 会返回本地路径和 Actions/授权排查信息。
 

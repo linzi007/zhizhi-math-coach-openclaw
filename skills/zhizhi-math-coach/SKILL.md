@@ -1,6 +1,6 @@
 ---
 name: zhizhi-math-coach
-description: "Use when coaching Chinese primary-school math with persistent local records: grade worksheet photos or wrong questions, infer causes and weak points, update learning memory, align with China grade/semester and textbook scope, explain knowledge points, and generate targeted printable HTML worksheets. Recommended with a vision-capable reasoning model."
+description: "Use when coaching Chinese primary-school math with persistent local records: grade worksheet photos or wrong questions, infer causes and weak points, update learning memory, align with China grade/semester and textbook scope, explain knowledge points, and generate targeted printable PDF/HTML worksheets. Recommended with a vision-capable reasoning model."
 ---
 
 # Zhizhi Math Coach
@@ -38,6 +38,7 @@ Use these paths in the user's personal learning project unless they provide diff
 - `records/YYYY-MM-DD-<source>-diagnosis.md`: one diagnosis per paper/photo batch/wrong-question batch.
 - `worksheets/YYYY-MM-DD-<topic-slug>/worksheet-spec.json`: compact worksheet source.
 - `worksheets/YYYY-MM-DD-<topic-slug>/worksheet.html`: child-facing printable worksheet.
+- `worksheets/YYYY-MM-DD-<topic-slug>/worksheet.pdf`: child-facing printable PDF for direct file delivery.
 - `worksheets/YYYY-MM-DD-<topic-slug>/answer-key.md`: answers, grading, and next-step rules.
 
 If the personal learning project is not initialized yet, run the bundled initializer from the workspace root:
@@ -84,6 +85,31 @@ Recommended settings:
 
 This skill is triggered by the user's OpenClaw request, such as `$zhizhi-math-coach 批改...` or `$zhizhi-math-coach 出一张...`, while the working directory is the personal learning project.
 
+Explicit GitHub advanced-setup trigger phrases include:
+
+- `进阶：配置 GitHub 云同步`
+- `进阶：开启 GitHub Pages 在线访问`
+- `生成 GitHub Deploy key`
+- `配置云端备份`
+- `返回 SSH 公钥`
+- `配置公开链接`
+
+When these phrases appear, treat the request as advanced GitHub setup. Do not grade or generate a worksheet unless the user also asks for that. Run or suggest `prepare_github_deploy_key.py`, return only the SSH public key, and include this public guide URL:
+
+`https://github.com/linzi007/zhizhi-math-coach-openclaw/blob/main/docs/github-advanced-setup.zh-CN.md`
+
+The advanced setup reply must include:
+
+- SSH public key copied only from `public-key-start` to `public-key-end`;
+- guide URL above;
+- GitHub path: `Settings -> Deploy keys -> Add deploy key`;
+- permission instruction: enable `Allow write access`;
+- next step: after the parent replies `已添加`, run `check_git_sync.py --workspace . --check-push`.
+
+If the GitHub owner or repository name is missing and cannot be inferred from `origin`, ask for both in plain Chinese:
+
+`请告诉我你的 GitHub 用户名和个人学习数据仓库名，例如 linzi007 / zhizhi-math-learning-data。`
+
 Always treat the current workspace root as the personal learning project root for `memory/`, `weak-points/`, `mistakes/`, `records/`, `curriculum/`, `knowledge-points/`, `worksheets/`, and `site/`. The reusable skill repository only provides instructions, scripts, references, templates, and sanitized examples.
 
 If the current workspace appears to be the reusable source repository `zhizhi-math-coach-openclaw` (for example it contains `docs/openclaw-release.md` and `examples/student-workspace/`), warn before writing student learning data. Do not warn merely because a personal workspace has an installed `skills/zhizhi-math-coach/` bundle from ClawHub. Only write student data into the source repository when the user explicitly says it is the intended personal learning workspace or the task is skill development with sanitized examples.
@@ -91,17 +117,19 @@ If the current workspace appears to be the reusable source repository `zhizhi-ma
 Do not assume background sync. Local files are changed by the current task only:
 
 - grading or diagnosis may write `records/`, `mistakes/`, `weak-points/`, and evidence-backed `memory/` updates;
-- worksheet generation may write `worksheets/<date-topic>/worksheet-spec.json`, `worksheet.html`, and `answer-key.md`;
+- worksheet generation may write `worksheets/<date-topic>/worksheet-spec.json`, `worksheet.html`, `worksheet.pdf`, and `answer-key.md`;
 - publishing may write `site/` and `worksheets/<date-topic>/publish.json`.
 - GitHub Pages setup may write `.github/workflows/pages.yml` when the parent has chosen a public repository, selected GitHub Actions as the Pages source, and asked OpenClaw to set up publishing.
 
-When publishing, rebuild `site/index.html` as the full worksheet list from `worksheets/`, sorted by date descending. Include only public-safe metadata: date, practice status, title, topic, grade, item count, and completion summary. Infer status from `worksheets/status.md` when available; do not expose answers or diagnosis details in `site/`.
+When publishing, rebuild `site/index.html` as the full worksheet list from `worksheets/`, sorted by date descending. Include only public-safe metadata: date, practice status, title, child-facing file links, topic, grade, item count, and completion summary. Infer status from `worksheets/status.md` when available; do not expose answers or diagnosis details in `site/`.
 
-If a worksheet is generated in a workspace that already has public Pages mode configured (`.github/workflows/pages.yml`, GitHub Pages source set to Actions, and Git preflight passes), automatically publish to Pages: run `publish_and_wait_pages.py`, wait for GitHub Actions deployment to finish, then reply with the index URL and worksheet URL. If the Actions run fails or times out, return the local paths, pushed commit if available, and Actions/setup guidance.
+PDF is the default worksheet delivery format. After worksheet generation, return or send `worksheet.pdf` first when it exists. If Chrome/Chromium is unavailable and PDF export was skipped, return the local `worksheet.html` path and mention that PDF export needs Chrome/Chromium.
 
-Do not run `git add`, `git commit`, or `git push` unless the parent explicitly asks to sync, publish, push, commit to GitHub, send a public link, or has enabled automatic Pages publishing for generated worksheets. When sync is requested, read `references/github-sync-authorization.md` first and run the bundled preflight before committing or pushing. Do not require GitHub CLI or provider-level token configuration; a repository-scoped SSH deploy key is the preferred setup. If authorization is missing, return the local file paths and setup guidance instead of treating generation as failed. If the personal repository is public, warn before committing sensitive learning records or answer keys.
+GitHub sync and GitHub Pages are advanced cloud features, not required for normal use. If GitHub sync is configured, sync generated learning data and worksheet artifacts when requested or enabled. If a worksheet is generated in a workspace that already has public Pages mode configured (`.github/workflows/pages.yml`, GitHub Pages source set to Actions, and Git preflight passes), publish to Pages after the PDF is available only when the user needs a public link: run `publish_and_wait_pages.py`, wait for GitHub Actions deployment to finish, then reply with the PDF path/file, index URL, and worksheet URL. If the Actions run fails or times out, return the PDF/local paths, pushed commit if available, and Actions/setup guidance.
 
-On the first meaningful reply in a personal learning workspace, use `references/openclaw-quickstart.md` for a short setup check. If GitHub sync is not ready or cannot be confirmed, include a short setup note: OpenClaw can generate a repository-specific public key, send it to the parent through Lark/Feishu when available, and the parent should add it in GitHub repository Settings -> Deploy keys with write access. Do not repeat the full setup on every ordinary grading reply; repeat it when the parent asks to sync/publish or a publish preflight fails.
+Do not run `git add`, `git commit`, or `git push` unless the parent explicitly asks to sync, publish, push, commit to GitHub, send a public link, or has enabled automatic Pages publishing for generated worksheets. When sync is requested, read `references/github-sync-authorization.md` first and run the bundled preflight before committing or pushing. Do not require GitHub CLI or provider-level token configuration; a repository-scoped SSH deploy key is the preferred setup. If authorization is missing, return the PDF/local file paths and setup guidance instead of treating generation as failed. If the personal repository is public, warn before committing sensitive learning records or answer keys unless the parent has explicitly accepted full public learning-data sync.
+
+On the first meaningful reply in a personal learning workspace, use `references/openclaw-quickstart.md` for a short setup check focused on local workspace readiness and PDF delivery. Do not mention GitHub setup during ordinary grading or worksheet generation unless the parent asks for cloud sync, push, public links, Pages, or a publish preflight fails. When needed, explain that OpenClaw can generate a repository-specific public key, send it to the parent through Lark/Feishu when available, and the parent should add it in GitHub repository Settings -> Deploy keys with write access.
 
 Skill resources are relative to `{baseDir}`:
 
@@ -118,17 +146,17 @@ Skill resources are relative to `{baseDir}`:
 - `references/geometry-generation.md`: deterministic SVG geometry rules.
 - `references/automation-openclaw.md`: scheduled reminders, channels, and automation boundaries.
 - `references/openclaw-quickstart.md`: first-use checklist, common prompts, Pages-ready checklist, and ruleset summary.
-- `references/github-pages-publishing.md`: public child-facing HTML worksheet publishing rules.
+- `references/github-pages-publishing.md`: public child-facing PDF/HTML worksheet publishing rules.
 - `references/github-sync-authorization.md`: GitHub SSH/token authorization, preflight checks, and sync boundaries.
 - `references/worksheet-standards.md`: child-facing printable worksheet rules.
 - `references/student-profile-template.md`: starter profile format.
-- `scripts/generate_worksheet.py`: generate worksheet HTML and answer key from JSON.
+- `scripts/generate_worksheet.py`: generate worksheet HTML, student-facing PDF, and answer key from JSON.
 - `scripts/check_git_sync.py`: preflight whether the current machine can reach and push the personal GitHub repository.
 - `scripts/prepare_github_deploy_key.py`: generate a repository-scoped SSH deploy key and public-key setup instructions for GitHub Deploy keys.
 - `scripts/setup_github_pages_workflow.py`: create `.github/workflows/pages.yml` for publishing `site/` through GitHub Actions.
 - `scripts/init_learning_workspace.py`: initialize a personal learning repository after the skill is installed.
 - `scripts/validate_worksheet_spec.py`: validate worksheet JSON without writing outputs.
-- `scripts/publish_html_site.py`: publish child-facing worksheet HTML into a GitHub Pages `site/` directory.
+- `scripts/publish_html_site.py`: publish child-facing worksheet HTML/PDF into a GitHub Pages `site/` directory.
 - `scripts/publish_and_wait_pages.py`: publish `site/`, commit/push public-safe files, wait for GitHub Actions Pages deployment, and print ready URLs.
 - `assets/worksheet/question-types.json`: reusable worksheet item types.
 - `assets/worksheet/a4-single.html`: printable HTML template.
@@ -195,7 +223,9 @@ python3 {baseDir}/scripts/generate_worksheet.py \
   worksheets/YYYY-MM-DD-topic/worksheet-spec.json
 ```
 
-If the workspace has public Pages mode configured and the parent accepts public worksheet links, publish only the child-facing worksheet HTML and wait for deployment:
+The generator writes `worksheet.html`, `worksheet.pdf` when Chrome/Chromium is available, and `answer-key.md`. Return or send `worksheet.pdf` as the primary worksheet artifact.
+
+If the workspace has public Pages mode configured and the parent accepts public worksheet links, publish only the child-facing worksheet HTML/PDF and wait for deployment:
 
 ```bash
 python3 {baseDir}/scripts/publish_and_wait_pages.py \
@@ -213,7 +243,7 @@ python3 {baseDir}/scripts/publish_html_site.py \
   --base-url https://<github-user>.github.io/<repo>
 ```
 
-When Pages auto-publishing succeeds, reply with the Pages index URL and worksheet URL. Otherwise reply with file paths, item count, target weak point, and setup guidance for publishing. Do not paste full worksheet HTML or full answer keys unless asked.
+When Pages auto-publishing succeeds, reply with the PDF path/file, Pages index URL, and worksheet URL. Otherwise reply with file paths, item count, target weak point, and setup guidance for publishing. Do not paste full worksheet HTML or full answer keys unless asked.
 
 ## Teaching Defaults
 
@@ -292,8 +322,9 @@ Feishu notifications should prefer GitHub Pages worksheet links when configured;
 When generating worksheets:
 
 - Keep `worksheet.html` child-facing and answer-free.
+- Generate and return `worksheet.pdf` first when available; it is the direct print/share artifact.
 - Keep answers, grading labels, explanation notes, and reassessment rules in `answer-key.md`.
-- Only child-facing `worksheet.html` may be published to GitHub Pages. Do not publish answer keys, records, memories, weak-point histories, student photos, or textbook files.
+- Only child-facing `worksheet.html` and `worksheet.pdf` may be published to GitHub Pages. Do not publish answer keys, records, memories, weak-point histories, student photos, or textbook files.
 - Use `worksheet-spec.json` as the source of truth.
 - Add new stable item types to `assets/worksheet/question-types.json` and `scripts/generate_worksheet.py`.
 - Include name/date/time/score fields and enough working space.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publish child-facing worksheet HTML files into a GitHub Pages site directory."""
+"""Publish child-facing worksheet HTML/PDF files into a GitHub Pages site directory."""
 
 from __future__ import annotations
 
@@ -104,6 +104,13 @@ def page_url(base_url: str | None, slug: str) -> str | None:
     if not base_url:
         return None
     return base_url.rstrip("/") + f"/worksheets/{slug}/"
+
+
+def pdf_url(base_url: str | None, slug: str) -> str | None:
+    worksheet_url = page_url(base_url, slug)
+    if not worksheet_url:
+        return None
+    return worksheet_url + "worksheet.pdf"
 
 
 def clean_cell(value: str) -> str:
@@ -215,6 +222,10 @@ def entry_for(
     item_count = count_items(spec)
     url = page_url(base_url, slug) or published.get("url")
     site_path = rel_to(site_dir / "worksheets" / slug / "index.html", workspace)
+    pdf_path = worksheet_dir / "worksheet.pdf"
+    has_pdf = pdf_path.exists()
+    site_pdf_path = site_dir / "worksheets" / slug / "worksheet.pdf"
+    pdf_location = pdf_url(base_url, slug) if has_pdf else published.get("pdf_url")
     return {
         "slug": slug,
         "title": title,
@@ -227,9 +238,12 @@ def entry_for(
         "practice_status": status.get("practice_status") or "未练习",
         "completion": status.get("completion") or "待完成",
         "source_worksheet": rel_to(worksheet_dir / "worksheet.html", workspace),
+        "source_pdf": rel_to(pdf_path, workspace) if has_pdf else published.get("source_pdf", ""),
         "source_spec": rel_to(spec_path, workspace) if spec_path.exists() else "",
         "site_path": site_path,
+        "site_pdf_path": rel_to(site_pdf_path, workspace) if has_pdf else published.get("site_pdf_path", ""),
         "url": url,
+        "pdf_url": pdf_location,
         "visibility": "public-child-facing",
     }
 
@@ -247,12 +261,15 @@ def write_index(site_dir: Path, entries: list[dict]) -> None:
         status = e(entry.get("practice_status") or "未练习")
         completion = e(entry.get("completion") or "待完成")
         href = e(f"worksheets/{entry['slug']}/")
+        pdf_href = e(f"worksheets/{entry['slug']}/worksheet.pdf") if entry.get("pdf_url") or entry.get("site_pdf_path") else ""
+        pdf_link = f'<a href="{pdf_href}">PDF</a>' if pdf_href else ""
         status_class = "done" if entry.get("practice_status") == "已练习" else "todo"
         rows.append(
             "          <tr>"
             f"<td>{date}</td>"
             f'<td><span class="status {status_class}">{status}</span></td>'
             f'<td><a href="{href}">{title}</a></td>'
+            f'<td class="links"><a href="{href}">HTML</a>{pdf_link}</td>'
             f"<td>{topic}</td>"
             f"<td>{grade}</td>"
             f"<td>{count_text}</td>"
@@ -265,6 +282,7 @@ def write_index(site_dir: Path, entries: list[dict]) -> None:
             f'<div><span class="status {status_class}">{status}</span></div>'
             f'<a href="{href}">{title}</a>'
             + (f'<span class="meta">{e(details)}</span>' if details else "")
+            + (f'<span class="meta">文件：<a href="{href}">HTML</a>{" / " + pdf_link if pdf_link else ""}</span>')
             + f'<span class="meta">完成情况：{completion}</span>'
             + "</li>"
         )
@@ -287,6 +305,7 @@ def write_index(site_dir: Path, entries: list[dict]) -> None:
     tr:last-child td {{ border-bottom: 0; }}
     a {{ color: #0645d8; font-weight: 650; text-decoration: none; }}
     a:hover {{ text-decoration: underline; }}
+    .links a + a {{ margin-left: 10px; }}
     .status {{ display: inline-block; min-width: 48px; padding: 3px 8px; border-radius: 999px; font-size: 13px; font-weight: 700; text-align: center; }}
     .status.done {{ color: #116329; background: #dafbe1; }}
     .status.todo {{ color: #7d4e00; background: #fff1c2; }}
@@ -310,6 +329,7 @@ def write_index(site_dir: Path, entries: list[dict]) -> None:
             <th>日期</th>
             <th>状态</th>
             <th>练习卷</th>
+            <th>文件</th>
             <th>主题</th>
             <th>年级</th>
             <th>题量</th>
@@ -317,7 +337,7 @@ def write_index(site_dir: Path, entries: list[dict]) -> None:
           </tr>
         </thead>
         <tbody>
-{chr(10).join(rows) if rows else '          <tr><td colspan="7">暂无练习卷</td></tr>'}
+{chr(10).join(rows) if rows else '          <tr><td colspan="8">暂无练习卷</td></tr>'}
         </tbody>
       </table>
     </div>
@@ -341,6 +361,12 @@ def publish_one(worksheet_dir: Path, workspace: Path, site_dir: Path, base_url: 
     target_dir = site_dir / "worksheets" / slug
     target_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(html_path, target_dir / "index.html")
+    pdf_path = worksheet_dir / "worksheet.pdf"
+    has_pdf = pdf_path.exists()
+    if has_pdf:
+        shutil.copy2(pdf_path, target_dir / "worksheet.pdf")
+    elif (target_dir / "worksheet.pdf").exists():
+        (target_dir / "worksheet.pdf").unlink()
 
     spec_path = worksheet_dir / "worksheet-spec.json"
     spec = load_json_if_exists(spec_path)
@@ -353,9 +379,12 @@ def publish_one(worksheet_dir: Path, workspace: Path, site_dir: Path, base_url: 
         "topic": spec.get("topic", ""),
         "strategy": spec.get("strategy", ""),
         "source_worksheet": rel_to(html_path, workspace),
+        "source_pdf": rel_to(pdf_path, workspace) if has_pdf else "",
         "source_spec": rel_to(spec_path, workspace) if spec_path.exists() else "",
         "site_path": rel_to(target_dir / "index.html", workspace),
+        "site_pdf_path": rel_to(target_dir / "worksheet.pdf", workspace) if has_pdf else "",
         "url": url,
+        "pdf_url": pdf_url(base_url, slug) if has_pdf else "",
         "visibility": "public-child-facing",
         "published_at": published_at,
     }
@@ -364,7 +393,7 @@ def publish_one(worksheet_dir: Path, workspace: Path, site_dir: Path, base_url: 
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Publish child-facing worksheet HTML files to a static site directory.")
+    parser = argparse.ArgumentParser(description="Publish child-facing worksheet HTML/PDF files to a static site directory.")
     parser.add_argument("paths", nargs="*", type=Path, help="Worksheet directories, worksheet.html files, or roots to scan.")
     parser.add_argument("--workspace", type=Path, default=Path.cwd(), help="Learning workspace root. Defaults to cwd.")
     parser.add_argument("--site-dir", type=Path, default=Path("site"), help="Output site directory relative to workspace.")

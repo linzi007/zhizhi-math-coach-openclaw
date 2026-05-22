@@ -21,7 +21,7 @@ Create a local profile in `memory/long-term.md`. Keep personally identifying inf
 ## Stable Parent Preferences
 
 - Parent-facing explanations should be short and practical.
-- Worksheets should be printable HTML.
+- Worksheets should be printable PDF/HTML, with PDF as the default delivery artifact when Chrome/Chromium is available.
 - Child-facing worksheets should not contain answers.
 - Answer keys and grading rules stay in `answer-key.md`.
 - Preferred reminder channel: <optional>

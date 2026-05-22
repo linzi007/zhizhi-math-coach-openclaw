@@ -78,12 +78,30 @@ python3 {baseDir}/scripts/check_git_sync.py --workspace <personal-learning-works
 
 If the preflight succeeds, commit and push only the requested scope.
 
-## First Reply And Publish-Time Guidance
+## Advanced Setup And Publish-Time Guidance
 
-On the first meaningful reply in a personal learning workspace, check whether GitHub sync appears ready when it is cheap to do so. If the workspace is missing `.git`, `origin`, or push authorization, include a short guidance note without blocking grading or worksheet generation:
+Do not check or prompt for GitHub sync during ordinary grading or PDF worksheet generation. Default use is local learning files plus direct `worksheet.pdf` delivery.
+
+Explicit trigger phrases:
+
+- `进阶：配置 GitHub 云同步`
+- `进阶：开启 GitHub Pages 在线访问`
+- `生成 GitHub Deploy key`
+- `配置云端备份`
+- `返回 SSH 公钥`
+- `配置公开链接`
+
+When triggered, return the SSH public key and this public guide URL:
+
+```text
+https://github.com/linzi007/zhizhi-math-coach-openclaw/blob/main/docs/github-advanced-setup.zh-CN.md
+```
+
+When the parent asks for cloud sync, public links, Pages, push, commit, or automatic online publishing, check whether GitHub sync appears ready. If the workspace is missing `.git`, `origin`, or push authorization, include a short guidance note without blocking grading or worksheet generation:
 
 - local learning files will still be generated;
-- public links require GitHub sync and Pages setup;
+- PDF delivery does not require GitHub;
+- cloud backup and public links require GitHub sync and, for Pages, repository Pages setup;
 - OpenClaw can generate a repository-specific SSH public key;
 - the parent should add it to GitHub Deploy keys with write access.
 

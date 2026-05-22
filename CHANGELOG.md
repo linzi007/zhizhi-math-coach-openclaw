@@ -18,3 +18,5 @@
 - Added automatic Pages publish/push/wait helper for generated worksheets.
 - Added an OpenClaw quickstart reference and clearer README first-use guidance.
 - Clarified the future plugin roadmap as a stable execution layer around the Skill.
+- Added PDF-first worksheet delivery: the generator writes `worksheet.pdf` when Chrome/Chromium is available, and Pages publishing can include the PDF.
+- Added explicit GitHub advanced-setup trigger phrases and a public Chinese setup guide for cloud sync and Pages.

@@ -22,13 +22,47 @@ python3 {baseDir}/scripts/init_learning_workspace.py \
   --textbook-volume <一年级下册>
 ```
 
-3. Check GitHub sync only if the parent wants sync, public links, or automatic Pages publishing:
+3. For normal use, no GitHub setup is required. Generate worksheets locally and return or send `worksheet.pdf`.
+
+## Advanced Cloud Sync And Pages
+
+Use this section only when the parent asks for cloud sync, GitHub backup, public links, Pages, push, or automatic online publishing.
+
+Trigger phrases:
+
+- `进阶：配置 GitHub 云同步`
+- `进阶：开启 GitHub Pages 在线访问`
+- `生成 GitHub Deploy key`
+- `配置云端备份`
+- `返回 SSH 公钥`
+- `配置公开链接`
+
+When triggered, return this public guide URL:
+
+```text
+https://github.com/linzi007/zhizhi-math-coach-openclaw/blob/main/docs/github-advanced-setup.zh-CN.md
+```
+
+The reply should include:
+
+- SSH public key copied only from `public-key-start` to `public-key-end`;
+- GitHub path: `Settings -> Deploy keys -> Add deploy key`;
+- instruction to enable `Allow write access`;
+- next step: parent replies `已添加`, then run `check_git_sync.py --workspace . --check-push`.
+
+If GitHub owner/repo is missing and cannot be inferred from `origin`, ask:
+
+```text
+请告诉我你的 GitHub 用户名和个人学习数据仓库名，例如 linzi007 / zhizhi-math-learning-data。
+```
+
+1. Check GitHub sync only if the parent wants sync, public links, or automatic Pages publishing:
 
 ```bash
 python3 {baseDir}/scripts/check_git_sync.py --workspace . --check-push
 ```
 
-4. If sync is not ready, generate a repository deploy key and send only the public key:
+2. If sync is not ready, generate a repository deploy key and send only the public key:
 
 ```bash
 python3 {baseDir}/scripts/prepare_github_deploy_key.py \
@@ -38,7 +72,7 @@ python3 {baseDir}/scripts/prepare_github_deploy_key.py \
   --configure-remote
 ```
 
-5. If public Pages is desired, confirm GitHub Settings -> Pages -> Source is `GitHub Actions`, then ensure the workflow exists:
+3. If public Pages is desired, confirm GitHub Settings -> Pages -> Source is `GitHub Actions`, then ensure the workflow exists:
 
 ```bash
 python3 {baseDir}/scripts/setup_github_pages_workflow.py --workspace .
@@ -55,6 +89,8 @@ Use these prompt shapes in examples and replies:
 
 ## Publish-Ready Checklist
 
+This is an advanced online-access checklist. It is not needed when the worksheet is delivered as a PDF file.
+
 Automatic Pages publishing is allowed when all are true:
 
 - `.github/workflows/pages.yml` exists.
@@ -63,7 +99,7 @@ Automatic Pages publishing is allowed when all are true:
 - `check_git_sync.py --check-push` succeeds.
 - The parent accepts public visibility of committed files in a public repository.
 
-When ready, publish and wait:
+When ready, generate the worksheet PDF first, then publish and wait only if a public link is needed:
 
 ```bash
 python3 {baseDir}/scripts/publish_and_wait_pages.py \
@@ -74,6 +110,7 @@ python3 {baseDir}/scripts/publish_and_wait_pages.py \
 
 Reply with:
 
+- Local or sent `worksheet.pdf`.
 - Pages index URL.
 - Newly generated worksheet URL.
 - Local `worksheet.html` and `answer-key.md` paths.

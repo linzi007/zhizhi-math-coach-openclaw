@@ -2,13 +2,13 @@
 
 ## Purpose
 
-Use GitHub Pages for child-facing worksheet HTML when the parent accepts public worksheet links.
+Use GitHub Pages for child-facing worksheet HTML/PDF when the parent accepts public worksheet links. PDF delivery stays first: generate or send `worksheet.pdf` before waiting for Pages when the channel supports file replies.
 
 Do not publish answers, diagnosis records, long-term memory, weak-point history, student photos, school papers, or textbook files.
 
 ## Default Flow
 
-After generating a worksheet in a Pages-enabled public personal repository, publish and wait:
+After generating a worksheet PDF/HTML in a Pages-enabled public personal repository, publish and wait when a public link is needed:
 
 ```bash
 python3 {baseDir}/scripts/publish_and_wait_pages.py \
@@ -19,7 +19,7 @@ python3 {baseDir}/scripts/publish_and_wait_pages.py \
 
 The script:
 
-1. Copies public-safe worksheet HTML into `site/`.
+1. Copies public-safe worksheet HTML and `worksheet.pdf` into `site/` when the PDF exists.
 2. Rebuilds `site/index.html` from all worksheets.
 3. Stages only public-safe publishing files: `site/`, `.github/workflows/pages.yml` when present, and `worksheets/*/publish.json`.
 4. Commits and pushes to the current branch.
@@ -39,10 +39,11 @@ The publisher writes:
 
 - `site/index.html`: public worksheet list.
 - `site/worksheets/<slug>/index.html`: child-facing worksheet page.
+- `site/worksheets/<slug>/worksheet.pdf`: child-facing worksheet PDF when generated.
 - `site/.nojekyll`: disables Jekyll processing.
 - `worksheets/YYYY-MM-DD-topic/publish.json`: publication manifest.
 
-The index is rebuilt from all public-safe worksheet HTML files under `worksheets/`, even when publishing a single worksheet path. It sorts worksheets by date descending and shows date, practice status, title, topic, grade, item count, and completion summary. Practice status is inferred from `worksheets/status.md` when available; otherwise a generated worksheet is shown as `未练习`.
+The index is rebuilt from all public-safe worksheet HTML files under `worksheets/`, even when publishing a single worksheet path. It sorts worksheets by date descending and shows date, practice status, title, file links, topic, grade, item count, and completion summary. Practice status is inferred from `worksheets/status.md` when available; otherwise a generated worksheet is shown as `未练习`.
 
 This only produces local `site/` files. A public URL requires the personal learning repository to be pushed to GitHub and GitHub Pages to be configured for that repository.
 
@@ -76,11 +77,11 @@ git push
 
 The push triggers the GitHub Actions Pages deployment. Return the expected URL `https://<github-user>.github.io/<repo>/` and tell the parent that the first deployment may take a short time.
 
-In normal worksheet generation, if Pages mode is already configured and Git preflight passes, run `publish_and_wait_pages.py` automatically after `generate_worksheet.py`. Reply only after deployment succeeds, with:
+In normal worksheet generation, first return or send the generated `worksheet.pdf` when available. If Pages mode is already configured and Git preflight passes, run `publish_and_wait_pages.py` after `generate_worksheet.py` when a public link is wanted, with:
 
 - the public index URL;
 - the newly generated worksheet URL;
-- local paths for `worksheet.html` and `answer-key.md`.
+- local paths for `worksheet.pdf`, `worksheet.html`, and `answer-key.md`.
 
 If deployment fails or times out, do not hide the local result. Return local paths, pushed commit if known, and the Actions run URL or next setup step.
 
@@ -109,6 +110,7 @@ This keeps the repository public-readable while allowing only the deploy key and
 Allowed in `site/`:
 
 - child-facing worksheet HTML;
+- child-facing worksheet PDF;
 - worksheet title, date, topic, and strategy;
 - generated SVG diagrams and blank answer spaces.
 
@@ -121,6 +123,6 @@ Forbidden in `site/`:
 
 ## OpenClaw Output Rule
 
-When Pages is configured, return the Pages URL to the parent and use it in Feishu notifications. Keep answer keys and diagnosis links outside published `site/` output.
+When Pages is configured, return the PDF file/path first, then the Pages URL when deployment is ready. Use the Pages URL in Feishu notifications when available, and send the PDF file when the channel supports file messages. Keep answer keys and diagnosis links outside published `site/` output.
 
 If the parent asks OpenClaw to sync, push, publish to GitHub, or send a public link, read `github-sync-authorization.md` first. Do not assume GitHub CLI, GitHub token environment variables, or saved credentials are available. Use the Git preflight before committing or pushing. If authorization is missing, keep the local `site/` output, generate or suggest a repository Deploy key, send the public key and GitHub Settings -> Deploy keys guidance through Lark/Feishu when available, and return the local `site/` paths.

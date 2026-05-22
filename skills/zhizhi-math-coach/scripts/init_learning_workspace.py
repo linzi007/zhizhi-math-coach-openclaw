@@ -66,7 +66,7 @@ Open this repository as the OpenClaw workspace for daily grading, diagnosis, wor
 - `weak-points/`: durable weak-point history.
 - `mistakes/`: school and system-generated mistake books.
 - `records/`: dated diagnosis and progress records.
-- `worksheets/`: generated worksheet specs, printable HTML, and answer keys.
+- `worksheets/`: generated worksheet specs, printable student PDF/HTML, and answer keys.
 - `site/`: optional child-facing public pages only.
 
 ## Public Repository Mode
@@ -83,6 +83,8 @@ python3 skills/zhizhi-math-coach/scripts/publish_and_wait_pages.py \
   --workspace . \
   --base-url https://<user>.github.io/{repo_name}
 ```
+
+Generated worksheets should produce `worksheet.pdf` first when Chrome/Chromium is available. Use the PDF for immediate printing or file delivery; Pages is an optional public link.
 
 ## Daily Use
 
@@ -153,7 +155,7 @@ def long_term_template(args: argparse.Namespace, today: dt.date) -> str:
 - Parent-facing output should be concise Chinese.
 - Child-facing worksheets should not include answers.
 - Answers and grading rules stay in `answer-key.md`.
-- Worksheets are printable HTML generated from `worksheet-spec.json`.
+- Worksheets are printable PDF/HTML generated from `worksheet-spec.json`.
 - Practice should target the cause of mistakes, not only repeat the same surface topic.
 - Parent explanations should include a short script and quick verification questions.
 
@@ -408,11 +410,11 @@ def build_files(args: argparse.Namespace, today: dt.date) -> dict[str, str]:
         ),
         "worksheets/README.md": directory_readme(
             "Worksheets",
-            "Store generated worksheet specs, printable child-facing HTML, and answer keys in dated subdirectories.",
+            "Store generated worksheet specs, printable child-facing PDF/HTML, and answer keys in dated subdirectories.",
         ),
         "site/README.md": directory_readme(
             "Public Site",
-            "Only publish child-facing worksheet pages here. Do not place answer keys, records, memory, uploads, or textbook-derived raw material in this directory.",
+            "Only publish child-facing worksheet PDF/HTML here. Do not place answer keys, records, memory, uploads, or textbook-derived raw material in this directory.",
         ),
     }
 

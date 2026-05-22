@@ -8,7 +8,7 @@
 - infer error type, likely cause, related weak point, and relapse or transfer status;
 - maintain short-term memory, long-term memory, progress records, mistake books, and weak-point files;
 - align practice with China grade/semester, textbook edition, school calendar, midterm/final windows, and winter/summer break;
-- generate parent-facing explanations, student-readable summaries, and targeted printable worksheets;
+- generate parent-facing explanations, student-readable summaries, and targeted printable PDF/HTML worksheets;
 - keep child-facing worksheets answer-free and parent-facing answer keys separate.
 
 The repository intentionally contains only generic templates and sanitized sample data. Keep real student records, photos, school papers, textbook PDFs, and generated learning data in a separate personal learning repository.
@@ -17,11 +17,11 @@ The repository intentionally contains only generic templates and sanitized sampl
 
 | Scenario | User action | OpenClaw/skill action |
 | --- | --- | --- |
-| First use | Create a personal learning repository and install `zhizhi-math-coach` | Initialize `memory/`, `curriculum/`, `worksheets/`, and `records/` |
-| First sync | Ask OpenClaw for a deploy-key public key | Parent adds it to GitHub Deploy keys with `Allow write access` |
-| Public worksheet links | Set GitHub Pages source to `GitHub Actions` | Create `.github/workflows/pages.yml` and publish `site/` |
+| First use | Create a local personal learning workspace and install `zhizhi-math-coach` | Initialize `memory/`, `curriculum/`, `worksheets/`, and `records/` |
 | Daily grading | Upload worksheet photos or wrong questions | Update `records/`, `mistakes/`, `weak-points/`, and evidence-backed memory |
-| Daily worksheet generation | Ask for variants, weak-point drills, or exam review | Generate `worksheet.html` and `answer-key.md`; auto-publish when Pages is ready |
+| Daily worksheet generation | Ask for variants, weak-point drills, or exam review | Generate and return/send `worksheet.pdf`; also save `worksheet.html` and `answer-key.md` |
+| Advanced cloud sync | Ask to sync, push, or back up learning data | Configure GitHub remote and Deploy key, then sync learning-data |
+| Advanced online access | Ask for public links or GitHub Pages | Configure Pages/Actions, publish `site/`, and return links |
 
 Common prompts:
 
@@ -29,10 +29,17 @@ Common prompts:
 $zhizhi-math-coach 批改这张练习卷，记录薄弱项。
 $zhizhi-math-coach 根据最近错题生成变式练习。
 $zhizhi-math-coach 针对退位减法薄弱项出专项练习。
-$zhizhi-math-coach 生成期末错因复习卷，并发布学生版链接。
+$zhizhi-math-coach 生成期末错因复习卷，并返回 PDF。
+$zhizhi-math-coach 进阶：配置 GitHub 云同步和 Pages 在线访问。
 ```
 
-For first-use setup, follow `skills/zhizhi-math-coach/references/openclaw-quickstart.md`.
+For first-use setup, follow `skills/zhizhi-math-coach/references/openclaw-quickstart.md`. GitHub is not required by default; GitHub sync and Pages are advanced capabilities.
+
+Public GitHub advanced setup guide:
+
+```text
+https://github.com/linzi007/zhizhi-math-coach-openclaw/blob/main/docs/github-advanced-setup.zh-CN.md
+```
 
 ## Project Layout
 
@@ -131,7 +138,7 @@ Output locations:
 
 - grading or diagnosis writes `records/`, `mistakes/`, `weak-points/`, and sometimes `memory/` in the personal repository;
 - explanation cards write or update `knowledge-points/` in the personal repository;
-- worksheet generation writes `worksheets/<date-topic>/worksheet-spec.json`, `worksheet.html`, and `answer-key.md` in the personal repository;
+- worksheet generation writes `worksheets/<date-topic>/worksheet-spec.json`, `worksheet.pdf`, `worksheet.html`, and `answer-key.md` in the personal repository;
 - publishing writes `site/` and `worksheets/<date-topic>/publish.json` in the personal repository.
 
 Scripts can be executed from the installed skill path, and their input and workspace arguments should point to the personal repository. For example, run `skills/zhizhi-math-coach/scripts/publish_html_site.py` with `--workspace .` only when the shell is currently inside `zhizhi-math-learning-data/`.
@@ -147,7 +154,7 @@ This is recommended because the skill often needs to:
 - read worksheet photos, handwritten answers, teacher marks, and geometry diagrams;
 - identify unclear handwriting or cropped photos and ask for confirmation instead of guessing;
 - compare new mistakes with long-term `memory/`, `records/`, `mistakes/`, and `weak-points/`;
-- create valid `worksheet-spec.json`, printable HTML, answer keys, and dated diagnosis records;
+- create valid `worksheet-spec.json`, printable PDF/HTML, answer keys, and dated diagnosis records;
 - reason through multi-step word problems, geometry, exam review plans, and transfer-failure patterns.
 
 Avoid small text-only models for photo grading, geometry, complex word problems, or memory updates. They may be acceptable for simple reminders or formatting existing records.
@@ -163,6 +170,7 @@ python3 skills/zhizhi-math-coach/scripts/generate_worksheet.py \
 
 Outputs:
 
+- `examples/student-workspace/worksheets/sample-borrowing-subtraction/worksheet.pdf`
 - `examples/student-workspace/worksheets/sample-borrowing-subtraction/worksheet.html`
 - `examples/student-workspace/worksheets/sample-borrowing-subtraction/answer-key.md`
 
@@ -179,15 +187,15 @@ Run the repository smoke check:
 python3 scripts/smoke_check.py
 ```
 
-If browser print verification is needed, add `--verify-print` to generation and make sure Chrome or Chromium is installed.
+PDF export is attempted by default and requires Chrome or Chromium. If browser print verification is needed, add `--verify-print`.
 
-## Personal Learning Repository
+## Personal Learning Workspace
 
-This repository is the reusable skill. Real generated data belongs in a separate personal learning repository.
+This repository is the reusable skill. Real generated data belongs in a separate personal learning workspace. By default this can be local only: grading, records, and worksheet generation write local files, and worksheets are returned or sent as `worksheet.pdf`.
 
-The personal learning repository can be public or private. If it is public, keep sensitive learning records out of `site/` and avoid committing sensitive raw inputs.
+If cloud backup or multi-device sync is desired, turn the workspace into a GitHub personal learning repository. That repository can be public or private; the user chooses.
 
-Recommended personal repository layout:
+Recommended personal workspace layout:
 
 ```text
 zhizhi-math-learning-data/
@@ -203,12 +211,11 @@ zhizhi-math-learning-data/
   site/
 ```
 
-Initialize a personal learning repository after installing the skill from ClawHub:
+Initialize a local personal learning workspace after installing the skill from ClawHub:
 
 ```bash
 mkdir zhizhi-math-learning-data
 cd zhizhi-math-learning-data
-git init
 openclaw skills install zhizhi-math-coach
 python3 skills/zhizhi-math-coach/scripts/init_learning_workspace.py \
   --workspace . \
@@ -218,6 +225,18 @@ python3 skills/zhizhi-math-coach/scripts/init_learning_workspace.py \
   --semester 下学期 \
   --textbook-edition 人教版 \
   --textbook-volume 一年级下册
+```
+
+Normal daily use can start here without GitHub:
+
+```text
+$zhizhi-math-coach 根据最近错题生成变式练习，并返回 PDF。
+```
+
+To enable advanced cloud sync, initialize Git and connect GitHub:
+
+```bash
+git init
 git add .
 git commit -m "Initialize math learning workspace"
 git remote add origin git@github.com:<user>/zhizhi-math-learning-data.git
@@ -226,9 +245,9 @@ git push -u origin main
 
 The generated `.gitignore` ignores `skills/` by default so downloaded ClawHub bundles are not committed into the personal learning repository. Reinstall the skill on another machine when needed. If the first `git push` fails, the local learning workspace is still usable; configure GitHub authorization on the current machine and retry sync later.
 
-## GitHub Authorization For Sync
+## Advanced: GitHub Cloud Sync And Pages
 
-OpenClaw may run on a machine that has no GitHub CLI and no saved GitHub credentials. Some OpenClaw providers may also have no safe GitHub token environment-variable setup. GitHub sync only needs plain `git`, a remote, and push authorization. GitHub CLI `gh` is optional.
+GitHub sync is not required for default use. It supports cloud backup for `learning-data`, multi-device sync, and optional GitHub Pages links. OpenClaw may run on a machine that has no GitHub CLI and no saved GitHub credentials. Some OpenClaw providers may also have no safe GitHub token environment-variable setup. GitHub sync only needs plain `git`, a remote, and push authorization. GitHub CLI `gh` is optional.
 
 Prefer a GitHub Deploy key. The expected interaction is: OpenClaw generates an SSH public key for the personal learning repository, sends that public key to the parent through Lark/Feishu or the OpenClaw reply, and the parent adds it in the target repository Settings -> Deploy keys with `Allow write access` enabled.
 
@@ -263,7 +282,7 @@ After the parent adds the key, run:
 python3 skills/zhizhi-math-coach/scripts/check_git_sync.py --workspace . --check-push
 ```
 
-On the first use inside a personal learning repository, if GitHub sync is not ready, the skill should briefly mention this Deploy key setup. Later, when the parent asks to publish a worksheet, send a link, push, or sync, a failed preflight should return the local file paths and repeat the Deploy key guidance instead of failing worksheet generation.
+Ordinary grading and PDF worksheet generation should not prompt for GitHub authorization. When the parent asks to publish a worksheet, send a link, push, sync, or configure cloud backup, a failed preflight should return the PDF/local file paths and repeat the Deploy key guidance instead of failing worksheet generation.
 
 If Deploy keys or SSH are not available, create a fine-grained GitHub personal access token for the personal learning repository only:
 
@@ -296,7 +315,7 @@ $zhizhi-math-coach 根据最近错题生成变式练习。
 Typical write triggers:
 
 - grading or diagnosis updates `records/`, `mistakes/`, `weak-points/`, and sometimes `memory/`;
-- worksheet generation updates `worksheets/<date-topic>/worksheet-spec.json`, `worksheet.html`, and `answer-key.md`;
+- worksheet generation updates `worksheets/<date-topic>/worksheet-spec.json`, `worksheet.pdf`, `worksheet.html`, and `answer-key.md`;
 - publishing updates `site/` and `worksheets/<date-topic>/publish.json`;
 - scheduled OpenClaw tasks only remind or suggest by default, unless the parent explicitly asks them to write records or generate worksheets.
 
@@ -318,9 +337,9 @@ git push
 
 For a public personal repository, commit only files that are safe to expose. In most cases that means `site/` only, or sanitized worksheet files without answers or student identifiers.
 
-## Publish Child-Facing HTML From The Personal Repository
+## Publish Child-Facing PDF/HTML From The Personal Repository
 
-When public worksheet links are acceptable, run the publisher in the personal learning repository. It publishes only child-facing HTML into that repository's `site/` directory:
+When public worksheet links are acceptable, run the publisher in the personal learning repository. It publishes only child-facing HTML/PDF into that repository's `site/` directory:
 
 ```bash
 python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
@@ -333,10 +352,11 @@ The publisher writes:
 
 - `site/index.html` in the personal repository: public worksheet list.
 - `site/worksheets/<slug>/index.html`: printable child-facing worksheet page.
+- `site/worksheets/<slug>/worksheet.pdf`: printable child-facing PDF when generated.
 - `site/.nojekyll`: GitHub Pages static-site marker.
 - `worksheets/<date-topic>/publish.json`: publication manifest.
 
-`site/index.html` scans all public-safe child-facing worksheets under `worksheets/`, sorts them by date descending, and shows date, practice status, title, topic, grade, item count, and completion summary. Practice status is inferred from `worksheets/status.md` when available; otherwise generated worksheets are shown as `未练习`.
+`site/index.html` scans all public-safe child-facing worksheets under `worksheets/`, sorts them by date descending, and shows date, practice status, title, file links, topic, grade, item count, and completion summary. Practice status is inferred from `worksheets/status.md` when available; otherwise generated worksheets are shown as `未练习`.
 
 Do not publish answer keys, grading records, memory files, weak-point history, uploaded papers, or textbook files to `site/`.
 
@@ -380,7 +400,7 @@ This keeps the public repository viewable but lets only the deploy key and repos
 Automatic publishing flow:
 
 - After public Pages, `.github/workflows/pages.yml`, and a writable Deploy key are configured, the skill auto-publishes new generated worksheets.
-- OpenClaw generates local `worksheet.html` and `answer-key.md`, refreshes `site/`, then commits and pushes public-safe files.
+- OpenClaw generates local `worksheet.pdf`, `worksheet.html`, and `answer-key.md`, returns or sends the PDF first, refreshes `site/`, then commits and pushes public-safe files when GitHub sync is configured.
 - After GitHub Actions completes, OpenClaw replies with the Pages index URL and the generated worksheet URL.
 - If Actions fails or times out, local files remain valid and OpenClaw returns local paths plus Actions/auth setup guidance.
 
@@ -408,7 +428,7 @@ python3 skills/zhizhi-math-coach/scripts/publish_and_wait_pages.py \
 
 When a parent only says "出一张练习卷", confirm purpose, content scope, length, and output format before generating.
 
-For Feishu delivery, prefer sending the GitHub Pages worksheet URL when the page is public-safe. Keep `answer-key.md` outside the published `site/` directory.
+For Feishu delivery, send the generated `worksheet.pdf` when file messages are available. Add the GitHub Pages worksheet URL when the page is public-safe and deployment is ready. Keep `answer-key.md` outside the published `site/` directory.
 
 ## Curriculum Boundary
 

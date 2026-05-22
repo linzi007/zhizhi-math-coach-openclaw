@@ -20,9 +20,9 @@ V1 is a Skill-first release. It supports:
 - recommended model capability guidance for vision, long-context records, structured output, and reasoning effort;
 - GitHub sync authorization guidance for repository Deploy keys, SSH, and fine-grained HTTPS tokens;
 - Git preflight checks that do not require GitHub CLI;
-- worksheet generation from JSON specs;
+- worksheet generation from JSON specs with PDF-first delivery;
 - deterministic geometry SVG rendering for simple diagrams;
-- GitHub Pages publisher script for personal learning repositories;
+- GitHub Pages publisher script for personal learning repositories, including child-facing PDF when generated;
 - GitHub Actions Pages workflow setup for public personal repositories;
 - automatic Pages publishing with GitHub Actions deployment waiting;
 - validation and smoke checks.
@@ -66,4 +66,4 @@ OpenClaw machines may not have GitHub CLI, credentials, or a provider-level GitH
 
 For free GitHub Pages on a public personal repository, instruct the parent to choose Settings -> Pages -> Build and deployment -> Source: GitHub Actions. OpenClaw may create `.github/workflows/pages.yml` with `scripts/setup_github_pages_workflow.py` and push it after Git sync authorization is ready. Clarify that a public repository exposes all tracked files, not only the Pages site, while non-collaborators cannot push by default.
 
-After worksheet generation in a configured public Pages workspace, OpenClaw should run `scripts/publish_and_wait_pages.py`, wait for the GitHub Actions deployment to complete, and then reply with the Pages index URL and worksheet URL. This helper uses plain git and the public GitHub Actions API; it does not require GitHub CLI.
+After worksheet generation, OpenClaw should return or send `worksheet.pdf` first when it exists. In a configured public Pages workspace, OpenClaw can then run `scripts/publish_and_wait_pages.py`, wait for the GitHub Actions deployment when a public link is needed, and reply with the Pages index URL and worksheet URL. This helper uses plain git and the public GitHub Actions API; it does not require GitHub CLI.

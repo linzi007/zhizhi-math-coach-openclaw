@@ -134,8 +134,8 @@ $zhizhi-math-coach 根据最近错题生成变式练习。
 The skill may write:
 
 - `records/`, `mistakes/`, `weak-points/`, and `memory/` after grading or diagnosis;
-- `worksheets/<date-topic>/` after worksheet generation;
-- `site/` and `worksheets/<date-topic>/publish.json` after publishing child-facing HTML.
+- `worksheets/<date-topic>/` after worksheet generation, including `worksheet.pdf` when Chrome/Chromium is available;
+- `site/` and `worksheets/<date-topic>/publish.json` after publishing child-facing HTML/PDF.
 
 GitHub sync is explicit. Before OpenClaw commits or pushes, run:
 
@@ -210,6 +210,8 @@ textbooks/*.pdf
 
 ## Publish Child-Facing Worksheets
 
+Worksheet generation produces `worksheet.pdf` first when Chrome/Chromium is available. Send or open that PDF for immediate printing; GitHub Pages is an optional public link layer.
+
 Run from the personal learning repository:
 
 ```bash
@@ -219,9 +221,9 @@ python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
   --base-url https://<user>.github.io/zhizhi-math-learning-data
 ```
 
-Only child-facing `worksheet.html` files are copied into `site/`. Answers, records, memories, weak-point histories, uploaded papers, and textbook files must stay out of `site/`. If the repository is public, treat everything outside `site/` as potentially visible too and only commit data you are comfortable publishing.
+Only child-facing `worksheet.html` and `worksheet.pdf` files are copied into `site/`. Answers, records, memories, weak-point histories, uploaded papers, and textbook files must stay out of `site/`. If the repository is public, treat everything outside `site/` as potentially visible too and only commit data you are comfortable publishing.
 
-The generated `site/index.html` scans all public-safe worksheets under `worksheets/`, sorts them by date descending, and shows date, practice status, title, topic, grade, item count, and completion summary. Practice status comes from `worksheets/status.md` when available; otherwise generated worksheets are shown as `未练习`.
+The generated `site/index.html` scans all public-safe worksheets under `worksheets/`, sorts them by date descending, and shows date, practice status, title, file links, topic, grade, item count, and completion summary. Practice status comes from `worksheets/status.md` when available; otherwise generated worksheets are shown as `未练习`.
 
 After public Pages, `.github/workflows/pages.yml`, and a writable Deploy key are configured, worksheet generation should auto-publish:
 
@@ -232,7 +234,7 @@ python3 skills/zhizhi-math-coach/scripts/publish_and_wait_pages.py \
   --base-url https://<user>.github.io/zhizhi-math-learning-data
 ```
 
-This refreshes `site/`, commits and pushes public-safe publishing files, waits for the GitHub Actions Pages workflow to complete, and then returns the Pages index and worksheet URLs. If deployment fails or times out, local worksheet files still remain valid.
+This refreshes `site/`, commits and pushes public-safe publishing files, waits for the GitHub Actions Pages workflow to complete, and then returns the Pages index and worksheet URLs. If deployment fails or times out, local worksheet PDF/HTML files still remain valid.
 
 ## GitHub Pages Workflow
 
