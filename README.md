@@ -4,6 +4,8 @@
 
 `zhizhi-math-coach` is an OpenClaw skill for an evidence-based primary-school math learning loop:
 
+This project started as a way to help my first-grade daughter, Zhizhi, with math learning at home. I hope it can also help other parents facing the same problem: understanding where a child is really stuck, then keeping explanations, practice, and review moving over time.
+
 - grade completed worksheets, school papers, photos, or copied wrong questions;
 - infer error type, likely cause, related weak point, and relapse or transfer status;
 - maintain short-term memory, long-term memory, progress records, mistake books, and weak-point files;
