@@ -1,6 +1,6 @@
 ---
 name: zhizhi-math-coach
-description: "Use for Chinese primary-school math coaching: grade worksheet photos or wrong questions, record weak points and learning progress, explain concepts, and generate printable PDF/HTML practice aligned with grades, semesters, textbooks, midterms, finals, and holidays. 中文辅助：小学数学批改、薄弱项记录、知识讲解和出卷。"
+description: "Primary-school math coaching skill created to help my first-grade daughter Zhizhi: grade worksheet photos or wrong questions, track weak points and learning progress, explain concepts for parents and students, and generate printable PDF/HTML practice aligned with grade, semester, textbook, exam, and holiday plans."
 ---
 
 # Zhizhi Math Coach

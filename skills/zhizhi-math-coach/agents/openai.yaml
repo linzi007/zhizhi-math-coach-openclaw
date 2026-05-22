@@ -1,4 +1,4 @@
 interface:
   display_name: "Zhizhi Math Coach"
-  short_description: "Math grading, weak points, PDF practice / 小学数学"
-  default_prompt: "Use $zhizhi-math-coach to grade primary-school math worksheet photos, record weak points and progress, explain concepts, and generate printable PDF practice. 中文辅助：批改、记录薄弱项、讲解并出卷。"
+  short_description: "Math coaching for Zhizhi: grading, weak points, PDF practice"
+  default_prompt: "Use $zhizhi-math-coach to grade primary-school math worksheet photos, track weak points and progress, explain concepts for parents and students, and generate printable PDF practice."
