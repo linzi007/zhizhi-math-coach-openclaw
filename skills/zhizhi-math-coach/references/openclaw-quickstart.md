@@ -102,6 +102,20 @@ Use these prompt shapes in examples and replies:
 - `$zhizhi-math-coach 根据最近错题生成变式练习。`
 - `$zhizhi-math-coach 针对退位减法薄弱项出专项练习。`
 - `$zhizhi-math-coach 生成期末错因复习卷，并发布学生版链接。`
+- `$zhizhi-math-coach 开启定时任务，每天提醒到期复习和待批改练习。`
+
+## Scheduled Reminders
+
+Use this only after the parent asks for scheduled reminders or `.zhizhi-math-coach/config.json` already has `automation.enabled` and `automation.auto_register_when_supported` true.
+
+```bash
+python3 {baseDir}/scripts/setup_scheduled_tasks.py \
+  --workspace . \
+  --enable-config \
+  --auto-register
+```
+
+If `openclaw` is not installed in the current environment, the script prints the `openclaw cron add` commands to run in an OpenClaw Gateway environment. Scheduled reminders should not write records or generate worksheets unless the parent explicitly enables those config flags.
 
 ## Publish-Ready Checklist
 

@@ -4,6 +4,22 @@
 
 Scheduled tasks should default to reminders and suggestions. They should not automatically change weak-point status, memory, records, or generate new worksheets unless the parent has explicitly requested that behavior.
 
+OpenClaw cron jobs are not declared by a skill manifest at install time. Use the bundled setup script after the parent explicitly enables scheduled reminders. The script detects whether `openclaw cron` is available; if not, it prints the exact commands instead of failing the learning workflow.
+
+```bash
+python3 {baseDir}/scripts/setup_scheduled_tasks.py \
+  --workspace <personal-learning-workspace> \
+  --enable-config \
+  --auto-register
+```
+
+The setup writes `.zhizhi-math-coach/config.json`:
+
+- `automation.enabled`: scheduled reminders are allowed.
+- `automation.auto_register_when_supported`: register via `openclaw cron` when the CLI exists.
+- `automation.allow_record_writes`: default `false`.
+- `automation.allow_auto_worksheet_generation`: default `false`.
+
 ## Recommended Schedule
 
 - Daily 20:30 Asia/Shanghai: due review reminders, pending upload reminders, and stale short-term observations.
@@ -31,3 +47,4 @@ For push delivery, use a channel adapter. Feishu/Lark is the default v1 recommen
 - Do not push full answer keys into a child-facing chat.
 - Do not infer new mastery status from time alone.
 - Do not schedule automatic worksheet generation by default.
+- Do not auto-create cron jobs merely because the skill was installed; require an explicit setup trigger or existing automation config.

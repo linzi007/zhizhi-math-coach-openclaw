@@ -58,6 +58,7 @@ skills/zhizhi-math-coach/
   scripts/prepare_github_deploy_key.py
   scripts/check_git_sync.py
   scripts/configure_learning_workspace.py
+  scripts/setup_scheduled_tasks.py
   scripts/sync_learning_repo.py
   assets/worksheet/
 docs/
@@ -503,6 +504,15 @@ python3 skills/zhizhi-math-coach/scripts/publish_and_wait_pages.py \
 不要将教材 PDF、教材截图、扫描件、OCR 内容或成套教材原题提交到公开仓库。
 
 ## OpenClaw 自动化建议
+
+定时任务不能仅靠安装 skill 自动创建；需要用户明确开启，或个人学习仓库的 `.zhizhi-math-coach/config.json` 已启用 `automation.enabled` 和 `automation.auto_register_when_supported`。开启后，skill 会检测当前环境是否支持 `openclaw cron`，支持就注册任务，不支持就输出可复制命令。
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/setup_scheduled_tasks.py \
+  --workspace . \
+  --enable-config \
+  --auto-register
+```
 
 定时任务默认只做提醒和建议，不自动修改学生档案，也不自动出卷：
 

@@ -59,6 +59,7 @@ skills/zhizhi-math-coach/
   scripts/prepare_github_deploy_key.py
   scripts/check_git_sync.py
   scripts/configure_learning_workspace.py
+  scripts/setup_scheduled_tasks.py
   scripts/sync_learning_repo.py
   assets/worksheet/
 docs/
@@ -460,6 +461,26 @@ python3 skills/zhizhi-math-coach/scripts/publish_and_wait_pages.py \
 When a parent only says "出一张练习卷", confirm purpose, content scope, length, and output format before generating.
 
 For Feishu delivery, send the generated `worksheet.pdf` when file messages are available. Add the GitHub Pages worksheet URL when the page is public-safe and deployment is ready. Keep `answer-key.md` outside the published `site/` directory.
+
+## OpenClaw Automation
+
+Scheduled tasks are not auto-created merely by installing the skill. The parent must explicitly enable them, or the personal learning repository must already have `.zhizhi-math-coach/config.json` with `automation.enabled` and `automation.auto_register_when_supported`. When enabled, the skill can detect whether `openclaw cron` is available, register jobs when supported, or print copyable commands when unsupported.
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/setup_scheduled_tasks.py \
+  --workspace . \
+  --enable-config \
+  --auto-register
+```
+
+Default scheduled jobs only produce reminders and suggestions:
+
+- Daily 20:30 Asia/Shanghai: due reviews, pending uploads, and stale short-term observations.
+- Sunday 20:00 Asia/Shanghai: weekly progress review and next-week suggestions.
+- End of semester: summary and holiday review pool.
+- Winter/summer break: weekly holiday review suggestions.
+
+Scheduled jobs should not update learning records, change weak-point status, or generate worksheets unless the parent explicitly enables those behaviors.
 
 ## Curriculum Boundary
 

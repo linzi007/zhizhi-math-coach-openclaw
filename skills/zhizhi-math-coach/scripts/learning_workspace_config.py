@@ -33,6 +33,22 @@ SENSITIVE_SYNC_SCOPE = {
     "weak-points",
     "worksheets",
 }
+DEFAULT_AUTOMATION_TASKS = [
+    {
+        "name": "Zhizhi daily math review reminder",
+        "kind": "daily_review",
+        "enabled": True,
+        "cron": "30 20 * * *",
+        "session": "isolated",
+    },
+    {
+        "name": "Zhizhi weekly math review",
+        "kind": "weekly_review",
+        "enabled": True,
+        "cron": "0 20 * * 0",
+        "session": "isolated",
+    },
+]
 
 
 def run_git(args: list[str], workspace: Path) -> subprocess.CompletedProcess[str]:
@@ -130,6 +146,16 @@ def default_config(
             "source": "github-actions",
             "auto_publish_worksheets": False,
             "base_url": default_base_url(owner, repo),
+        },
+        "automation": {
+            "enabled": False,
+            "scheduler": "openclaw-cron",
+            "auto_register_when_supported": False,
+            "timezone": "Asia/Shanghai",
+            "allow_record_writes": False,
+            "allow_auto_worksheet_generation": False,
+            "tasks": DEFAULT_AUTOMATION_TASKS,
+            "registered_jobs": [],
         },
     }
 

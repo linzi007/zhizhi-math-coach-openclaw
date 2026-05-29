@@ -18,13 +18,13 @@ Use a local evidence loop for every task:
 7. Explain the correction in parent-friendly language, and include a shorter student-facing version when useful.
 8. Generate short validation practice for the cause, not just the surface topic.
 9. Update the mistake book, progress dashboard, weak-point records, memory, and next-practice suggestion only when evidence supports it.
-10. If automatic Git sync or Pages publishing is enabled in `.zhizhi-math-coach/config.json`, sync/publish without asking again after local files are written.
+10. If automatic Git sync, Pages publishing, or scheduled reminders are enabled in `.zhizhi-math-coach/config.json`, sync/publish/register supported automation without asking again after local files are written.
 
 ## Expected Workspace
 
 Use these paths in the user's personal learning project unless they provide different names. The project repository may be public or private; do not assume either.
 
-- `.zhizhi-math-coach/config.json`: machine-readable workspace role, Git sync, and GitHub Pages publishing settings. This file is the source of truth for whether the parent has already enabled automatic pull/commit/push and Pages publishing.
+- `.zhizhi-math-coach/config.json`: machine-readable workspace role, Git sync, GitHub Pages publishing, and scheduled reminder settings. This file is the source of truth for whether the parent has already enabled automatic pull/commit/push, Pages publishing, and OpenClaw cron registration.
 - `memory/long-term.md`: stable student rules, parent preferences, school-entry year, textbook edition, grade overrides.
 - `memory/short-term.md`: current observations, active priorities, pending checks.
 - `memory/local-memory-rules.md`: read/write/promotion rules for memory.
@@ -99,6 +99,17 @@ python3 {baseDir}/scripts/sync_learning_repo.py \
 
 3. Then read `memory/`, `curriculum/`, `records/`, `mistakes/`, `weak-points/`, and worksheet files from the updated workspace.
 
+If `automation.enabled` and `automation.auto_register_when_supported` are true, and no scheduled jobs are recorded yet, run:
+
+```bash
+python3 {baseDir}/scripts/setup_scheduled_tasks.py \
+  --workspace . \
+  --enable-config \
+  --auto-register
+```
+
+This script must detect whether `openclaw cron` is available. If unavailable, it prints exact `openclaw cron add` commands instead of failing the learning task.
+
 After local files are changed:
 
 - If `git_sync.enabled`, `git_sync.auto_commit_after_task`, and `git_sync.auto_push_after_task` are true, run:
@@ -147,6 +158,16 @@ Explicit GitHub advanced-setup trigger phrases include:
 - `配置云端备份`
 - `返回 SSH 公钥`
 - `配置公开链接`
+
+Explicit scheduled-task setup trigger phrases include:
+
+- `开启定时任务`
+- `配置每日提醒`
+- `配置每周复盘`
+- `开启自动复习提醒`
+- `配置 OpenClaw cron`
+
+When these scheduled-task phrases appear, configure reminders with `setup_scheduled_tasks.py`. Scheduled tasks must default to reminders and suggestions only; do not enable automatic worksheet generation or record writes unless the parent explicitly asks for those behaviors.
 
 When these phrases appear, treat the request as advanced GitHub setup. Do not grade or generate a worksheet unless the user also asks for that. Run or suggest `prepare_github_deploy_key.py`, return only the SSH public key, and include this public guide URL:
 
@@ -209,6 +230,7 @@ Skill resources are relative to `{baseDir}`:
 - `scripts/configure_learning_workspace.py`: create or update `.zhizhi-math-coach/config.json` for a personal learning repository.
 - `scripts/prepare_github_deploy_key.py`: generate a repository-scoped SSH deploy key and public-key setup instructions for GitHub Deploy keys.
 - `scripts/setup_github_pages_workflow.py`: create `.github/workflows/pages.yml` for publishing `site/` through GitHub Actions.
+- `scripts/setup_scheduled_tasks.py`: enable automation config and register OpenClaw cron reminder jobs when `openclaw cron` is available.
 - `scripts/sync_learning_repo.py`: pull, commit, and push configured learning-data changes without asking again when automatic sync is enabled.
 - `scripts/init_learning_workspace.py`: initialize a personal learning repository after the skill is installed.
 - `scripts/validate_worksheet_spec.py`: validate worksheet JSON without writing outputs.
@@ -370,6 +392,17 @@ Scheduled OpenClaw tasks should default to reminders and suggestions:
 - Winter/summer break: weekly review suggestions.
 
 Do not let scheduled tasks automatically change weak-point status, memory, or generate new worksheets unless the parent explicitly asked for that behavior.
+
+OpenClaw cron is not declared as a skill-install manifest. It is registered by running the bundled setup script after the parent enables scheduled tasks:
+
+```bash
+python3 {baseDir}/scripts/setup_scheduled_tasks.py \
+  --workspace . \
+  --enable-config \
+  --auto-register
+```
+
+If `openclaw` is not available on the current machine, the script prints the `openclaw cron add` commands for the provider or parent to run later.
 
 Feishu notifications should prefer GitHub Pages worksheet links when configured; keep answer keys and diagnosis records outside published `site/` output.
 

@@ -24,6 +24,7 @@ WORKSPACE_CONFIG_PATH = SKILL_DIR / "scripts" / "learning_workspace_config.py"
 CONFIGURE_WORKSPACE_PATH = SKILL_DIR / "scripts" / "configure_learning_workspace.py"
 GIT_SYNC_CHECK_PATH = SKILL_DIR / "scripts" / "check_git_sync.py"
 SYNC_LEARNING_REPO_PATH = SKILL_DIR / "scripts" / "sync_learning_repo.py"
+SCHEDULED_TASKS_SETUP_PATH = SKILL_DIR / "scripts" / "setup_scheduled_tasks.py"
 DEPLOY_KEY_PREP_PATH = SKILL_DIR / "scripts" / "prepare_github_deploy_key.py"
 PAGES_WORKFLOW_SETUP_PATH = SKILL_DIR / "scripts" / "setup_github_pages_workflow.py"
 PUBLISH_AND_WAIT_PATH = SKILL_DIR / "scripts" / "publish_and_wait_pages.py"
@@ -159,6 +160,10 @@ def check_sync_learning_repo_loads() -> None:
     load_module(SYNC_LEARNING_REPO_PATH, "learning_repo_syncer")
 
 
+def check_scheduled_tasks_setup_loads() -> None:
+    load_module(SCHEDULED_TASKS_SETUP_PATH, "scheduled_tasks_setup")
+
+
 def check_deploy_key_preparer_loads() -> None:
     load_module(DEPLOY_KEY_PREP_PATH, "github_deploy_key_preparer")
 
@@ -222,6 +227,8 @@ def check_init_workspace_script() -> None:
         config = json.loads((target / ".zhizhi-math-coach/config.json").read_text(encoding="utf-8"))
         if config.get("workspace_role") != "personal-learning-data":
             fail("init script did not create personal-learning-data workspace config")
+        if "automation" not in config:
+            fail("init script did not create automation config section")
 
 
 def main() -> int:
@@ -234,6 +241,7 @@ def main() -> int:
     check_configure_workspace_loads()
     check_git_sync_checker_loads()
     check_sync_learning_repo_loads()
+    check_scheduled_tasks_setup_loads()
     check_deploy_key_preparer_loads()
     check_pages_workflow_setup_loads()
     check_publish_and_wait_loads()

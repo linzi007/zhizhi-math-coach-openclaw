@@ -35,6 +35,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--public-repository-accepted", action="store_true", help="Parent accepts the visibility of committed files in a public repository.")
     parser.add_argument("--enable-pages", action="store_true", help="Mark GitHub Pages publishing as enabled.")
     parser.add_argument("--auto-publish-pages", action="store_true", help="Automatically publish generated worksheets to Pages.")
+    parser.add_argument("--enable-scheduled-tasks", action="store_true", help="Mark OpenClaw scheduled reminders as enabled.")
+    parser.add_argument("--auto-register-scheduled-tasks", action="store_true", help="Automatically register OpenClaw cron jobs when supported.")
+    parser.add_argument("--allow-scheduled-record-writes", action="store_true", help="Allow scheduled jobs to write learning records.")
+    parser.add_argument("--allow-scheduled-worksheet-generation", action="store_true", help="Allow scheduled jobs to generate worksheets.")
     return parser.parse_args()
 
 
@@ -90,6 +94,15 @@ def main() -> int:
             }
         )
 
+    if args.enable_scheduled_tasks or args.auto_register_scheduled_tasks:
+        patch["automation"] = {
+            "enabled": True,
+            "scheduler": "openclaw-cron",
+            "auto_register_when_supported": args.auto_register_scheduled_tasks,
+            "allow_record_writes": args.allow_scheduled_record_writes,
+            "allow_auto_worksheet_generation": args.allow_scheduled_worksheet_generation,
+        }
+
     config = update_config(
         workspace,
         patch,
@@ -108,9 +121,10 @@ def main() -> int:
     print(f"pages.enabled: {config.get('pages', {}).get('enabled')}")
     print(f"pages.auto_publish_worksheets: {config.get('pages', {}).get('auto_publish_worksheets')}")
     print(f"pages.base_url: {config.get('pages', {}).get('base_url')}")
+    print(f"automation.enabled: {config.get('automation', {}).get('enabled')}")
+    print(f"automation.auto_register_when_supported: {config.get('automation', {}).get('auto_register_when_supported')}")
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
