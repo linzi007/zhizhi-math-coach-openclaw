@@ -18,11 +18,11 @@
 
 | 场景 | 用户动作 | OpenClaw/Skill 动作 |
 | --- | --- | --- |
-| 第一次使用 | 创建本地个人学习工作区并安装 `zhizhi-math-coach` | 初始化 `memory/`、`curriculum/`、`worksheets/`、`records/` |
+| 第一次使用 | 创建本地个人学习工作区并安装 `zhizhi-math-coach` | 初始化 `memory/`、`curriculum/`、`worksheets/`、`records/` 和 `.zhizhi-math-coach/config.json` |
 | 日常批改 | 上传练习卷/错题照片 | 写入 `records/`、`mistakes/`、`weak-points/`、必要时更新 `memory/` |
 | 日常出卷 | 说明错题变式、薄弱项专项或考前复习 | 生成并优先回复/发送 `worksheet.pdf`，同时保存 `worksheet.html` 和 `answer-key.md` |
-| 进阶云同步 | 明确要求同步、push 或云端备份 | 配置 GitHub remote 和 Deploy key 后同步 learning-data |
-| 进阶在线访问 | 明确要求公开链接或 GitHub Pages | 配置 Pages/Actions 后发布 `site/` 并返回链接 |
+| 进阶云同步 | 明确要求同步、push、云端备份，或已在配置中启用自动同步 | 配置 GitHub remote 和 Deploy key 后自动 pull/commit/push learning-data |
+| 进阶在线访问 | 明确要求公开链接或已在配置中启用 Pages 自动发布 | 配置 Pages/Actions 后发布 `site/` 并返回链接 |
 
 常用触发语：
 
@@ -57,6 +57,8 @@ skills/zhizhi-math-coach/
   scripts/setup_github_pages_workflow.py
   scripts/prepare_github_deploy_key.py
   scripts/check_git_sync.py
+  scripts/configure_learning_workspace.py
+  scripts/sync_learning_repo.py
   assets/worksheet/
 docs/
 scripts/smoke_check.py
@@ -301,7 +303,7 @@ git push --dry-run origin HEAD
 
 ## 本地更新和同步如何触发
 
-默认没有后台自动同步。
+默认没有后台自动同步。只有当个人学习仓库中的 `.zhizhi-math-coach/config.json` 明确启用 `git_sync` 或 `pages.auto_publish_worksheets` 后，OpenClaw 才会把 pull、commit、push 和 Pages 发布视为已授权的自动流程。
 
 当 OpenClaw 在个人学习仓库中工作，并且用户触发 skill 时，才会读写本地学习文件。例如：
 
@@ -317,23 +319,46 @@ $zhizhi-math-coach 根据最近错题生成变式练习。
 - 发布学生版页面会更新 `site/` 和 `worksheets/<date-topic>/publish.json`；
 - OpenClaw 定时任务默认只提醒或建议，不自动写学习记录，也不自动出卷，除非家长明确要求。
 
-同步到 GitHub 只在用户明确要求同步、push、发布、发链接，或用户自己在个人学习仓库里执行 Git 提交和推送时发生。OpenClaw 提交或推送前应先运行：
+配置状态不靠对话记忆，也不靠 README 推断，而是写在个人学习仓库：
+
+```text
+.zhizhi-math-coach/config.json
+```
+
+如果没有这个文件，OpenClaw 应按未配置处理：只生成本地学习文件和 PDF，除非家长明确要求同步或发布。
+
+首次授权通过后，应写入配置：
 
 ```bash
-python3 skills/zhizhi-math-coach/scripts/check_git_sync.py --workspace . --check-push
+python3 skills/zhizhi-math-coach/scripts/check_git_sync.py \
+  --workspace . \
+  --check-push \
+  --write-config \
+  --auto-sync \
+  --sync-full-learning-data \
+  --public-repository-accepted
 ```
 
 如果预检失败，本地生成文件仍然有效；完成 SSH 或 token 授权后可以重试同步。
 
-若个人学习仓库是 private，可以同步完整学习状态：
+配置完成后，每次任务开始前可自动拉取远端最新数据：
 
 ```bash
-git add curriculum knowledge-points memory mistakes records weak-points worksheets site
-git commit -m "Update learning records"
-git push
+python3 skills/zhizhi-math-coach/scripts/sync_learning_repo.py \
+  --workspace . \
+  --mode before-task
 ```
 
-若个人学习仓库是 public，只提交适合公开的文件。多数情况下只提交 `site/`，或提交已脱敏、无答案、无学生身份信息的练习卷文件。
+任务完成后可自动提交并推送配置范围内的学习数据：
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/sync_learning_repo.py \
+  --workspace . \
+  --mode after-task \
+  --message "Update learning data"
+```
+
+同步脚本会先 `git pull --rebase --autostash`，再按配置提交并 push；如果 push 时发现远端更新，会再 pull/rebase 并重试一次。若个人学习仓库是 public，只有在 `.zhizhi-math-coach/config.json` 里记录了 `public_repository_accepted: true` 和 `sync_full_learning_data: true` 时，才会同步完整学习状态。
 
 ## 出卷方式
 
@@ -418,10 +443,14 @@ python3 skills/zhizhi-math-coach/scripts/publish_html_site.py \
 3. 如果 OpenClaw 已经通过 Deploy key 获得写权限，可以直接创建、提交并 push：
 
 ```bash
-python3 skills/zhizhi-math-coach/scripts/setup_github_pages_workflow.py --workspace .
-git add .github/workflows/pages.yml site
-git commit -m "Configure GitHub Pages publishing"
-git push
+python3 skills/zhizhi-math-coach/scripts/setup_github_pages_workflow.py \
+  --workspace . \
+  --public-repository-accepted
+
+python3 skills/zhizhi-math-coach/scripts/sync_learning_repo.py \
+  --workspace . \
+  --mode after-task \
+  --message "Configure GitHub Pages publishing"
 ```
 
 推荐 ruleset 配置：
@@ -446,8 +475,8 @@ git push
 
 自动发布流程：
 
-- 当个人学习仓库已经配置 public Pages、`.github/workflows/pages.yml` 和可写 Deploy key 后，skill 生成新练习卷时会自动发布学生版页面。
-- OpenClaw 会先生成本地 `worksheet.pdf`、`worksheet.html` 和 `answer-key.md`，优先返回或发送 PDF，再刷新 `site/`，提交并 push public-safe 文件。
+- 当个人学习仓库已经配置 public Pages、`.github/workflows/pages.yml`、可写 Deploy key，并且 `.zhizhi-math-coach/config.json` 中 `pages.auto_publish_worksheets` 为 `true` 后，skill 生成新练习卷时会自动发布学生版页面。
+- OpenClaw 会先自动 pull 最新 learning-data，生成本地 `worksheet.pdf`、`worksheet.html` 和 `answer-key.md`，优先返回或发送 PDF，再刷新 `site/`，提交并 push。
 - GitHub Actions 执行完成后，OpenClaw 再回复 Pages 首页链接和本次练习卷链接。
 - 如果 Actions 失败或超时，本地文件仍然有效，OpenClaw 会返回本地路径和 Actions/授权排查信息。
 

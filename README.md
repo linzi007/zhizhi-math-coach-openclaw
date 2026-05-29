@@ -19,11 +19,11 @@ The repository intentionally contains only generic templates and sanitized sampl
 
 | Scenario | User action | OpenClaw/skill action |
 | --- | --- | --- |
-| First use | Create a local personal learning workspace and install `zhizhi-math-coach` | Initialize `memory/`, `curriculum/`, `worksheets/`, and `records/` |
+| First use | Create a local personal learning workspace and install `zhizhi-math-coach` | Initialize `memory/`, `curriculum/`, `worksheets/`, `records/`, and `.zhizhi-math-coach/config.json` |
 | Daily grading | Upload worksheet photos or wrong questions | Update `records/`, `mistakes/`, `weak-points/`, and evidence-backed memory |
 | Daily worksheet generation | Ask for variants, weak-point drills, or exam review | Generate and return/send `worksheet.pdf`; also save `worksheet.html` and `answer-key.md` |
-| Advanced cloud sync | Ask to sync, push, or back up learning data | Configure GitHub remote and Deploy key, then sync learning-data |
-| Advanced online access | Ask for public links or GitHub Pages | Configure Pages/Actions, publish `site/`, and return links |
+| Advanced cloud sync | Ask to sync/push/back up, or enable automatic sync in config | Configure GitHub remote and Deploy key, then automatically pull/commit/push learning-data |
+| Advanced online access | Ask for public links, or enable Pages auto-publishing in config | Configure Pages/Actions, publish `site/`, and return links |
 
 Common prompts:
 
@@ -58,6 +58,8 @@ skills/zhizhi-math-coach/
   scripts/setup_github_pages_workflow.py
   scripts/prepare_github_deploy_key.py
   scripts/check_git_sync.py
+  scripts/configure_learning_workspace.py
+  scripts/sync_learning_repo.py
   assets/worksheet/
 docs/
 scripts/smoke_check.py
@@ -305,7 +307,7 @@ When Git prompts, enter the GitHub username and use the token as the password. D
 
 ## What Triggers Local Updates And Sync
 
-There is no background sync by default.
+There is no background sync by default. OpenClaw treats pull, commit, push, and Pages publishing as already authorized only when the personal learning repository has `.zhizhi-math-coach/config.json` with `git_sync` or `pages.auto_publish_worksheets` enabled.
 
 Local learning files are updated when OpenClaw is working inside the personal learning repository and the user invokes the skill, for example:
 
@@ -321,23 +323,46 @@ Typical write triggers:
 - publishing updates `site/` and `worksheets/<date-topic>/publish.json`;
 - scheduled OpenClaw tasks only remind or suggest by default, unless the parent explicitly asks them to write records or generate worksheets.
 
-GitHub sync happens only when the user explicitly asks to sync/push/publish or manually commits and pushes from the personal learning repository. Before OpenClaw commits or pushes, it should run:
+The configured state is stored in the personal learning repository, not in chat history or README text:
+
+```text
+.zhizhi-math-coach/config.json
+```
+
+If that file is missing, OpenClaw should behave as unconfigured: generate local learning files and PDFs unless the parent explicitly asks for sync or publishing.
+
+After Git authorization succeeds, write the config:
 
 ```bash
-python3 skills/zhizhi-math-coach/scripts/check_git_sync.py --workspace . --check-push
+python3 skills/zhizhi-math-coach/scripts/check_git_sync.py \
+  --workspace . \
+  --check-push \
+  --write-config \
+  --auto-sync \
+  --sync-full-learning-data \
+  --public-repository-accepted
 ```
 
 If the preflight fails, the generated local files remain valid and sync can be retried after SSH or token authorization is configured.
 
-For a private personal repository, sync can archive the full learning state:
+After configuration, the task can pull the latest remote data before reading records:
 
 ```bash
-git add curriculum knowledge-points memory mistakes records weak-points worksheets site
-git commit -m "Update learning records"
-git push
+python3 skills/zhizhi-math-coach/scripts/sync_learning_repo.py \
+  --workspace . \
+  --mode before-task
 ```
 
-For a public personal repository, commit only files that are safe to expose. In most cases that means `site/` only, or sanitized worksheet files without answers or student identifiers.
+After the task changes local files, it can commit and push the configured learning-data scope:
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/sync_learning_repo.py \
+  --workspace . \
+  --mode after-task \
+  --message "Update learning data"
+```
+
+The sync script runs `git pull --rebase --autostash` before committing and pushing. If push is rejected because the remote changed, it pulls/rebases and retries once. For public repositories, full learning-state sync requires `public_repository_accepted: true` and `sync_full_learning_data: true` in the config.
 
 ## Publish Child-Facing PDF/HTML From The Personal Repository
 
@@ -373,10 +398,14 @@ Recommended GitHub Pages setup:
 3. If OpenClaw already has write access through the Deploy key, it can create, commit, and push the workflow:
 
 ```bash
-python3 skills/zhizhi-math-coach/scripts/setup_github_pages_workflow.py --workspace .
-git add .github/workflows/pages.yml site
-git commit -m "Configure GitHub Pages publishing"
-git push
+python3 skills/zhizhi-math-coach/scripts/setup_github_pages_workflow.py \
+  --workspace . \
+  --public-repository-accepted
+
+python3 skills/zhizhi-math-coach/scripts/sync_learning_repo.py \
+  --workspace . \
+  --mode after-task \
+  --message "Configure GitHub Pages publishing"
 ```
 
 Recommended ruleset:
@@ -401,8 +430,8 @@ This keeps the public repository viewable but lets only the deploy key and repos
 
 Automatic publishing flow:
 
-- After public Pages, `.github/workflows/pages.yml`, and a writable Deploy key are configured, the skill auto-publishes new generated worksheets.
-- OpenClaw generates local `worksheet.pdf`, `worksheet.html`, and `answer-key.md`, returns or sends the PDF first, refreshes `site/`, then commits and pushes public-safe files when GitHub sync is configured.
+- After public Pages, `.github/workflows/pages.yml`, a writable Deploy key, and `.zhizhi-math-coach/config.json` with `pages.auto_publish_worksheets: true` are configured, the skill auto-publishes new generated worksheets.
+- OpenClaw pulls the latest learning-data first, generates local `worksheet.pdf`, `worksheet.html`, and `answer-key.md`, returns or sends the PDF first, refreshes `site/`, then commits and pushes.
 - After GitHub Actions completes, OpenClaw replies with the Pages index URL and the generated worksheet URL.
 - If Actions fails or times out, local files remain valid and OpenClaw returns local paths plus Actions/auth setup guidance.
 

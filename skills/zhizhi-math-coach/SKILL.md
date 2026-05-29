@@ -9,19 +9,22 @@ description: "Primary-school math coaching skill created to help my first-grade 
 
 Use a local evidence loop for every task:
 
-1. Read local memory, curriculum, school calendar, progress, and relevant weak-point files before deciding.
-2. Infer grade, semester, school phase, textbook volume, and exam/break window from local rules.
-3. Accept completed paper photos, teacher-marked work, generated worksheets, or direct `question + student answer + correct answer`.
-4. Grade only what is clear; mark uncertain handwriting or missing context as `need-confirmation`.
-5. Compare mistakes with historical weak points before assigning causes.
-6. Explain the correction in parent-friendly language, and include a shorter student-facing version when useful.
-7. Generate short validation practice for the cause, not just the surface topic.
-8. Update the mistake book, progress dashboard, weak-point records, memory, and next-practice suggestion only when evidence supports it.
+1. Read `.zhizhi-math-coach/config.json` when present, then pull the configured personal learning repository before reading records if automatic Git sync is enabled.
+2. Read local memory, curriculum, school calendar, progress, and relevant weak-point files before deciding.
+3. Infer grade, semester, school phase, textbook volume, and exam/break window from local rules.
+4. Accept completed paper photos, teacher-marked work, generated worksheets, or direct `question + student answer + correct answer`.
+5. Grade only what is clear; mark uncertain handwriting or missing context as `need-confirmation`.
+6. Compare mistakes with historical weak points before assigning causes.
+7. Explain the correction in parent-friendly language, and include a shorter student-facing version when useful.
+8. Generate short validation practice for the cause, not just the surface topic.
+9. Update the mistake book, progress dashboard, weak-point records, memory, and next-practice suggestion only when evidence supports it.
+10. If automatic Git sync or Pages publishing is enabled in `.zhizhi-math-coach/config.json`, sync/publish without asking again after local files are written.
 
 ## Expected Workspace
 
 Use these paths in the user's personal learning project unless they provide different names. The project repository may be public or private; do not assume either.
 
+- `.zhizhi-math-coach/config.json`: machine-readable workspace role, Git sync, and GitHub Pages publishing settings. This file is the source of truth for whether the parent has already enabled automatic pull/commit/push and Pages publishing.
 - `memory/long-term.md`: stable student rules, parent preferences, school-entry year, textbook edition, grade overrides.
 - `memory/short-term.md`: current observations, active priorities, pending checks.
 - `memory/local-memory-rules.md`: read/write/promotion rules for memory.
@@ -81,6 +84,57 @@ Recommended settings:
 - Fast/simple tasks: use lower reasoning for reminders, checklist updates, or formatting existing records.
 - Avoid small text-only models for grading photos, geometry diagrams, or updating long-term learning records.
 
+## Workspace Config And Automatic Sync
+
+At the start of every meaningful task in a personal learning workspace:
+
+1. Read `.zhizhi-math-coach/config.json` if it exists.
+2. If `workspace_role` is `personal-learning-data` and `git_sync.enabled` plus `git_sync.auto_pull_before_task` are true, run:
+
+```bash
+python3 {baseDir}/scripts/sync_learning_repo.py \
+  --workspace . \
+  --mode before-task
+```
+
+3. Then read `memory/`, `curriculum/`, `records/`, `mistakes/`, `weak-points/`, and worksheet files from the updated workspace.
+
+After local files are changed:
+
+- If `git_sync.enabled`, `git_sync.auto_commit_after_task`, and `git_sync.auto_push_after_task` are true, run:
+
+```bash
+python3 {baseDir}/scripts/sync_learning_repo.py \
+  --workspace . \
+  --mode after-task \
+  --message "Update learning data"
+```
+
+- Do not ask the parent to confirm pull, commit, or push again when these config flags are already true. Treat the config as the durable consent and state for this personal learning repository.
+- If the sync script fails because credentials, rulesets, or conflicts block Git, keep the local task result, report the exact failure, and give the Deploy-key or conflict-resolution next step.
+
+When a repository has been configured after Git authorization succeeds, persist the state with:
+
+```bash
+python3 {baseDir}/scripts/check_git_sync.py \
+  --workspace . \
+  --check-push \
+  --write-config \
+  --auto-sync \
+  --sync-full-learning-data \
+  --public-repository-accepted
+```
+
+When Pages is configured, persist Pages auto-publishing with:
+
+```bash
+python3 {baseDir}/scripts/setup_github_pages_workflow.py \
+  --workspace . \
+  --public-repository-accepted
+```
+
+If `.zhizhi-math-coach/config.json` is missing, do not assume automatic sync from README text alone. Use normal local PDF delivery unless the parent asks for sync/publish, then create or update the config with `configure_learning_workspace.py`, `check_git_sync.py --write-config`, or `setup_github_pages_workflow.py`.
+
 ## Trigger And Sync Boundary
 
 This skill is triggered by the user's OpenClaw request, such as `$zhizhi-math-coach 批改...` or `$zhizhi-math-coach 出一张...`, while the working directory is the personal learning project.
@@ -104,7 +158,7 @@ The advanced setup reply must include:
 - guide URL above;
 - GitHub path: `Settings -> Deploy keys -> Add deploy key`;
 - permission instruction: enable `Allow write access`;
-- next step: after the parent replies `已添加`, run `check_git_sync.py --workspace . --check-push`.
+- next step: after the parent replies `已添加`, run `check_git_sync.py --workspace . --check-push --write-config --auto-sync --sync-full-learning-data --public-repository-accepted`.
 
 If the GitHub owner or repository name is missing and cannot be inferred from `origin`, ask for both in plain Chinese:
 
@@ -114,7 +168,7 @@ Always treat the current workspace root as the personal learning project root fo
 
 If the current workspace appears to be the reusable source repository `zhizhi-math-coach-openclaw` (for example it contains `docs/openclaw-release.md` and `examples/student-workspace/`), warn before writing student learning data. Do not warn merely because a personal workspace has an installed `skills/zhizhi-math-coach/` bundle from ClawHub. Only write student data into the source repository when the user explicitly says it is the intended personal learning workspace or the task is skill development with sanitized examples.
 
-Do not assume background sync. Local files are changed by the current task only:
+Do not assume background sync unless `.zhizhi-math-coach/config.json` enables it. Local files are changed by the current task only:
 
 - grading or diagnosis may write `records/`, `mistakes/`, `weak-points/`, and evidence-backed `memory/` updates;
 - worksheet generation may write `worksheets/<date-topic>/worksheet-spec.json`, `worksheet.html`, `worksheet.pdf`, and `answer-key.md`;
@@ -125,9 +179,9 @@ When publishing, rebuild `site/index.html` as the full worksheet list from `work
 
 PDF is the default worksheet delivery format. After worksheet generation, return or send `worksheet.pdf` first when it exists. If Chrome/Chromium is unavailable and PDF export was skipped, return the local `worksheet.html` path and mention that PDF export needs Chrome/Chromium.
 
-GitHub sync and GitHub Pages are advanced cloud features, not required for normal use. If GitHub sync is configured, sync generated learning data and worksheet artifacts when requested or enabled. If a worksheet is generated in a workspace that already has public Pages mode configured (`.github/workflows/pages.yml`, GitHub Pages source set to Actions, and Git preflight passes), publish to Pages after the PDF is available only when the user needs a public link: run `publish_and_wait_pages.py`, wait for GitHub Actions deployment to finish, then reply with the PDF path/file, index URL, and worksheet URL. If the Actions run fails or times out, return the PDF/local paths, pushed commit if available, and Actions/setup guidance.
+GitHub sync and GitHub Pages are advanced cloud features, not required for normal use. If GitHub sync is configured and enabled in `.zhizhi-math-coach/config.json`, sync generated learning data and worksheet artifacts automatically according to the config flags. If a worksheet is generated and `pages.enabled` plus `pages.auto_publish_worksheets` are true, publish to Pages after the PDF is available: run `publish_and_wait_pages.py`, wait for GitHub Actions deployment to finish, then reply with the PDF path/file, index URL, and worksheet URL. If the Actions run fails or times out, return the PDF/local paths, pushed commit if available, and Actions/setup guidance.
 
-Do not run `git add`, `git commit`, or `git push` unless the parent explicitly asks to sync, publish, push, commit to GitHub, send a public link, or has enabled automatic Pages publishing for generated worksheets. When sync is requested, read `references/github-sync-authorization.md` first and run the bundled preflight before committing or pushing. Do not require GitHub CLI or provider-level token configuration; a repository-scoped SSH deploy key is the preferred setup. If authorization is missing, return the PDF/local file paths and setup guidance instead of treating generation as failed. If the personal repository is public, warn before committing sensitive learning records or answer keys unless the parent has explicitly accepted full public learning-data sync.
+Do not run `git add`, `git commit`, or `git push` unless the parent explicitly asks to sync, publish, push, commit to GitHub, send a public link, or `.zhizhi-math-coach/config.json` enables automatic sync or automatic Pages publishing. When sync is requested or newly configured, read `references/github-sync-authorization.md` first and run the bundled preflight before committing or pushing. Do not require GitHub CLI or provider-level token configuration; a repository-scoped SSH deploy key is the preferred setup. If authorization is missing, return the PDF/local file paths and setup guidance instead of treating generation as failed. If the personal repository is public, warn before committing sensitive learning records or answer keys unless the parent has explicitly accepted full public learning-data sync in `.zhizhi-math-coach/config.json`.
 
 On the first meaningful reply in a personal learning workspace, use `references/openclaw-quickstart.md` for a short setup check focused on local workspace readiness and PDF delivery. Do not mention GitHub setup during ordinary grading or worksheet generation unless the parent asks for cloud sync, push, public links, Pages, or a publish preflight fails. When needed, explain that OpenClaw can generate a repository-specific public key, send it to the parent through Lark/Feishu when available, and the parent should add it in GitHub repository Settings -> Deploy keys with write access.
 
@@ -152,8 +206,10 @@ Skill resources are relative to `{baseDir}`:
 - `references/student-profile-template.md`: starter profile format.
 - `scripts/generate_worksheet.py`: generate worksheet HTML, student-facing PDF, and answer key from JSON.
 - `scripts/check_git_sync.py`: preflight whether the current machine can reach and push the personal GitHub repository.
+- `scripts/configure_learning_workspace.py`: create or update `.zhizhi-math-coach/config.json` for a personal learning repository.
 - `scripts/prepare_github_deploy_key.py`: generate a repository-scoped SSH deploy key and public-key setup instructions for GitHub Deploy keys.
 - `scripts/setup_github_pages_workflow.py`: create `.github/workflows/pages.yml` for publishing `site/` through GitHub Actions.
+- `scripts/sync_learning_repo.py`: pull, commit, and push configured learning-data changes without asking again when automatic sync is enabled.
 - `scripts/init_learning_workspace.py`: initialize a personal learning repository after the skill is installed.
 - `scripts/validate_worksheet_spec.py`: validate worksheet JSON without writing outputs.
 - `scripts/publish_html_site.py`: publish child-facing worksheet HTML/PDF into a GitHub Pages `site/` directory.

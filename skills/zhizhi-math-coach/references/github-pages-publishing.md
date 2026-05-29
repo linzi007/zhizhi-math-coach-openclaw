@@ -8,7 +8,7 @@ Do not publish answers, diagnosis records, long-term memory, weak-point history,
 
 ## Default Flow
 
-After generating a worksheet PDF/HTML in a Pages-enabled public personal repository, publish and wait when a public link is needed:
+After generating a worksheet PDF/HTML in a Pages-enabled public personal repository, publish and wait when a public link is needed or when `.zhizhi-math-coach/config.json` has `pages.auto_publish_worksheets: true`:
 
 ```bash
 python3 {baseDir}/scripts/publish_and_wait_pages.py \
@@ -21,10 +21,12 @@ The script:
 
 1. Copies public-safe worksheet HTML and `worksheet.pdf` into `site/` when the PDF exists.
 2. Rebuilds `site/index.html` from all worksheets.
-3. Stages only public-safe publishing files: `site/`, `.github/workflows/pages.yml` when present, and `worksheets/*/publish.json`.
-4. Commits and pushes to the current branch.
-5. Waits for the GitHub Actions Pages workflow for that commit.
-6. Checks the Pages index and worksheet URLs before reporting `pages-ready`.
+3. Pulls the remote branch with `git pull --rebase --autostash` before committing, unless `--no-pull` is passed.
+4. Stages only public-safe publishing files: `site/`, `.github/workflows/pages.yml` when present, and `worksheets/*/publish.json`.
+5. Commits and pushes to the configured branch.
+6. If push is rejected because the remote changed, pulls with rebase and retries once.
+7. Waits for the GitHub Actions Pages workflow for that commit.
+8. Checks the Pages index and worksheet URLs before reporting `pages-ready`.
 
 Use local-only publishing when GitHub sync is unavailable or the parent asks only for files:
 
@@ -77,7 +79,7 @@ git push
 
 The push triggers the GitHub Actions Pages deployment. Return the expected URL `https://<github-user>.github.io/<repo>/` and tell the parent that the first deployment may take a short time.
 
-In normal worksheet generation, first return or send the generated `worksheet.pdf` when available. If Pages mode is already configured and Git preflight passes, run `publish_and_wait_pages.py` after `generate_worksheet.py` when a public link is wanted, with:
+In normal worksheet generation, first return or send the generated `worksheet.pdf` when available. If Pages mode is already configured in `.zhizhi-math-coach/config.json`, run `publish_and_wait_pages.py` after `generate_worksheet.py` without asking again when `pages.auto_publish_worksheets` is true. Otherwise run it only when a public link is wanted. Return:
 
 - the public index URL;
 - the newly generated worksheet URL;
@@ -125,4 +127,4 @@ Forbidden in `site/`:
 
 When Pages is configured, return the PDF file/path first, then the Pages URL when deployment is ready. Use the Pages URL in Feishu notifications when available, and send the PDF file when the channel supports file messages. Keep answer keys and diagnosis links outside published `site/` output.
 
-If the parent asks OpenClaw to sync, push, publish to GitHub, or send a public link, read `github-sync-authorization.md` first. Do not assume GitHub CLI, GitHub token environment variables, or saved credentials are available. Use the Git preflight before committing or pushing. If authorization is missing, keep the local `site/` output, generate or suggest a repository Deploy key, send the public key and GitHub Settings -> Deploy keys guidance through Lark/Feishu when available, and return the local `site/` paths.
+If the parent asks OpenClaw to sync, push, publish to GitHub, or send a public link, or if workspace config enables automatic publishing, read `github-sync-authorization.md` first. Do not assume GitHub CLI, GitHub token environment variables, or saved credentials are available. Use the Git preflight before newly enabling sync; after config is enabled, the sync/publish scripts should pull, commit, and push automatically. If authorization is missing, keep the local `site/` output, generate or suggest a repository Deploy key, send the public key and GitHub Settings -> Deploy keys guidance through Lark/Feishu when available, and return the local `site/` paths.

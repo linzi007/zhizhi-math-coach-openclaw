@@ -5,8 +5,16 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import json
 import sys
 from pathlib import Path
+
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from learning_workspace_config import default_config  # noqa: E402
 
 
 DEFAULT_TEXTBOOK_INDEX = "https://github.com/TapXWorld/ChinaTextbook/tree/master/小学/数学/人教版"
@@ -386,9 +394,11 @@ def directory_readme(title: str, body: str) -> str:
 
 def build_files(args: argparse.Namespace, today: dt.date) -> dict[str, str]:
     repo_name = args.workspace.resolve().name
+    config = default_config(args.workspace, student_name=args.student_name)
     return {
         "README.md": readme_template(repo_name),
         ".gitignore": gitignore_template(),
+        ".zhizhi-math-coach/config.json": json.dumps(config, ensure_ascii=False, indent=2),
         "memory/long-term.md": long_term_template(args, today),
         "memory/short-term.md": short_term_template(args),
         "memory/local-memory-rules.md": local_memory_rules_template(),

@@ -17,6 +17,15 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PUBLISH_SCRIPT = SCRIPT_DIR / "publish_html_site.py"
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from learning_workspace_config import (  # noqa: E402
+    configured_branch,
+    configured_remote,
+    load_config,
+    pages_base_url,
+)
 
 
 def run(args: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
@@ -70,6 +79,24 @@ def current_branch(workspace: Path) -> str:
     if result.returncode != 0 or not result.stdout.strip():
         fail("cannot determine current git branch")
     return result.stdout.strip()
+
+
+def remote_branch_exists(workspace: Path, remote: str, branch: str) -> bool:
+    result = git(["rev-parse", "--verify", f"refs/remotes/{remote}/{branch}"], workspace)
+    return result.returncode == 0
+
+
+def pull_rebase_autostash(workspace: Path, remote: str, branch: str) -> None:
+    fetch = git(["fetch", remote, branch], workspace)
+    if fetch.returncode != 0:
+        fail(fetch.stderr.strip() or fetch.stdout.strip() or f"git fetch {remote} {branch} failed")
+    if not remote_branch_exists(workspace, remote, branch):
+        print(f"ok: remote branch {remote}/{branch} does not exist yet; skipping pull")
+        return
+    pull = git(["pull", "--rebase", "--autostash", remote, branch], workspace)
+    if pull.returncode != 0:
+        fail(pull.stderr.strip() or pull.stdout.strip() or f"git pull --rebase --autostash {remote} {branch} failed")
+    print(pull.stdout.strip() or pull.stderr.strip() or f"ok: pulled {remote}/{branch}")
 
 
 def head_sha(workspace: Path) -> str:
@@ -206,12 +233,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("paths", nargs="*", help="Worksheet directories/files or roots to publish. Defaults to worksheets.")
     parser.add_argument("--workspace", type=Path, default=Path("."), help="Personal learning repository root.")
     parser.add_argument("--base-url", help="GitHub Pages base URL. Defaults to https://<owner>.github.io/<repo>.")
-    parser.add_argument("--remote", default="origin", help="Git remote name. Defaults to origin.")
+    parser.add_argument("--remote", help="Git remote name. Defaults to config git_sync.remote or origin.")
+    parser.add_argument("--branch", help="Git branch. Defaults to config git_sync.branch or current branch.")
     parser.add_argument("--workflow", default="pages.yml", help="Workflow filename. Defaults to pages.yml.")
     parser.add_argument("--message", default="Publish worksheet pages", help="Commit message.")
     parser.add_argument("--timeout", type=int, default=360, help="Seconds to wait for GitHub Actions and Pages URLs.")
     parser.add_argument("--interval", type=int, default=10, help="Polling interval in seconds.")
     parser.add_argument("--no-push", action="store_true", help="Publish local files and commit, but do not push/wait.")
+    parser.add_argument("--no-pull", action="store_true", help="Skip git pull --rebase --autostash before publishing.")
     return parser.parse_args()
 
 
@@ -221,9 +250,14 @@ def main() -> int:
     if not workspace.exists():
         fail(f"workspace does not exist: {workspace}")
 
-    owner, repo = infer_owner_repo(workspace, args.remote)
-    branch = current_branch(workspace)
-    base_url = args.base_url or f"https://{owner}.github.io/{repo}"
+    config = load_config(workspace)
+    remote = args.remote or configured_remote(config)
+    owner, repo = infer_owner_repo(workspace, remote)
+    branch = args.branch or configured_branch(config, workspace) or current_branch(workspace)
+    base_url = args.base_url or pages_base_url(config) or f"https://{owner}.github.io/{repo}"
+
+    if not args.no_pull:
+        pull_rebase_autostash(workspace, remote, branch)
 
     links = run_publish(workspace, args.paths, base_url)
     add_paths = rel_paths(
@@ -255,9 +289,15 @@ def main() -> int:
         print("ok: --no-push set; skipping push and deployment wait")
         return 0
 
-    push_result = git(["push", args.remote, branch], workspace)
+    push_result = git(["push", remote, branch], workspace)
     if push_result.returncode != 0:
-        fail(push_result.stderr.strip() or push_result.stdout.strip() or "git push failed")
+        first_error = push_result.stderr.strip() or push_result.stdout.strip()
+        if any(marker in first_error.lower() for marker in ["fetch first", "non-fast-forward", "rejected"]):
+            print("wait: push rejected because remote changed; pulling with rebase and retrying")
+            pull_rebase_autostash(workspace, remote, branch)
+            push_result = git(["push", remote, branch], workspace)
+        if push_result.returncode != 0:
+            fail(push_result.stderr.strip() or push_result.stdout.strip() or "git push failed")
     print(push_result.stdout.strip() or push_result.stderr.strip())
 
     if committed:

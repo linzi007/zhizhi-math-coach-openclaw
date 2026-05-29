@@ -10,6 +10,17 @@ import sys
 from pathlib import Path
 
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from learning_workspace_config import (  # noqa: E402
+    default_base_url,
+    infer_owner_repo,
+    update_config,
+)
+
+
 def run_git(args: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         ["git", *args],
@@ -30,6 +41,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--workspace", type=Path, default=Path("."), help="Personal learning repository root. Defaults to current directory.")
     parser.add_argument("--remote", default="origin", help="Git remote name. Defaults to origin.")
     parser.add_argument("--check-push", action="store_true", help="Run git push --dry-run to test push authorization.")
+    parser.add_argument("--write-config", action="store_true", help="Persist successful Git sync settings to .zhizhi-math-coach/config.json.")
+    parser.add_argument("--auto-sync", action="store_true", help="When writing config, enable automatic pull, commit, and push.")
+    parser.add_argument("--sync-full-learning-data", action="store_true", help="When writing config, allow committing learning records.")
+    parser.add_argument("--public-repository-accepted", action="store_true", help="When writing config, record that the parent accepts public repository visibility.")
     return parser.parse_args()
 
 
@@ -91,6 +106,40 @@ def main() -> int:
     if not ok:
         line("next", "generate local files only, then configure git/SSH/token on this machine or sync from another machine")
         return 1
+
+    if args.write_config:
+        branch = run_git(["branch", "--show-current"], workspace)
+        branch_name = branch.stdout.strip() if branch.returncode == 0 and branch.stdout.strip() else "main"
+        inferred = infer_owner_repo(workspace, args.remote)
+        owner = inferred[0] if inferred else ""
+        repo = inferred[1] if inferred else workspace.name
+        update_config(
+            workspace,
+            {
+                "github": {
+                    "owner": owner,
+                    "repo": repo,
+                },
+                "git_sync": {
+                    "enabled": True,
+                    "remote": args.remote,
+                    "branch": branch_name,
+                    "auto_pull_before_task": args.auto_sync,
+                    "auto_commit_after_task": args.auto_sync,
+                    "auto_push_after_task": args.auto_sync,
+                    "sync_full_learning_data": args.sync_full_learning_data or args.auto_sync,
+                    "public_repository_accepted": args.public_repository_accepted,
+                },
+                "pages": {
+                    "base_url": default_base_url(owner, repo),
+                },
+            },
+            owner=owner,
+            repo=repo,
+            remote=args.remote,
+            branch=branch_name,
+        )
+        line("ok", ".zhizhi-math-coach/config.json updated with Git sync settings")
 
     line("ready", "git sync can be attempted from this workspace")
     return 0

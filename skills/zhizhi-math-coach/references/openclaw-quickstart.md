@@ -9,7 +9,8 @@ Keep the user-facing reply short. Prefer a checklist and the next command/action
 ## First-Use Checklist
 
 1. Confirm the current workspace is the personal learning repository, not `zhizhi-math-coach-openclaw`.
-2. If the learning files are missing, initialize:
+2. Check `.zhizhi-math-coach/config.json` when present. It is the durable record for whether Git sync and Pages auto-publishing are already enabled.
+3. If the learning files are missing, initialize:
 
 ```bash
 python3 {baseDir}/scripts/init_learning_workspace.py \
@@ -22,7 +23,7 @@ python3 {baseDir}/scripts/init_learning_workspace.py \
   --textbook-volume <一年级下册>
 ```
 
-3. For normal use, no GitHub setup is required. Generate worksheets locally and return or send `worksheet.pdf`.
+4. For normal unconfigured use, no GitHub setup is required. Generate worksheets locally and return or send `worksheet.pdf`.
 
 ## Advanced Cloud Sync And Pages
 
@@ -48,7 +49,7 @@ The reply should include:
 - SSH public key copied only from `public-key-start` to `public-key-end`;
 - GitHub path: `Settings -> Deploy keys -> Add deploy key`;
 - instruction to enable `Allow write access`;
-- next step: parent replies `已添加`, then run `check_git_sync.py --workspace . --check-push`.
+- next step: parent replies `已添加`, then run `check_git_sync.py --workspace . --check-push --write-config --auto-sync --sync-full-learning-data --public-repository-accepted`.
 
 If GitHub owner/repo is missing and cannot be inferred from `origin`, ask:
 
@@ -56,10 +57,16 @@ If GitHub owner/repo is missing and cannot be inferred from `origin`, ask:
 请告诉我你的 GitHub 用户名和个人学习数据仓库名，例如 linzi007 / zhizhi-math-learning-data。
 ```
 
-1. Check GitHub sync only if the parent wants sync, public links, or automatic Pages publishing:
+1. Check GitHub sync only if the parent wants sync, public links, automatic Pages publishing, or `.zhizhi-math-coach/config.json` already enables it:
 
 ```bash
-python3 {baseDir}/scripts/check_git_sync.py --workspace . --check-push
+python3 {baseDir}/scripts/check_git_sync.py \
+  --workspace . \
+  --check-push \
+  --write-config \
+  --auto-sync \
+  --sync-full-learning-data \
+  --public-repository-accepted
 ```
 
 2. If sync is not ready, generate a repository deploy key and send only the public key:
@@ -75,7 +82,16 @@ python3 {baseDir}/scripts/prepare_github_deploy_key.py \
 3. If public Pages is desired, confirm GitHub Settings -> Pages -> Source is `GitHub Actions`, then ensure the workflow exists:
 
 ```bash
-python3 {baseDir}/scripts/setup_github_pages_workflow.py --workspace .
+python3 {baseDir}/scripts/setup_github_pages_workflow.py \
+  --workspace . \
+  --public-repository-accepted
+```
+
+If a workspace is already configured and the task changes learning files, run:
+
+```bash
+python3 {baseDir}/scripts/sync_learning_repo.py --workspace . --mode before-task
+python3 {baseDir}/scripts/sync_learning_repo.py --workspace . --mode after-task --message "Update learning data"
 ```
 
 ## Quick Prompt Reference
@@ -93,6 +109,7 @@ This is an advanced online-access checklist. It is not needed when the worksheet
 
 Automatic Pages publishing is allowed when all are true:
 
+- `.zhizhi-math-coach/config.json` exists with `pages.enabled` and `pages.auto_publish_worksheets` true.
 - `.github/workflows/pages.yml` exists.
 - The GitHub repository Pages source is `GitHub Actions`.
 - The repository deploy key has write access.

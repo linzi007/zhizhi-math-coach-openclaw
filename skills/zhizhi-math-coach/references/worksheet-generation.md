@@ -26,7 +26,7 @@ python3 {baseDir}/scripts/generate_worksheet.py \
 
 7. If Chrome/Chromium is missing, the HTML and answer key are still useful; report the PDF fallback clearly.
 8. If page count matters, add `--verify-print`.
-9. If a public worksheet link is needed, publish child-facing HTML/PDF only:
+9. If a public worksheet link is needed, or `.zhizhi-math-coach/config.json` enables `pages.auto_publish_worksheets`, publish child-facing HTML/PDF only:
 
 ```bash
 python3 {baseDir}/scripts/publish_html_site.py \
@@ -35,7 +35,8 @@ python3 {baseDir}/scripts/publish_html_site.py \
   --base-url https://<github-user>.github.io/<repo>
 ```
 
-10. Reply with the PDF path/file first, then item count, target weak point, Pages URL when available, and page count only if checked.
+10. If `.zhizhi-math-coach/config.json` enables automatic Git sync, run `sync_learning_repo.py --mode after-task` after worksheet and publishing files are written.
+11. Reply with the PDF path/file first, then item count, target weak point, Pages URL when available, and page count only if checked.
 
 ## Spec Rules
 

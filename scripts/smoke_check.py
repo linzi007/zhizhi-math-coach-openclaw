@@ -20,7 +20,10 @@ GENERATOR_PATH = SKILL_DIR / "scripts" / "generate_worksheet.py"
 VALIDATOR_PATH = SKILL_DIR / "scripts" / "validate_worksheet_spec.py"
 PUBLISHER_PATH = SKILL_DIR / "scripts" / "publish_html_site.py"
 INIT_WORKSPACE_PATH = SKILL_DIR / "scripts" / "init_learning_workspace.py"
+WORKSPACE_CONFIG_PATH = SKILL_DIR / "scripts" / "learning_workspace_config.py"
+CONFIGURE_WORKSPACE_PATH = SKILL_DIR / "scripts" / "configure_learning_workspace.py"
 GIT_SYNC_CHECK_PATH = SKILL_DIR / "scripts" / "check_git_sync.py"
+SYNC_LEARNING_REPO_PATH = SKILL_DIR / "scripts" / "sync_learning_repo.py"
 DEPLOY_KEY_PREP_PATH = SKILL_DIR / "scripts" / "prepare_github_deploy_key.py"
 PAGES_WORKFLOW_SETUP_PATH = SKILL_DIR / "scripts" / "setup_github_pages_workflow.py"
 PUBLISH_AND_WAIT_PATH = SKILL_DIR / "scripts" / "publish_and_wait_pages.py"
@@ -140,8 +143,20 @@ def check_publisher_loads() -> None:
     load_module(PUBLISHER_PATH, "worksheet_publisher")
 
 
+def check_workspace_config_loads() -> None:
+    load_module(WORKSPACE_CONFIG_PATH, "learning_workspace_config")
+
+
+def check_configure_workspace_loads() -> None:
+    load_module(CONFIGURE_WORKSPACE_PATH, "learning_workspace_configurer")
+
+
 def check_git_sync_checker_loads() -> None:
     load_module(GIT_SYNC_CHECK_PATH, "git_sync_checker")
+
+
+def check_sync_learning_repo_loads() -> None:
+    load_module(SYNC_LEARNING_REPO_PATH, "learning_repo_syncer")
 
 
 def check_deploy_key_preparer_loads() -> None:
@@ -186,6 +201,7 @@ def check_init_workspace_script() -> None:
 
         required = [
             "README.md",
+            ".zhizhi-math-coach/config.json",
             "memory/long-term.md",
             "memory/local-memory-rules.md",
             "curriculum/profile.md",
@@ -203,6 +219,9 @@ def check_init_workspace_script() -> None:
         long_term = (target / "memory/long-term.md").read_text(encoding="utf-8")
         if "Smoke Test" not in long_term or "一年级下学期" not in long_term:
             fail("init script did not apply student profile arguments")
+        config = json.loads((target / ".zhizhi-math-coach/config.json").read_text(encoding="utf-8"))
+        if config.get("workspace_role") != "personal-learning-data":
+            fail("init script did not create personal-learning-data workspace config")
 
 
 def main() -> int:
@@ -211,7 +230,10 @@ def main() -> int:
     check_worksheet_specs()
     check_site_public_boundary()
     check_publisher_loads()
+    check_workspace_config_loads()
+    check_configure_workspace_loads()
     check_git_sync_checker_loads()
+    check_sync_learning_repo_loads()
     check_deploy_key_preparer_loads()
     check_pages_workflow_setup_loads()
     check_publish_and_wait_loads()

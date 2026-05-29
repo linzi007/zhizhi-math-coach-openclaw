@@ -9,6 +9,14 @@
 - 生成一个在线链接，点开就能查看和打印练习卷；
 - 让 OpenClaw 自动把练习数据同步到你的 GitHub 仓库。
 
+配置成功后，OpenClaw 会在你的个人学习仓库写入：
+
+```text
+.zhizhi-math-coach/config.json
+```
+
+这个文件用于告诉后续 OpenClaw 任务：这个仓库已经开启 Git 同步、是否允许自动 pull/commit/push、是否开启 GitHub Pages 自动发布。没有这个文件时，OpenClaw 不应该只凭 README 或历史对话判断“已经配置过”。
+
 ## 你需要准备什么
 
 你只需要准备一个 GitHub 账号。后面的命令由 OpenClaw 执行；你主要负责在 GitHub 网页上创建仓库、粘贴公钥、勾选权限。
@@ -116,7 +124,19 @@ Settings -> Deploy keys -> Add deploy key
 已添加
 ```
 
-OpenClaw 会检查当前机器是否已经能写入你的 GitHub 仓库。检查通过后，它会把当前学习工作区同步到 GitHub。
+OpenClaw 会检查当前机器是否已经能写入你的 GitHub 仓库。检查通过后，它会把当前学习工作区同步到 GitHub，并写入 `.zhizhi-math-coach/config.json`，让后续任务自动 pull、自动提交、自动 push。
+
+OpenClaw 内部会运行类似下面的命令：
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/check_git_sync.py \
+  --workspace . \
+  --check-push \
+  --write-config \
+  --auto-sync \
+  --sync-full-learning-data \
+  --public-repository-accepted
+```
 
 如果检查失败，不代表学习数据丢失。PDF、记录和练习卷仍在本地工作区里。失败时把 OpenClaw 返回的错误发出来，它会继续引导你处理。
 
@@ -146,9 +166,17 @@ Settings -> Pages
 $zhizhi-math-coach 进阶：开启 GitHub Pages 在线访问
 ```
 
-OpenClaw 会创建 GitHub Pages 所需的 workflow 文件，并提交到你的个人学习仓库。
+OpenClaw 会创建 GitHub Pages 所需的 workflow 文件，更新 `.zhizhi-math-coach/config.json`，并提交到你的个人学习仓库。
 
-之后当你要求“发布在线链接”时，OpenClaw 会先返回 PDF，再发布在线页面。页面地址通常是：
+OpenClaw 内部会运行类似下面的命令：
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/setup_github_pages_workflow.py \
+  --workspace . \
+  --public-repository-accepted
+```
+
+之后生成新练习卷时，如果配置文件中 `pages.auto_publish_worksheets` 是 `true`，OpenClaw 会先自动 pull 最新学习数据，再生成 PDF，之后自动发布在线页面。页面地址通常是：
 
 ```text
 https://<你的GitHub用户名>.github.io/zhizhi-math-learning-data/
@@ -159,6 +187,8 @@ https://<你的GitHub用户名>.github.io/zhizhi-math-learning-data/
 ```text
 https://<你的GitHub用户名>.github.io/zhizhi-math-learning-data/worksheets/<练习卷目录名>/
 ```
+
+每次自动同步时，OpenClaw 会先执行 `git pull --rebase --autostash`，再提交和 push；如果 push 时远端刚好有新提交，会再 pull/rebase 并重试一次。
 
 ## 第六步：保护 main 分支
 

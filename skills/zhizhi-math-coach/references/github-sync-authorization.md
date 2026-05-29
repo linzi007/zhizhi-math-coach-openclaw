@@ -7,7 +7,9 @@ OpenClaw may run on a machine that has no GitHub CLI, no SSH key, and no saved G
 The learning workflow must work in two layers:
 
 1. Always generate local learning files first.
-2. Sync to GitHub only after the parent asks for sync/publish and the current machine passes Git authorization checks.
+2. Sync to GitHub only after the parent asks for sync/publish, or after `.zhizhi-math-coach/config.json` records that automatic sync/Pages publishing is enabled and the current machine passes Git authorization checks.
+
+The machine-readable config is the durable memory for this setup. README text and prior chat history are not enough for OpenClaw to know that a personal repository is already configured.
 
 ## What Is Required
 
@@ -73,14 +75,20 @@ If no Lark/Feishu channel is available, return the same guidance in the OpenClaw
 After the parent confirms the key has been added, run:
 
 ```bash
-python3 {baseDir}/scripts/check_git_sync.py --workspace <personal-learning-workspace> --check-push
+python3 {baseDir}/scripts/check_git_sync.py \
+  --workspace <personal-learning-workspace> \
+  --check-push \
+  --write-config \
+  --auto-sync \
+  --sync-full-learning-data \
+  --public-repository-accepted
 ```
 
-If the preflight succeeds, commit and push only the requested scope.
+If the preflight succeeds, this writes `.zhizhi-math-coach/config.json` so future OpenClaw runs can automatically pull, commit, and push the configured learning-data scope.
 
 ## Advanced Setup And Publish-Time Guidance
 
-Do not check or prompt for GitHub sync during ordinary grading or PDF worksheet generation. Default use is local learning files plus direct `worksheet.pdf` delivery.
+Do not check or prompt for GitHub sync during ordinary grading or PDF worksheet generation unless `.zhizhi-math-coach/config.json` already enables automatic sync or Pages publishing. Default unconfigured use is local learning files plus direct `worksheet.pdf` delivery.
 
 Explicit trigger phrases:
 
@@ -105,7 +113,7 @@ When the parent asks for cloud sync, public links, Pages, push, commit, or autom
 - OpenClaw can generate a repository-specific SSH public key;
 - the parent should add it to GitHub Deploy keys with write access.
 
-When the parent later asks to publish a worksheet, send a public link, sync, push, or commit:
+When the parent later asks to publish a worksheet, send a public link, sync, push, or commit, or when the workspace config already enables automatic publishing:
 
 1. Generate the worksheet and local `site/` output first.
 2. Run the Git preflight.
@@ -182,14 +190,31 @@ If the check fails, do not treat worksheet generation as failed. Return:
 - exact command the parent can run to fix it;
 - a note that sync can be retried later.
 
-## Sync Policy
+## Configured Automatic Sync Policy
 
-Do not run `git add`, `git commit`, or `git push` for ordinary grading or local-only generation. Sync when the parent says "同步", "发布", "push", "提交到 GitHub", "发链接", or equivalent, or when the personal workspace is already configured for automatic Pages publishing of generated worksheets.
+Do not run `git add`, `git commit`, or `git push` for ordinary grading or local-only generation unless the parent says "同步", "发布", "push", "提交到 GitHub", "发链接", or equivalent, or `.zhizhi-math-coach/config.json` enables automatic Git sync or automatic Pages publishing.
+
+Before reading long-term records in a configured workspace:
+
+```bash
+python3 {baseDir}/scripts/sync_learning_repo.py \
+  --workspace <personal-learning-workspace> \
+  --mode before-task
+```
+
+After local files are changed in a configured workspace:
+
+```bash
+python3 {baseDir}/scripts/sync_learning_repo.py \
+  --workspace <personal-learning-workspace> \
+  --mode after-task \
+  --message "Update learning data"
+```
 
 If sync is requested:
 
 1. Generate or update local files.
-2. If a child-facing link is requested, run `publish_html_site.py`.
+2. If a child-facing link is requested or Pages auto-publishing is enabled, run `publish_html_site.py` or `publish_and_wait_pages.py`.
 3. Run the Git preflight.
 4. If preflight passes, commit and push the requested scope.
 5. If preflight fails, return local paths and setup guidance.
