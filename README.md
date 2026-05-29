@@ -470,13 +470,16 @@ Scheduled tasks are not auto-created merely by installing the skill. The parent 
 python3 skills/zhizhi-math-coach/scripts/setup_scheduled_tasks.py \
   --workspace . \
   --enable-config \
-  --auto-register
+  --auto-register \
+  --timezone Asia/Shanghai
 ```
+
+`--timezone` should be the parent's local IANA timezone, not the server's implicit system timezone. Use `Asia/Shanghai` for mainland China, or another local timezone such as `America/Los_Angeles`.
 
 Default scheduled jobs only produce reminders and suggestions:
 
-- Daily 20:30 Asia/Shanghai: due reviews, pending uploads, and stale short-term observations.
-- Sunday 20:00 Asia/Shanghai: weekly progress review and next-week suggestions.
+- Daily 20:30 local time: due reviews, pending uploads, and stale short-term observations.
+- Sunday 20:00 local time: weekly progress review and next-week suggestions.
 - End of semester: summary and holiday review pool.
 - Winter/summer break: weekly holiday review suggestions.
 

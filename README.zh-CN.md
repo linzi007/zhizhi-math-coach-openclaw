@@ -511,13 +511,16 @@ python3 skills/zhizhi-math-coach/scripts/publish_and_wait_pages.py \
 python3 skills/zhizhi-math-coach/scripts/setup_scheduled_tasks.py \
   --workspace . \
   --enable-config \
-  --auto-register
+  --auto-register \
+  --timezone Asia/Shanghai
 ```
+
+`--timezone` 使用当地 IANA 时区名，不使用服务器系统时间。中国大陆默认用 `Asia/Shanghai`；如果学生在其他地区，可以改成当地时区，例如 `America/Los_Angeles`。
 
 定时任务默认只做提醒和建议，不自动修改学生档案，也不自动出卷：
 
-- 每日 20:30：提醒到期复练、待上传批改、短期记忆中待确认事项。
-- 每周日 20:00：生成周复盘和下周建议。
+- 每日当地时间 20:30：提醒到期复练、待上传批改、短期记忆中待确认事项。
+- 每周日当地时间 20:00：生成周复盘和下周建议。
 - 学期结束后：生成学期总结和寒暑假复习池。
 - 寒暑假期间：每周给出假期复习建议。
 

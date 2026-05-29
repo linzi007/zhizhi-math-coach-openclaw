@@ -394,7 +394,7 @@ def directory_readme(title: str, body: str) -> str:
 
 def build_files(args: argparse.Namespace, today: dt.date) -> dict[str, str]:
     repo_name = args.workspace.resolve().name
-    config = default_config(args.workspace, student_name=args.student_name)
+    config = default_config(args.workspace, student_name=args.student_name, timezone=args.timezone)
     return {
         "README.md": readme_template(repo_name),
         ".gitignore": gitignore_template(),
@@ -442,6 +442,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--textbook-edition", default="人教版")
     parser.add_argument("--textbook-volume", default="一年级下册")
     parser.add_argument("--textbook-index", default=DEFAULT_TEXTBOOK_INDEX)
+    parser.add_argument("--timezone", default="Asia/Shanghai", help="IANA timezone for scheduled reminders, for example Asia/Shanghai.")
     parser.add_argument("--force", action="store_true", help="Overwrite existing files. Use carefully.")
     parser.add_argument(
         "--allow-source-repo",

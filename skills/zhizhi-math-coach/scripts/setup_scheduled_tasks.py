@@ -111,7 +111,7 @@ def print_command(cmd: list[str]) -> None:
     print(" ".join(shell_quote(part) if any(ch.isspace() for ch in part) else part for part in cmd))
 
 
-def ensure_automation_config(workspace: Path, auto_register: bool) -> dict[str, Any]:
+def ensure_automation_config(workspace: Path, auto_register: bool, timezone: str | None) -> dict[str, Any]:
     config = load_config(workspace) or {}
     automation = config.get("automation", {})
     if not isinstance(automation, dict):
@@ -124,7 +124,7 @@ def ensure_automation_config(workspace: Path, auto_register: bool) -> dict[str, 
             "enabled": True,
             "scheduler": "openclaw-cron",
             "auto_register_when_supported": auto_register,
-            "timezone": automation.get("timezone") or "Asia/Shanghai",
+            "timezone": timezone or automation.get("timezone") or "Asia/Shanghai",
             "allow_record_writes": bool(automation.get("allow_record_writes")),
             "allow_auto_worksheet_generation": bool(automation.get("allow_auto_worksheet_generation")),
             "tasks": tasks,
@@ -140,6 +140,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--openclaw-bin", default="openclaw", help="OpenClaw CLI binary name or path.")
     parser.add_argument("--model", help="Optional model override for cron runs.")
     parser.add_argument("--thinking", help="Optional thinking level override for cron runs.")
+    parser.add_argument("--timezone", help="IANA timezone for scheduled reminders, for example Asia/Shanghai.")
     parser.add_argument("--print-only", action="store_true", help="Print commands without executing them.")
     parser.add_argument("--enable-config", action="store_true", help="Enable automation in .zhizhi-math-coach/config.json.")
     parser.add_argument("--auto-register", action="store_true", help="Persist auto_register_when_supported=true in config.")
@@ -156,7 +157,7 @@ def main() -> int:
 
     config = load_config(workspace)
     if args.enable_config or config is None:
-        config = ensure_automation_config(workspace, args.auto_register)
+        config = ensure_automation_config(workspace, args.auto_register, args.timezone)
     if config is None:
         print("error: missing .zhizhi-math-coach/config.json; run configure_learning_workspace.py first", file=sys.stderr)
         return 2
@@ -167,7 +168,10 @@ def main() -> int:
         return 0
 
     tasks = automation.get("tasks") if isinstance(automation.get("tasks"), list) else DEFAULT_AUTOMATION_TASKS
-    timezone = str(automation.get("timezone") or "Asia/Shanghai")
+    timezone = str(args.timezone or automation.get("timezone") or "Asia/Shanghai")
+    if args.timezone and args.timezone != automation.get("timezone"):
+        config = update_config(workspace, {"automation": {"timezone": args.timezone}})
+        automation = config.get("automation", {})
     commands = [
         build_command(args.openclaw_bin, workspace, task, timezone, args.model, args.thinking)
         for task in tasks
@@ -212,4 +216,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

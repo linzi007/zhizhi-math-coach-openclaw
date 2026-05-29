@@ -10,20 +10,22 @@ OpenClaw cron jobs are not declared by a skill manifest at install time. Use the
 python3 {baseDir}/scripts/setup_scheduled_tasks.py \
   --workspace <personal-learning-workspace> \
   --enable-config \
-  --auto-register
+  --auto-register \
+  --timezone Asia/Shanghai
 ```
 
 The setup writes `.zhizhi-math-coach/config.json`:
 
 - `automation.enabled`: scheduled reminders are allowed.
 - `automation.auto_register_when_supported`: register via `openclaw cron` when the CLI exists.
+- `automation.timezone`: IANA timezone used by `openclaw cron --tz`; use the parent's local timezone, for example `Asia/Shanghai`.
 - `automation.allow_record_writes`: default `false`.
 - `automation.allow_auto_worksheet_generation`: default `false`.
 
 ## Recommended Schedule
 
-- Daily 20:30 Asia/Shanghai: due review reminders, pending upload reminders, and stale short-term observations.
-- Sunday 20:00 Asia/Shanghai: weekly progress review and next-week suggestions.
+- Daily 20:30 local time: due review reminders, pending upload reminders, and stale short-term observations.
+- Sunday 20:00 local time: weekly progress review and next-week suggestions.
 - End of semester: generate a summary and holiday review pool.
 - Winter/summer break: weekly holiday review suggestions.
 

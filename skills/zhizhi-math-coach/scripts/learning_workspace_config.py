@@ -115,6 +115,7 @@ def default_config(
     branch: str | None = None,
     owner: str | None = None,
     repo: str | None = None,
+    timezone: str = "Asia/Shanghai",
 ) -> dict[str, Any]:
     inferred = infer_owner_repo(workspace, remote)
     owner = owner or (inferred[0] if inferred else "")
@@ -151,7 +152,7 @@ def default_config(
             "enabled": False,
             "scheduler": "openclaw-cron",
             "auto_register_when_supported": False,
-            "timezone": "Asia/Shanghai",
+            "timezone": timezone,
             "allow_record_writes": False,
             "allow_auto_worksheet_generation": False,
             "tasks": DEFAULT_AUTOMATION_TASKS,

@@ -110,6 +110,8 @@ python3 {baseDir}/scripts/setup_scheduled_tasks.py \
 
 This script must detect whether `openclaw cron` is available. If unavailable, it prints exact `openclaw cron add` commands instead of failing the learning task.
 
+Use the local IANA timezone stored in `automation.timezone` for scheduled reminders. Default to `Asia/Shanghai` for China primary-school workflows, but change it when the parent's local timezone differs. Do not rely on an OpenClaw server's system timezone.
+
 After local files are changed:
 
 - If `git_sync.enabled`, `git_sync.auto_commit_after_task`, and `git_sync.auto_push_after_task` are true, run:
@@ -384,10 +386,10 @@ Supported strategies:
 
 ## Automation Boundary
 
-Scheduled OpenClaw tasks should default to reminders and suggestions:
+Scheduled OpenClaw tasks should default to reminders and suggestions in the configured local timezone:
 
-- Daily 20:30 Asia/Shanghai: due practice, pending uploads, stale short-term observations.
-- Sunday 20:00 Asia/Shanghai: weekly progress review and next-week suggestions.
+- Daily 20:30 local time: due practice, pending uploads, stale short-term observations.
+- Sunday 20:00 local time: weekly progress review and next-week suggestions.
 - End of semester: summary and holiday review pool.
 - Winter/summer break: weekly review suggestions.
 
@@ -399,7 +401,8 @@ OpenClaw cron is not declared as a skill-install manifest. It is registered by r
 python3 {baseDir}/scripts/setup_scheduled_tasks.py \
   --workspace . \
   --enable-config \
-  --auto-register
+  --auto-register \
+  --timezone Asia/Shanghai
 ```
 
 If `openclaw` is not available on the current machine, the script prints the `openclaw cron add` commands for the provider or parent to run later.

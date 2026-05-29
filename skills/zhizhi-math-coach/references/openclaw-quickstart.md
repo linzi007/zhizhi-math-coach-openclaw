@@ -112,10 +112,11 @@ Use this only after the parent asks for scheduled reminders or `.zhizhi-math-coa
 python3 {baseDir}/scripts/setup_scheduled_tasks.py \
   --workspace . \
   --enable-config \
-  --auto-register
+  --auto-register \
+  --timezone Asia/Shanghai
 ```
 
-If `openclaw` is not installed in the current environment, the script prints the `openclaw cron add` commands to run in an OpenClaw Gateway environment. Scheduled reminders should not write records or generate worksheets unless the parent explicitly enables those config flags.
+Use the parent's local IANA timezone for `--timezone`. If `openclaw` is not installed in the current environment, the script prints the `openclaw cron add` commands to run in an OpenClaw Gateway environment. Scheduled reminders should not write records or generate worksheets unless the parent explicitly enables those config flags.
 
 ## Publish-Ready Checklist
 

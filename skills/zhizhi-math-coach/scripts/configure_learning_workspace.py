@@ -37,6 +37,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--auto-publish-pages", action="store_true", help="Automatically publish generated worksheets to Pages.")
     parser.add_argument("--enable-scheduled-tasks", action="store_true", help="Mark OpenClaw scheduled reminders as enabled.")
     parser.add_argument("--auto-register-scheduled-tasks", action="store_true", help="Automatically register OpenClaw cron jobs when supported.")
+    parser.add_argument("--timezone", default="Asia/Shanghai", help="IANA timezone for scheduled reminders, for example Asia/Shanghai.")
     parser.add_argument("--allow-scheduled-record-writes", action="store_true", help="Allow scheduled jobs to write learning records.")
     parser.add_argument("--allow-scheduled-worksheet-generation", action="store_true", help="Allow scheduled jobs to generate worksheets.")
     return parser.parse_args()
@@ -99,6 +100,7 @@ def main() -> int:
             "enabled": True,
             "scheduler": "openclaw-cron",
             "auto_register_when_supported": args.auto_register_scheduled_tasks,
+            "timezone": args.timezone,
             "allow_record_writes": args.allow_scheduled_record_writes,
             "allow_auto_worksheet_generation": args.allow_scheduled_worksheet_generation,
         }
@@ -111,6 +113,7 @@ def main() -> int:
         branch=args.branch,
         owner=owner,
         repo=repo,
+        timezone=args.timezone,
     )
 
     print(f"written: {workspace / '.zhizhi-math-coach' / 'config.json'}")
@@ -123,6 +126,7 @@ def main() -> int:
     print(f"pages.base_url: {config.get('pages', {}).get('base_url')}")
     print(f"automation.enabled: {config.get('automation', {}).get('enabled')}")
     print(f"automation.auto_register_when_supported: {config.get('automation', {}).get('auto_register_when_supported')}")
+    print(f"automation.timezone: {config.get('automation', {}).get('timezone')}")
     return 0
 
 
