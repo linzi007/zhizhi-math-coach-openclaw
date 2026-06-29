@@ -24,6 +24,10 @@ WORKSPACE_CONFIG_PATH = SKILL_DIR / "scripts" / "learning_workspace_config.py"
 CONFIGURE_WORKSPACE_PATH = SKILL_DIR / "scripts" / "configure_learning_workspace.py"
 GIT_SYNC_CHECK_PATH = SKILL_DIR / "scripts" / "check_git_sync.py"
 SYNC_LEARNING_REPO_PATH = SKILL_DIR / "scripts" / "sync_learning_repo.py"
+BUILD_GRADING_CONTEXT_PATH = SKILL_DIR / "scripts" / "build_grading_context.py"
+VALIDATE_DIAGNOSIS_PAYLOAD_PATH = SKILL_DIR / "scripts" / "validate_diagnosis_payload.py"
+RECORD_DIAGNOSIS_PATH = SKILL_DIR / "scripts" / "record_grading_diagnosis.py"
+RUN_LOG_PATH = SKILL_DIR / "scripts" / "run_log.py"
 SCHEDULED_TASKS_SETUP_PATH = SKILL_DIR / "scripts" / "setup_scheduled_tasks.py"
 DEPLOY_KEY_PREP_PATH = SKILL_DIR / "scripts" / "prepare_github_deploy_key.py"
 PAGES_WORKFLOW_SETUP_PATH = SKILL_DIR / "scripts" / "setup_github_pages_workflow.py"
@@ -160,6 +164,228 @@ def check_sync_learning_repo_loads() -> None:
     load_module(SYNC_LEARNING_REPO_PATH, "learning_repo_syncer")
 
 
+def write_smoke_workspace_files(workspace: Path) -> None:
+    for rel_path in ["records", "mistakes", "weak-points", "memory", "curriculum", ".zhizhi-math-coach"]:
+        (workspace / rel_path).mkdir(parents=True, exist_ok=True)
+    (workspace / ".zhizhi-math-coach/config.json").write_text(
+        json.dumps(
+            {
+                "workspace_role": "personal-learning-data",
+                "git_sync": {
+                    "enabled": True,
+                    "auto_pull_before_task": False,
+                    "auto_commit_after_task": True,
+                    "auto_push_after_task": True,
+                    "defer_push_after_grading": True,
+                },
+                "pages": {"enabled": False, "auto_publish_worksheets": False},
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    (workspace / "memory/active-context.md").write_text(
+        "# Active Context\n\n- Updated: 2026-06-29\n- Smoke active context\n",
+        encoding="utf-8",
+    )
+    (workspace / "curriculum/profile.md").write_text(
+        "# Curriculum Profile\n\n- Grade: 一年级\n- Semester: 下学期\n",
+        encoding="utf-8",
+    )
+    (workspace / "records/learning-progress.md").write_text(
+        "# Learning Progress\n\n"
+        "## Dated Records\n\n"
+        "| Date | Type | Source/Topic | Result | Finding | Next Step |\n"
+        "| --- | --- | --- | --- | --- | --- |\n",
+        encoding="utf-8",
+    )
+    (workspace / "mistakes/school-mistakes.md").write_text(
+        "# School Mistakes\n\n## Entries\n",
+        encoding="utf-8",
+    )
+
+
+def smoke_payload() -> dict[str, object]:
+    return {
+        "date": "2026-06-29",
+        "source_slug": "photo-smoke",
+        "source": "photo smoke",
+        "source_type": "school",
+        "grade": "一年级",
+        "semester": "一年级下学期",
+        "total_items": 1,
+        "correct_items": 0,
+        "overall": "smoke diagnosis",
+        "mistakes": [
+            {
+                "item_no": "1",
+                "question": "1 + 1 = ?",
+                "student_answer": "3",
+                "correct_answer": "2",
+                "result": "wrong",
+                "error_type": "计算技能",
+                "cause": "口算事实不熟",
+                "weak_point_slug": "fact-fluency",
+                "evidence": "smoke evidence",
+                "confidence": "高",
+                "remediation": "short fluency check",
+            }
+        ],
+        "weak_points": [
+            {
+                "slug": "fact-fluency",
+                "title": "口算事实",
+                "status": "观察中",
+                "history_note": "smoke evidence",
+                "next_action": "short fluency check",
+            }
+        ],
+        "progress": {
+            "result": "0/1",
+            "finding": "smoke diagnosis",
+            "next_step": "short fluency check",
+        },
+        "active_context_md": "# Active Context\n\n- Updated: 2026-06-29\n- Smoke active context\n",
+    }
+
+
+def run_module_main(module, argv: list[str]) -> tuple[int, str]:
+    old_argv = sys.argv[:]
+    stdout = io.StringIO()
+    try:
+        sys.argv = argv
+        with contextlib.redirect_stdout(stdout):
+            result = module.main()
+    finally:
+        sys.argv = old_argv
+    return result, stdout.getvalue()
+
+
+def check_grading_context_payload_pipeline() -> None:
+    load_module(RUN_LOG_PATH, "zhizhi_run_log")
+    build_module = load_module(BUILD_GRADING_CONTEXT_PATH, "grading_context_builder")
+    validate_module = load_module(VALIDATE_DIAGNOSIS_PAYLOAD_PATH, "diagnosis_payload_validator")
+    record_module = load_module(RECORD_DIAGNOSIS_PATH, "grading_diagnosis_recorder_pipeline")
+    with tempfile.TemporaryDirectory() as tmp:
+        workspace = Path(tmp) / "learning-data"
+        write_smoke_workspace_files(workspace)
+        payload = smoke_payload()
+        payload_path = workspace / "payload.json"
+        payload_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+
+        result, stdout = run_module_main(
+            build_module,
+            [
+                "build_grading_context.py",
+                "--workspace",
+                str(workspace),
+                "--format",
+                "json",
+                "--run-id",
+                "smoke",
+            ],
+        )
+        if result != 0:
+            fail("build_grading_context.py returned non-zero")
+        context = json.loads(stdout)
+        if context.get("mode_default") != "fast_grade_light_record":
+            fail("build_grading_context.py did not set default grading mode")
+        if "memory/active-context.md" not in context.get("files_read", []):
+            fail("build_grading_context.py did not read active context")
+        if context.get("warnings"):
+            fail(f"build_grading_context.py emitted unexpected warnings: {context['warnings']}")
+
+        result, stdout = run_module_main(
+            validate_module,
+            [
+                "validate_diagnosis_payload.py",
+                "--workspace",
+                str(workspace),
+                "--mode",
+                "full_archive",
+                "--input",
+                str(payload_path),
+                "--run-id",
+                "smoke",
+            ],
+        )
+        if result != 0:
+            fail("validate_diagnosis_payload.py rejected valid payload")
+        validation = json.loads(stdout)
+        if not validation.get("ok"):
+            fail("validate_diagnosis_payload.py did not report ok")
+
+        invalid_path = workspace / "invalid.json"
+        invalid_payload = dict(payload)
+        invalid_payload.pop("source")
+        invalid_path.write_text(json.dumps(invalid_payload, ensure_ascii=False), encoding="utf-8")
+        result, stdout = run_module_main(
+            validate_module,
+            [
+                "validate_diagnosis_payload.py",
+                "--workspace",
+                str(workspace),
+                "--input",
+                str(invalid_path),
+                "--run-id",
+                "smoke",
+            ],
+        )
+        if result == 0:
+            fail("validate_diagnosis_payload.py accepted invalid payload")
+        invalid_validation = json.loads(stdout)
+        if "missing top-level field: source" not in invalid_validation.get("errors", []):
+            fail("validate_diagnosis_payload.py did not report missing source")
+
+        result, stdout = run_module_main(
+            record_module,
+            [
+                "record_grading_diagnosis.py",
+                "--workspace",
+                str(workspace),
+                "--mode",
+                "full_archive",
+                "--input",
+                str(payload_path),
+                "--run-id",
+                "smoke",
+            ],
+        )
+        if result != 0:
+            fail("record_grading_diagnosis.py returned non-zero")
+        output = json.loads(stdout)
+        if not output.get("ok"):
+            fail("record_grading_diagnosis.py did not report ok")
+        if not (workspace / "records/2026-06-29-photo-smoke-diagnosis.md").exists():
+            fail("record_grading_diagnosis.py did not create diagnosis record")
+        if "题1" not in (workspace / "mistakes/school-mistakes.md").read_text(encoding="utf-8"):
+            fail("record_grading_diagnosis.py did not append mistake entry")
+        if "photo smoke" not in (workspace / "records/learning-progress.md").read_text(encoding="utf-8"):
+            fail("record_grading_diagnosis.py did not append progress row")
+        if not (workspace / "weak-points/fact-fluency.md").exists():
+            fail("record_grading_diagnosis.py did not create weak-point record")
+        if "Smoke active context" not in (workspace / "memory/active-context.md").read_text(encoding="utf-8"):
+            fail("record_grading_diagnosis.py did not refresh active context")
+        progress_text = (workspace / "records/learning-progress.md").read_text(encoding="utf-8")
+        if "\n\n| 2026-06-29 |" in progress_text:
+            fail("record_grading_diagnosis.py inserted a blank line into the progress table")
+
+        run_log_path = workspace / ".zhizhi-math-coach/run-log.jsonl"
+        if not run_log_path.exists():
+            fail("run-log.jsonl was not created")
+        events = [json.loads(line) for line in run_log_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+        scripts = {event.get("script") for event in events}
+        for script_name in ["build_grading_context.py", "validate_diagnosis_payload.py", "record_grading_diagnosis.py"]:
+            if script_name not in scripts:
+                fail(f"run-log.jsonl missing event for {script_name}")
+        if not any(event.get("run_id") == "smoke" and event.get("ok") and event.get("duration_ms", -1) >= 0 for event in events):
+            fail("run-log.jsonl missing successful smoke event with duration")
+
+
+def check_record_grading_diagnosis_script() -> None:
+    check_grading_context_payload_pipeline()
+
+
 def check_scheduled_tasks_setup_loads() -> None:
     load_module(SCHEDULED_TASKS_SETUP_PATH, "scheduled_tasks_setup")
 
@@ -208,6 +434,7 @@ def check_init_workspace_script() -> None:
             "README.md",
             ".zhizhi-math-coach/config.json",
             "memory/long-term.md",
+            "memory/active-context.md",
             "memory/local-memory-rules.md",
             "curriculum/profile.md",
             "curriculum/school-calendar.md",
@@ -241,6 +468,7 @@ def main() -> int:
     check_configure_workspace_loads()
     check_git_sync_checker_loads()
     check_sync_learning_repo_loads()
+    check_record_grading_diagnosis_script()
     check_scheduled_tasks_setup_loads()
     check_deploy_key_preparer_loads()
     check_pages_workflow_setup_loads()

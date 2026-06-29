@@ -20,3 +20,4 @@
 - Clarified the future plugin roadmap as a stable execution layer around the Skill.
 - Added PDF-first worksheet delivery: the generator writes `worksheet.pdf` when Chrome/Chromium is available, and Pages publishing can include the PDF.
 - Added explicit GitHub advanced-setup trigger phrases and a public Chinese setup guide for cloud sync and Pages.
+- Added fast daily grading workflow with compact active context, diagnosis payload validation, run logging, subagent boundaries, and deferred grading push support.

@@ -15,6 +15,44 @@ Plugin value:
 
 ## Candidate Tools
 
+### `build_grading_context`
+
+Current v1 surface: `scripts/build_grading_context.py`.
+
+Input:
+
+```json
+{ "workspace_path": ".", "format": "json" }
+```
+
+Output:
+
+```json
+{
+  "mode_default": "fast_grade_light_record",
+  "files_read": ["memory/active-context.md", "curriculum/profile.md"],
+  "warnings": [],
+  "active_context": "...",
+  "curriculum_profile": "..."
+}
+```
+
+### `validate_diagnosis_payload`
+
+Current v1 surface: `scripts/validate_diagnosis_payload.py`.
+
+Input:
+
+```json
+{ "payload_path": "diagnosis-update.json", "mode": "fast_grade_light_record" }
+```
+
+Output:
+
+```json
+{ "ok": true, "errors": [], "warnings": [] }
+```
+
 ### `validate_worksheet_spec`
 
 Input:
@@ -74,6 +112,47 @@ Output:
   "actions_url": "https://github.com/user/repo/actions/runs/123"
 }
 ```
+
+### `record_grading_diagnosis`
+
+Current v1 surface: `scripts/record_grading_diagnosis.py`.
+
+Input:
+
+```json
+{
+  "workspace_path": ".",
+  "diagnosis_payload_path": "diagnosis-update.json"
+}
+```
+
+Output:
+
+```json
+{
+  "ok": true,
+  "written": [
+    "records/YYYY-MM-DD-source-diagnosis.md",
+    "records/learning-progress.md",
+    "mistakes/school-mistakes.md",
+    "weak-points/topic.md"
+  ]
+}
+```
+
+The plugin version should keep the same boundary: it writes provided diagnosis data, but it does not grade images, infer causes, or upload/sync files.
+
+### `append_run_log`
+
+Current v1 surface: `scripts/run_log.py` used by local scripts.
+
+Output destination:
+
+```text
+.zhizhi-math-coach/run-log.jsonl
+```
+
+The plugin version should emit structured duration and status events for context build, validation, recording, sync, publishing, and worksheet generation.
 
 ### `send_lark_message`
 
