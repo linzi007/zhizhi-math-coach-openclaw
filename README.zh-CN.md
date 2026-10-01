@@ -37,6 +37,22 @@ $zhizhi-math-worksheet 根据这几道错题出一份约 10 分钟的专项变�
 
 新 skill 源码在 `skills/zhizhi-math-worksheet/`。将完整目录复制到个人 OpenClaw workspace 的 `skills/` 下即可作为本地 skill 使用；本次新增不代表已安装到其他工作区或已发布至 ClawHub。只需要出卷时无需安装教练 skill；两者同时可用时，教练提供诊断与学情，出卷 skill 负责设计和文件交付。
 
+## 已安装用户：更新并配套使用
+
+在运行 OpenClaw 的机器上，进入原教练 skill 所属的 agent 工作区：
+
+```bash
+openclaw skills update @linzi007/zhizhi-math-coach
+openclaw skills install @linzi007/zhizhi-math-worksheet
+openclaw skills check
+```
+
+如果出卷 skill 已安装，第二条用 `update`。如果原来是全局安装，前两条都加 `--global`；指定 agent 时都使用相同的 `--agent <id>`。更新提示本地改动时先保留改动，不直接强制覆盖。
+
+本次配套版本为教练 `0.3.1`、出卷 `0.1.1`。更新不会自动安装另一个 skill，因此需要上面两条命令。两者已约定交接：教练批改并筛选题目 → 出卷 skill 生成学生卷与答案 → 教练继续处理已授权的记录或同步。用户仍可只调用 `$zhizhi-math-coach`，不必在中间重复发起出卷。
+
+两者需对同一个 agent 可见；如有 skill 白名单，保留原有项并加入两个技能名称。安装后建议开启新会话。查看版本和路径可运行 `openclaw skills info zhizhi-math-coach` 与 `openclaw skills info zhizhi-math-worksheet`。
+
 ## 试卷图片：先答疑，再完整归档
 
 图片处理分为前台和后台：先保存原图、批改家长关注的题并讲解；再整理整张试卷，包括正确、错误、未作答和待确认题。OpenClaw 的多模态模型负责读图、识别知识点和诊断，脚本负责校验、存档及汇总证据。

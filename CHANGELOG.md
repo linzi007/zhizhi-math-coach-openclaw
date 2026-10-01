@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Clarified coach/worksheet companion identities, same-agent handoff and return, and existing-install update instructions for paired coach `0.3.1` and worksheet `0.1.1` releases.
 - Prepared English skill discovery text, worksheet references, prompts and separate ClawHub package guidance; added explicit output-language/curriculum rules and English model-HTML answer labels with a sanitized sample, while documenting remaining Chinese archive defaults.
 - Added standalone `zhizhi-math-worksheet` with full-paper photo and general question-list branches, separate answer PDFs and optional diagnostic context from the coach; documented reviewed list/diagram examples and the remaining learning-outcome validation limits.
 - Documented photo-to-variant generation with direct model-authored PDF layouts, reference-aware typography, separate printable answers and content/preview review, alongside the HTML generator.

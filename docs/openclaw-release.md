@@ -16,6 +16,32 @@ Suggested English listing summaries:
 
 The worksheet skill does not depend on the coach package. It needs an agent with appropriate image understanding when using photos, local document-authoring tools, and a PDF renderer for preview checks. It does not bundle a model, image-generation API, or document runtime. Coach integration is optional; if the worksheet skill is absent, the coach retains its existing compatibility workflow. This repository ships skills, not an OpenClaw plugin tool package.
 
+## Updating an existing coach installation
+
+On the machine running OpenClaw, in the same agent workspace as the installed coach:
+
+```bash
+openclaw skills update @linzi007/zhizhi-math-coach
+openclaw skills install @linzi007/zhizhi-math-worksheet
+openclaw skills info zhizhi-math-coach
+openclaw skills info zhizhi-math-worksheet
+openclaw skills check
+```
+
+If the worksheet skill is already installed, use `update` instead of `install` for it. If the existing coach is globally installed, add `--global` to both update/install commands. For a specific agent workspace, use the same `--agent <id>` on both commands and on the checks. Do not mix scopes unintentionally or overwrite modified local files with `--force` by default.
+
+Both skill names must be visible to the same agent. If an agent skill allowlist is configured, retain its existing entries and add both names. Start a new conversation after the update to obtain a fresh skill selection; existing file-backed sessions may refresh through the watcher, while managed-library selections require explicit refresh/attachment.
+
+The intended paired releases are coach `0.3.1` and worksheet `0.1.1`. Instructions already linked generation in coach `0.3.0`; the patch clarifies the reciprocal handoff and return. This is not automatic dependency installation. Once both are available, the parent can simply say:
+
+```text
+Use $zhizhi-math-coach to check this paper and create practice for the confirmed mistakes, with separate answers.
+```
+
+The coach selects inputs and handles learning records; the worksheet skill designs and checks the paper. Both operate in one conversation without requiring another user turn. Installing the pair does not enable cron jobs or Git sync.
+
+Commands and scope behavior follow the [OpenClaw skills CLI](https://docs.openclaw.ai/cli/skills) and [skills lifecycle](https://docs.openclaw.ai/tools/skills). Older OpenClaw releases may not have `skills update`; use that version's CLI help and update the runtime or use its existing ClawHub install mechanism in the same directory.
+
 ## Language and regional support
 
 English is the canonical language of public skill descriptions, UI metadata, and the worksheet's runtime references. `README.md` is the English project guide; `README.zh-CN.md` remains the Chinese guide. Do not package duplicate executable skills solely to translate their descriptions.

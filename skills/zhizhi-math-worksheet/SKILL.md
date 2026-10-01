@@ -7,6 +7,12 @@ description: "Create printable elementary math worksheets and separate answer ke
 
 Design questions, diagrams, and page layouts; deliver a student worksheet and a separate answer key. This skill works independently: no learning archive, coach skill, GitHub account, or image-generation service is required. Mistakes and review topics guide upstream question selection; diagnosis is optional input.
 
+## Optional math-coach integration
+
+The companion is `@linzi007/zhizhi-math-coach` (skill name `zhizhi-math-coach`); this package is `@linzi007/zhizhi-math-worksheet`. When both are installed and visible to the same agent, accept the coach's selected questions, optional diagnosis, learned scope, output-language preferences and output directory without making the parent repeat them. Use the actual installed skill catalog when the coach's instructions are needed, not a guessed sibling path. This is instruction-level cooperation in the current conversation, not a separate agent or an automatic package dependency.
+
+On completion, return student/answer PDF paths, previews, the private answer-manifest path, source-question mappings and actual review status to the calling workflow. The coach then owns any requested or already-configured archive, sync and publishing actions. Do not re-enter diagnosis or generation on return. If the user later submits completed work for grading or mastery tracking, use the installed coach when available; never treat the generated answer key as evidence of the student's performance. Standalone generation does not require installing or invoking the coach.
+
 ## Language and curriculum
 
 - Write replies in the user's language unless they request another language.

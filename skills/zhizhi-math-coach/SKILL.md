@@ -21,6 +21,10 @@ For a request that only asks for a paper, use the installed `zhizhi-math-workshe
 
 For grading followed by practice, complete the requested diagnosis, select relevant questions, then pass a question list with complete stems, options and necessary diagram descriptions. Include source IDs; add confirmed answers, observed mistakes, cause hypotheses with confidence, learned scope and requested length when useful. Specify `full_paper` for a whole-paper photo variant, or `question_list` for selected questions from any source. Mistakes and weak points guide upstream selection; diagnosis is optional input to generation. The worksheet skill returns local artifacts and the private question/answer mapping; this coach handles any already-configured recording, sync or publication afterward. Generation alone is never mastery evidence.
 
+The companion's registry identity is `@linzi007/zhizhi-math-worksheet`; this skill is `@linzi007/zhizhi-math-coach`. When both are visible to the same agent, a request to this coach can complete grading and worksheet generation in one conversation. Load the companion's actual installed `SKILL.md` from the skill catalog before following it; do not require another user message, spawn another agent, or assume a sibling filesystem path. Include requested student/answer languages and the output directory in the handoff. Resume here with the returned files, source mappings and review status; record the worksheet as generated, not completed by the student. Do not loop back into generation during the return step.
+
+Installing or updating this package does not automatically install the companion. If it is missing, use the compatibility workflow for the current task and mention the optional companion only when useful. For installation help, use `openclaw skills install @linzi007/zhizhi-math-worksheet` in the same agent scope; match an existing global install with `--global`. Do not install a package merely because a grading task references it.
+
 ## Core Loop
 
 Use a local evidence loop for every task:

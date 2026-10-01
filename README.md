@@ -30,6 +30,20 @@ $zhizhi-math-worksheet Create similar questions from this list and produce a pri
 $zhizhi-math-worksheet Make a ten-minute practice paper based on these incorrect questions, with answers.
 ```
 
+## Update the coach and add the companion
+
+In the existing OpenClaw agent workspace, run:
+
+```bash
+openclaw skills update @linzi007/zhizhi-math-coach
+openclaw skills install @linzi007/zhizhi-math-worksheet
+openclaw skills check
+```
+
+Use `update` for the worksheet if already installed. Match the original installation scope: use `--global` for both global package operations, or the same `--agent <id>` for a specific agent. Preserve local modifications before considering any forced update. Keep both skills visible in any configured agent allowlist and start a new conversation after updating.
+
+Coach `0.3.1` and worksheet `0.1.1` document the reciprocal workflow: the coach selects questions and passes context; the worksheet returns PDFs, source mappings and review status; the coach resumes authorized record/sync work. A single coach request can use both. This does not auto-install dependencies or enable background jobs. See [update details](docs/openclaw-release.md#updating-an-existing-coach-installation).
+
 ## Language and regional support
 
 Public skill instructions and UI descriptions are English. Replies follow the user's language. Student materials follow an explicit requested language, or otherwise the source paper/question language; parent explanations can use a different language. English and Chinese use the same two worksheet branches. A4 remains the default; request US Letter explicitly when needed.
