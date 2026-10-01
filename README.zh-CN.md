@@ -14,6 +14,49 @@
 
 本仓库只包含通用模板、脚本和脱敏示例。真实学生记录、试卷照片、学校作业、教材 PDF 和学习过程中生成的数据应放在单独的个人学习仓库。
 
+## 两个独立 Skill
+
+面向 ClawHub，两个 skill 的公共说明和界面介绍使用英文；本中文指南继续保留。回复跟随用户语言，学生卷优先使用明确指定的语言，否则沿用原卷/题目语言，家长解释可另选语言。默认 A4，明确要求时可用其他纸张尺寸。英语不等于美国课程，中文也不自动决定学期或时区。
+
+现有教练的档案初始化、部分汇总标签和旧固定题型仍偏中文及中国学制，尚未完全国际化；英文出卷优先使用独立出卷 skill，或带 `language: en` 的模型 HTML。英文输出示例位于 `examples/student-workspace/worksheets/sample-model-english/`。
+
+| Skill | 职责 |
+| --- | --- |
+| [`zhizhi-math-coach`](skills/zhizhi-math-coach/SKILL.md) | 批改讲解、整卷归档、知识点掌握评估与已配置的后台任务 |
+| [`zhizhi-math-worksheet`](skills/zhizhi-math-worksheet/SKILL.md) | 整卷照片直接变式，或根据通用题目列表编卷，交付 A4 学生试卷、独立答案 PDF 和打印预览 |
+
+出卷 skill 可以单独使用，不要求先建立学习档案。保留两条分支：整卷照片走已验证的直接变式流程；其他来源走题目列表分支。错题、薄弱项和复习题都是上游选题来源，出卷不强制要求错因诊断。
+
+题目列表已用原卷中的6道题完成文字入参验证，图形条件通过文字描述保留，输出学生卷和答案各一页 A4。另完成了非真实学生钟表错题的样卷检查；这些验证针对生成质量，尚未证明真实学习效果。详见[入参约定](skills/zhizhi-math-worksheet/references/question-list.md)和[验证记录](skills/zhizhi-math-worksheet/references/validation.md)。
+
+```text
+$zhizhi-math-worksheet 按这张试卷出一份类似题型的变式卷，A4 打印，答案单独一份。
+$zhizhi-math-worksheet 根据这份题目列表逐题做变式，生成 A4 试卷并附独立答案。
+$zhizhi-math-worksheet 根据这几道错题出一份约 10 分钟的专项变式卷，附答案。
+```
+
+新 skill 源码在 `skills/zhizhi-math-worksheet/`。将完整目录复制到个人 OpenClaw workspace 的 `skills/` 下即可作为本地 skill 使用；本次新增不代表已安装到其他工作区或已发布至 ClawHub。只需要出卷时无需安装教练 skill；两者同时可用时，教练提供诊断与学情，出卷 skill 负责设计和文件交付。
+
+## 试卷图片：先答疑，再完整归档
+
+图片处理分为前台和后台：先保存原图、批改家长关注的题并讲解；再整理整张试卷，包括正确、错误、未作答和待确认题。OpenClaw 的多模态模型负责读图、识别知识点和诊断，脚本负责校验、存档及汇总证据。
+
+- **完整档案**：原图副本、逐题 Markdown、结构化 JSON，保留题目、作答、图形描述和解析。
+- **知识点掌握情况**：按正确题和错题共同判断，展示有效题数、观察正确率、判断依据与建议复测日期；多知识点题按步骤证据区分，避免“一题错，全都不会”。
+- **异步处理**：可配置 OpenClaw 每5分钟领取一份图片任务，支持超时重试、状态查询和重复记录去重。
+- **自由设计试卷**：模型根据知识点和学情设计题目、图形与版式，统一套用 A4、字号和间距规范，交付打印 PDF 和页面预览图；固定题型模板只是可选工具。
+
+只提供一张试卷照片并要求“出一份类似的变式卷”也可以：模型以原卷的知识点、结构和题量为依据，设计整卷并分别生成学生版 PDF 和答案 PDF，再检查实际打印预览。可直接用 PDF 工具排版，也可走 HTML 生成流程；整卷参考原卷密度，短练习采用更大字号。题型无需预先注册。
+
+在个人学习工作区启用后台消费者：
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/setup_scheduled_tasks.py \
+  --workspace . --enable-config --photo-worker --auto-register --timezone Asia/Shanghai
+```
+
+需要可用的 OpenClaw 和支持读取本地图片的多模态模型。未安装 CLI 时只打印配置命令，不代表任务已经注册。详见 [图片处理流程与数据格式](skills/zhizhi-math-coach/references/photo-intake.md)、[整卷批改输入示例](examples/student-workspace/sample-full-paper.json) 和 [模型设计的试卷示例](examples/student-workspace/worksheets/sample-model-designed/worksheet.html)。
+
 ## Quick Reference
 
 | 场景 | 用户动作 | OpenClaw/Skill 动作 |
@@ -61,6 +104,10 @@ skills/zhizhi-math-coach/
   scripts/setup_scheduled_tasks.py
   scripts/sync_learning_repo.py
   assets/worksheet/
+skills/zhizhi-math-worksheet/
+  SKILL.md
+  agents/openai.yaml
+  references/
 docs/
 scripts/smoke_check.py
 examples/student-workspace/
@@ -376,7 +423,7 @@ python3 skills/zhizhi-math-coach/scripts/sync_learning_repo.py \
 - `mixed_maintenance`：当前单元、旧薄弱项和计算熟练度混合保持。
 - `geometry_drill`：使用结构化 `geometry_spec` 渲染 SVG/HTML 图形题。
 
-当家长只说“出一张练习卷”时，skill 会先确认出卷目的、内容范围、题量/时长和输出形式。
+当家长只说“出一张练习卷”时，skill 使用最近确认的学习范围和学情，默认生成约 10 分钟的短练习；只有缺失信息会明显影响出题时才追问。提供试卷照片并要求变式时，优先参考原卷的结构、知识点和题量。
 
 ## 生成示例练习卷
 
@@ -404,6 +451,7 @@ python3 skills/zhizhi-math-coach/scripts/validate_worksheet_spec.py \
 
 ```bash
 python3 scripts/smoke_check.py
+python3 -m unittest discover -s tests -v
 ```
 
 默认会尝试导出学生版 PDF，需要本机安装 Chrome 或 Chromium。如果需要校验打印页数，可在生成命令中添加 `--verify-print`。
@@ -543,12 +591,13 @@ python3 skills/zhizhi-math-coach/scripts/setup_scheduled_tasks.py \
 GitHub 发布和 ClawHub 收录是两件事：
 
 - GitHub 用于公开源码、文档和示例。
-- ClawHub 发布的是 `skills/zhizhi-math-coach` 这个 skill bundle。
+- ClawHub 分别发布 `skills/zhizhi-math-coach` 和 `skills/zhizhi-math-worksheet` 两个独立 skill bundle；保留现有名称，不把整个源码仓库作为单个 skill 上传。
 
 发布前建议运行：
 
 ```bash
 python3 scripts/smoke_check.py
+python3 -m unittest discover -s tests -v
 ```
 
 更多发布说明见：

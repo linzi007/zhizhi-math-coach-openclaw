@@ -1,69 +1,66 @@
-# OpenClaw Release Notes
+# OpenClaw and ClawHub Release Guide
 
-## Skill Identity
+## Two independent packages
 
-- Public skill name: `zhizhi-math-coach`
-- Main entry: `$zhizhi-math-coach`
-- Skill path: `skills/zhizhi-math-coach`
+Publish each skill directory as its own ClawHub package. Do not upload the whole source repository as one skill. Keep the existing slugs so prompts and installed references remain stable.
 
-## V1 Scope
+| Package slug | Display name | Package root |
+| --- | --- | --- |
+| `zhizhi-math-coach` | Zhizhi Math Coach | `skills/zhizhi-math-coach/` |
+| `zhizhi-math-worksheet` | Zhizhi Math Worksheets | `skills/zhizhi-math-worksheet/` |
 
-V1 is a Skill-first release. It supports:
+Suggested English listing summaries:
 
-- grading and diagnosis;
-- weak-point tracking;
-- parent explanations and student summaries;
-- China grade/semester/calendar alignment;
-- curriculum and textbook-scope references;
-- personal learning repository initialization;
-- first-use quickstart and setup checklist;
-- recommended model capability guidance for vision, long-context records, structured output, and reasoning effort;
-- GitHub sync authorization guidance for repository Deploy keys, SSH, and fine-grained HTTPS tokens;
-- Git preflight checks that do not require GitHub CLI;
-- worksheet generation from JSON specs with PDF-first delivery;
-- deterministic geometry SVG rendering for simple diagrams;
-- GitHub Pages publisher script for personal learning repositories, including child-facing PDF when generated;
-- GitHub Actions Pages workflow setup for public personal repositories;
-- automatic Pages publishing with GitHub Actions deployment waiting;
-- validation and smoke checks.
+- **Coach:** Check elementary math work, explain mistakes, document full papers, and track learning evidence. Includes optional OpenClaw background processing and personal-repository sync. Archive helpers currently favor Chinese-school workflows.
+- **Worksheets:** Turn a worksheet photo or question list into printable math practice with separate answers and page previews. Keep a full-paper variant workflow or use selected questions for review. English and Chinese output instructions; no learning archive or GitHub setup required.
 
-V1 does not ship an OpenClaw plugin tool package. Plugin interfaces are documented in `docs/plugin-tools-roadmap.md`.
+The worksheet skill does not depend on the coach package. It needs an agent with appropriate image understanding when using photos, local document-authoring tools, and a PDF renderer for preview checks. It does not bundle a model, image-generation API, or document runtime. Coach integration is optional; if the worksheet skill is absent, the coach retains its existing compatibility workflow. This repository ships skills, not an OpenClaw plugin tool package.
 
-## Pre-release Checklist
+## Language and regional support
 
-Run from the repository root:
+English is the canonical language of public skill descriptions, UI metadata, and the worksheet's runtime references. `README.md` is the English project guide; `README.zh-CN.md` remains the Chinese guide. Do not package duplicate executable skills solely to translate their descriptions.
+
+Output language is independent of instruction language: follow explicit student/parent language preferences, otherwise retain the source language for student material and use the conversation language for explanations. Default to A4 unless another paper size is requested. Do not infer curriculum, currency, units, timezone, or school dates from language.
+
+Current limits must be visible in release notes:
+
+- The coach's initializer, some archive summaries, and legacy question templates still use Chinese labels and Chinese-school defaults. They are not completely localized.
+- English model-authored HTML has English generated answer headings and explanations; this does not automatically translate supplied question content.
+- The reviewed PDF samples are Chinese. English HTML/answer checks do not substitute for English PDF visual testing or tests of another national curriculum.
+- Existing generation examples are not controlled evidence of improved learner outcomes.
+
+## Package checks
+
+From the repository root:
 
 ```bash
-python3 scripts/smoke_check.py
+python3 -B scripts/smoke_check.py
+python3 -B -m unittest discover -s tests -v
 ```
 
-Check manually:
+Also validate both skill folders with the available skill validator. Check that each package has matching folder/frontmatter identity and that its required references are inside that package. The worksheet package should remain usable without sibling package files or root-level README files.
 
-- `README.md` uses `zhizhi-math-coach`.
-- `SKILL.md` frontmatter name is `zhizhi-math-coach`.
-- `references/openclaw-quickstart.md` matches the current GitHub Pages and Deploy key flow.
-- no real student data, school papers, PDFs, images, screenshots, or OCR dumps are committed;
-- sample worksheets are sanitized;
-- examples do not copy textbook problem sets.
+Include only maintained skill instructions, referenced docs, scripts, assets, and synthetic examples appropriate to that package. Keep real student records, completed work, school papers, source photos, textbook copies, generated PDFs/previews, local caches, and credentials out of ClawHub bundles. Inspect each selected package directory before upload; a clean root `.gitignore` is not a package-content check.
 
-## Install Test
+## Install and behavior checks
 
-Open this repository as an OpenClaw workspace, then try:
+Use an isolated personal workspace and install the package being checked by itself. For the worksheet package, try:
 
 ```text
-$zhizhi-math-coach 批改这几道错题，并记录薄弱项。
-$zhizhi-math-coach 根据退位减法薄弱项出一张练习卷。
-$zhizhi-math-coach 给家长一份周长知识点讲解稿。
+$zhizhi-math-worksheet Make a similar version of this worksheet for A4 printing, with separate answers.
+$zhizhi-math-worksheet Create variants from this question list in English, with an English answer key.
+$zhizhi-math-worksheet Typeset these questions without changing their numbers or wording.
+$zhizhi-math-worksheet Keep the student paper in Chinese and explain the answers to me in English.
 ```
 
-For ClawHub publication, package only reusable skill files, docs, scripts, and sanitized examples.
+Confirm the two input branches, correct language selection, source-to-output mappings, separate solutions, available-runtime handling, and actual PDF rendering. The full-paper path must not require the question-list format first. Do not describe installation or a live OpenClaw run as tested unless it was performed.
 
-## GitHub Pages
+For the coach, test grading, full-paper records, uncertainty, and a supplied regional profile before enabling scheduled jobs or synchronization. A request to generate a worksheet must not silently enable those services.
 
-This public skill repository should not commit generated `site/` output. Use `publish_html_site.py` from a personal learning repository, then enable Pages in that repository if public child-facing worksheet links are acceptable. The personal learning repository may be public or private; the user chooses.
+## Publication and versions
 
-OpenClaw machines may not have GitHub CLI, credentials, or a provider-level GitHub token environment-variable setup. Prefer a repository-scoped Deploy key: generate it with `scripts/prepare_github_deploy_key.py`, send only the public key to the parent through Lark/Feishu or the OpenClaw reply, and ask the parent to add it to the personal learning repository under Settings -> Deploy keys with write access. Before any OpenClaw-initiated commit or push, run `scripts/check_git_sync.py` from the installed skill against the personal learning repository. Use a fine-grained token scoped only to the personal learning repository as a fallback.
+Use the current ClawHub CLI or website to publish the selected package root under its matching slug, with a new package version and English release notes. Follow the current CLI help for exact options. Prepare the files and checks before requesting any final publication approval if required. Local changes or validation do not mean the package has been published. Updating one package does not imply that the other was released.
 
-For free GitHub Pages on a public personal repository, instruct the parent to choose Settings -> Pages -> Build and deployment -> Source: GitHub Actions. OpenClaw may create `.github/workflows/pages.yml` with `scripts/setup_github_pages_workflow.py` and push it after Git sync authorization is ready. Clarify that a public repository exposes all tracked files, not only the Pages site, while non-collaborators cannot push by default.
+## Optional GitHub Pages
 
-After worksheet generation, OpenClaw should return or send `worksheet.pdf` first when it exists. In a configured public Pages workspace, OpenClaw can then run `scripts/publish_and_wait_pages.py`, wait for the GitHub Actions deployment when a public link is needed, and reply with the Pages index URL and worksheet URL. This helper uses plain git and the public GitHub Actions API; it does not require GitHub CLI.
+Pages is a separate feature for a personal learning repository. It is not part of ClawHub installation. Publish only child-facing worksheet files, using the coach's configured authorization and publication workflow when available; keep answers and learning records private. A local printable worksheet is a valid result without GitHub or Pages.

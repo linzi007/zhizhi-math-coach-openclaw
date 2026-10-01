@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- Prepared English skill discovery text, worksheet references, prompts and separate ClawHub package guidance; added explicit output-language/curriculum rules and English model-HTML answer labels with a sanitized sample, while documenting remaining Chinese archive defaults.
+- Added standalone `zhizhi-math-worksheet` with full-paper photo and general question-list branches, separate answer PDFs and optional diagnostic context from the coach; documented reviewed list/diagram examples and the remaining learning-outcome validation limits.
+- Documented photo-to-variant generation with direct model-authored PDF layouts, reference-aware typography, separate printable answers and content/preview review, alongside the HTML generator.
+- Added model-authored worksheets with a shared A4 print profile, separate answer manifests and optional PDF page previews; fixed templates remain optional.
+
+- Added full-paper photo archives with original images, all visible item results and structured JSON evidence.
+- Added evidence-based knowledge-point assessment, spaced-review suggestions and automatic light/full recording decisions.
+- Added a durable leased photo queue and an opt-in OpenClaw cron consumer every five minutes.
+- Made local recording idempotent and recoverable after partial writes; added read-only dry runs and path/date checks.
+- Added clocks, number lines, shape collections, shaded grids and polygons; visual practice templates verify answers against diagram data.
+- Fixed scoped Git commits, selected-only publishing, generation-time semantic validation and post-rebase deployment tracking.
+- Added local regression tests for recording, photo jobs, assessments, rendering and Git/publication boundaries.
+
 - Renamed the public skill identity to `zhizhi-math-coach`.
 - Added China grade, semester, exam, and holiday planning references.
 - Added curriculum and textbook-scope alignment guidance.

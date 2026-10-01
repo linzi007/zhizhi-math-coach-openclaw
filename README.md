@@ -1,19 +1,57 @@
-# Zhizhi Math Coach OpenClaw Skill
+# Zhizhi Math Skills for OpenClaw
 
 [中文说明](README.zh-CN.md)
 
-`zhizhi-math-coach` is an OpenClaw skill for an evidence-based primary-school math learning loop:
+Two independently installable skills help parents and teachers turn elementary math work into explanations and printable practice.
 
 This project started as a way to help my first-grade daughter, Zhizhi, with math learning at home. I hope it can also help other parents facing the same problem: understanding where a child is really stuck, then keeping explanations, practice, and review moving over time.
 
 - grade completed worksheets, school papers, photos, or copied wrong questions;
 - infer error type, likely cause, related weak point, and relapse or transfer status;
 - maintain short-term memory, long-term memory, progress records, mistake books, and weak-point files;
-- align practice with China grade/semester, textbook edition, school calendar, midterm/final windows, and winter/summer break;
+- align practice with the supplied learning scope, with dedicated references for Chinese textbooks and school calendars;
 - generate parent-facing explanations, student-readable summaries, and targeted printable PDF/HTML worksheets;
 - keep child-facing worksheets answer-free and parent-facing answer keys separate.
 
 The repository intentionally contains only generic templates and sanitized sample data. Keep real student records, photos, school papers, textbook PDFs, and generated learning data in a separate personal learning repository.
+
+## Two independent skills
+
+- [`zhizhi-math-coach`](skills/zhizhi-math-coach/SKILL.md) handles grading, explanations, complete archives, knowledge assessment and configured background work.
+- [`zhizhi-math-worksheet`](skills/zhizhi-math-worksheet/SKILL.md) keeps the direct full-paper photo workflow alongside a general question-list branch, delivering an A4 student PDF, separate answer PDF and print previews. It works without the coach or an initialized learning archive. Mistakes, weak points and revision needs are upstream selection sources; diagnosis is optional context.
+
+One GPT-6 Astra session demonstrated the full-paper workflow. A further six-question example from the source paper verified the text-list variant workflow, including diagram descriptions and actual A4 PDF previews. A synthetic clock-reading mistake also produced a reviewed worksheet. These are generation-quality checks in the same conversation, not independent blind tests or proven student learning outcomes. See the skill's [input contract](skills/zhizhi-math-worksheet/references/question-list.md) and [validation record](skills/zhizhi-math-worksheet/references/validation.md).
+
+Copy the complete `skills/zhizhi-math-worksheet/` directory into your personal OpenClaw workspace's `skills/` directory to use it locally. This repository addition does not install it elsewhere or publish it to ClawHub.
+
+```text
+$zhizhi-math-worksheet Make a similar version of this paper for A4 printing, with a separate answer key.
+$zhizhi-math-worksheet Create similar questions from this list and produce a printable worksheet with separate answers.
+$zhizhi-math-worksheet Make a ten-minute practice paper based on these incorrect questions, with answers.
+```
+
+## Language and regional support
+
+Public skill instructions and UI descriptions are English. Replies follow the user's language. Student materials follow an explicit requested language, or otherwise the source paper/question language; parent explanations can use a different language. English and Chinese use the same two worksheet branches. A4 remains the default; request US Letter explicitly when needed.
+
+Language does not select a national curriculum. The coach's archive initializer, some record summaries, and older fixed templates still use Chinese labels and China-specific defaults. These components are not fully localized. For English worksheets, use the standalone worksheet skill or model-authored HTML with `language: en`. For another school system, supply/adapt the profile and calendar before using learning-record automation.
+
+Chinese users can continue with the [Chinese guide](README.zh-CN.md). See the [release guide](docs/openclaw-release.md) for the two ClawHub package boundaries and current validation limits.
+
+## Photo intake, knowledge assessment and visual practice
+
+Photo intake preserves originals and answers the parent's immediate grading question first. A configured OpenClaw worker then documents **every visible question**, including correct, wrong, unanswered and uncertain items. The multimodal model reads the images and assigns concepts; local scripts validate and archive evidence, aggregate per-concept performance, and suggest dated checks.
+
+The opt-in worker polls every five minutes with leases, capped retries and idempotent recording. The example below uses the Chinese-school sample timezone; replace it with the learner's actual IANA timezone before enabling it in the personal workspace:
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/setup_scheduled_tasks.py \
+  --workspace . --enable-config --photo-worker --auto-register --timezone Asia/Shanghai
+```
+
+An available OpenClaw gateway/CLI and an image-capable model are required. Printed setup commands do not mean a worker has been registered. See [photo intake and payload schema](skills/zhizhi-math-coach/references/photo-intake.md) and the [full-paper example](examples/student-workspace/sample-full-paper.json).
+
+The model designs the paper from learning evidence, with a shared A4 typography profile and separate answers. Deliver PDF and page previews; reusable question templates are optional. See the [model-designed example](examples/student-workspace/worksheets/sample-model-designed/worksheet.html) and [generation workflow](skills/zhizhi-math-coach/references/worksheet-generation.md).
 
 ## Quick Reference
 
@@ -28,16 +66,16 @@ The repository intentionally contains only generic templates and sanitized sampl
 Common prompts:
 
 ```text
-$zhizhi-math-coach 批改这张练习卷，记录薄弱项。
-$zhizhi-math-coach 根据最近错题生成变式练习。
-$zhizhi-math-coach 针对退位减法薄弱项出专项练习。
-$zhizhi-math-coach 生成期末错因复习卷，并返回 PDF。
-$zhizhi-math-coach 进阶：配置 GitHub 云同步和 Pages 在线访问。
+$zhizhi-math-coach Check this completed worksheet and record evidence of concepts needing practice.
+$zhizhi-math-coach Select practice questions based on recent mistakes and prepare a worksheet.
+$zhizhi-math-coach Prepare targeted practice for subtraction with regrouping.
+$zhizhi-math-coach Prepare an end-of-term review worksheet from recurring errors and return a PDF.
+$zhizhi-math-coach Set up GitHub backup and public worksheet links through GitHub Pages.
 ```
 
 For first-use setup, follow `skills/zhizhi-math-coach/references/openclaw-quickstart.md`. GitHub is not required by default; GitHub sync and Pages are advanced capabilities.
 
-Public GitHub advanced setup guide:
+Chinese GitHub advanced setup guide (English setup instructions are also in the installed coach's `references/github-sync-authorization.md`):
 
 ```text
 https://github.com/linzi007/zhizhi-math-coach-openclaw/blob/main/docs/github-advanced-setup.zh-CN.md
@@ -62,6 +100,10 @@ skills/zhizhi-math-coach/
   scripts/setup_scheduled_tasks.py
   scripts/sync_learning_repo.py
   assets/worksheet/
+skills/zhizhi-math-worksheet/
+  SKILL.md
+  agents/openai.yaml
+  references/
 docs/
 scripts/smoke_check.py
 examples/student-workspace/
@@ -96,10 +138,10 @@ Typical use:
 Example prompts:
 
 ```text
-$zhizhi-math-coach 批改这几道错题，记录薄弱项并给家长讲解稿。
-$zhizhi-math-coach 根据最近错题变式出一张 10 分钟练习卷。
-$zhizhi-math-coach 针对退位减法薄弱项出专项练习，并给答案和复评标准。
-$zhizhi-math-coach 生成一年级下册人教版当前范围的期末错因复习卷。
+$zhizhi-math-coach Check these answers, record the evidence, and explain the mistakes to the parent.
+$zhizhi-math-coach Make a ten-minute practice worksheet based on recent mistakes.
+$zhizhi-math-coach Create subtraction-with-regrouping practice with answers and reassessment notes.
+$zhizhi-math-coach Create a review worksheet within the learner's confirmed curriculum scope.
 ```
 
 ## Workspace And Skill Source Model
@@ -152,7 +194,7 @@ Do not run regular student learning sessions with `zhizhi-math-coach-openclaw` a
 
 ## Recommended Model
 
-Use a vision-capable frontier reasoning model. For OpenAI API setups, use `gpt-5.2` or a newer GPT-5.x frontier model when available; start with medium reasoning for daily use and raise reasoning for hard cases.
+Use an available vision-capable reasoning model with reliable file and document tools. The reviewed examples used GPT-6 Astra, but the skills do not require that model or change the configured model. Use reasoning effort appropriate to the task.
 
 This is recommended because the skill often needs to:
 
@@ -166,7 +208,16 @@ Avoid small text-only models for photo grading, geometry, complex word problems,
 
 ## Generate A Sample Worksheet
 
-From the repository root:
+An English model-authored sample is included. From the repository root:
+
+```bash
+python3 skills/zhizhi-math-coach/scripts/generate_worksheet.py \
+  examples/student-workspace/worksheets/sample-model-english/worksheet-spec.json --no-pdf
+```
+
+This writes an English student HTML page and an English answer key. Omit `--no-pdf` to attempt browser PDF export when available. The committed English example has HTML/answer-language checks; a printed English PDF has not yet received the same visual review as the Chinese examples.
+
+The original Chinese subtraction example remains available:
 
 ```bash
 python3 skills/zhizhi-math-coach/scripts/generate_worksheet.py \
@@ -190,6 +241,7 @@ Run the repository smoke check:
 
 ```bash
 python3 scripts/smoke_check.py
+python3 -m unittest discover -s tests -v
 ```
 
 PDF export is attempted by default and requires Chrome or Chromium. If browser print verification is needed, add `--verify-print`.
@@ -216,7 +268,7 @@ zhizhi-math-learning-data/
   site/
 ```
 
-Initialize a local personal learning workspace after installing the skill from ClawHub:
+For a learner following the Chinese-school profile, initialize a local personal learning workspace with the example below. This initializer uses Chinese labels and a September-start school year; do not apply it unchanged to another school system:
 
 ```bash
 mkdir zhizhi-math-learning-data
@@ -235,7 +287,7 @@ python3 skills/zhizhi-math-coach/scripts/init_learning_workspace.py \
 Normal daily use can start here without GitHub:
 
 ```text
-$zhizhi-math-coach 根据最近错题生成变式练习，并返回 PDF。
+$zhizhi-math-coach Create variants of recent incorrect questions and return a PDF.
 ```
 
 To enable advanced cloud sync, initialize Git and connect GitHub:
@@ -313,8 +365,8 @@ There is no background sync by default. OpenClaw treats pull, commit, push, and 
 Local learning files are updated when OpenClaw is working inside the personal learning repository and the user invokes the skill, for example:
 
 ```text
-$zhizhi-math-coach 批改这张练习卷，记录薄弱项。
-$zhizhi-math-coach 根据最近错题生成变式练习。
+$zhizhi-math-coach Check this completed worksheet and record evidence of concepts needing practice.
+$zhizhi-math-coach Select practice questions based on recent mistakes and prepare a worksheet.
 ```
 
 Typical write triggers:
@@ -384,7 +436,7 @@ The publisher writes:
 - `site/.nojekyll`: GitHub Pages static-site marker.
 - `worksheets/<date-topic>/publish.json`: publication manifest.
 
-`site/index.html` scans all public-safe child-facing worksheets under `worksheets/`, sorts them by date descending, and shows date, practice status, title, file links, topic, grade, item count, and completion summary. Practice status is inferred from `worksheets/status.md` when available; otherwise generated worksheets are shown as `未练习`.
+`site/index.html` lists selected and previously published child-facing worksheets, sorted by date descending, with practice status, title, file links, topic, grade, item count, and completion summary. It does not publish unselected drafts. Practice status is inferred from `worksheets/status.md` when available; the legacy publisher currently uses Chinese labels such as `未练习` (not yet practiced).
 
 Do not publish answer keys, grading records, memory files, weak-point history, uploaded papers, or textbook files to `site/`.
 
@@ -458,7 +510,7 @@ python3 skills/zhizhi-math-coach/scripts/publish_and_wait_pages.py \
 - `mixed_maintenance`: keep current unit, old weak points, and fluency alive.
 - `geometry_drill`: render deterministic SVG/HTML geometry items from structured specs.
 
-When a parent only says "出一张练习卷", confirm purpose, content scope, length, and output format before generating.
+When a parent only says "make a worksheet", use the latest confirmed learning scope and assessment for a short, roughly 10-minute practice; ask only when missing information would materially change the questions. When a photo is supplied as a reference for a variant paper, preserve its concepts, section structure and approximate length. The model may author the PDF directly or use the HTML generator. Deliver a student PDF and separate printable answers, and inspect previews rendered from both actual PDFs. See `references/worksheet-generation.md` in the skill for the two workflows.
 
 For Feishu delivery, send the generated `worksheet.pdf` when file messages are available. Add the GitHub Pages worksheet URL when the page is public-safe and deployment is ready. Keep `answer-key.md` outside the published `site/` directory.
 
@@ -487,7 +539,7 @@ Scheduled jobs should not update learning records, change weak-point status, or 
 
 ## Curriculum Boundary
 
-This skill can use textbook metadata and local curriculum files to avoid out-of-scope practice. For example, a personal workspace may point to an external source such as `TapXWorld/ChinaTextbook` for the 人教版小学数学目录, but this public repository must not commit textbook PDFs, screenshots, or copied textbook problem sets.
+This skill can use textbook metadata and local curriculum files to avoid out-of-scope practice. For a Chinese-school profile, a personal workspace may point to an external source such as `TapXWorld/ChinaTextbook` for the People's Education Press primary math contents. This public repository must not commit textbook PDFs, screenshots, or copied textbook problem sets.
 
 Use textbook information for:
 

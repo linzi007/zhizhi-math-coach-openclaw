@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "render_mode": "model_html",
+  "language": "en",
+  "title": "Equal Groups and Intervals",
+  "date": "2026-10-01",
+  "review_status": "model_reviewed",
+  "target": "Connect equal groups and route intervals to multiplication.",
+  "questions": [
+    {"id": "1", "knowledge_points": ["multiplication.equal-groups"], "answer": "12 counters; 3 x 4 = 12 (or 4 x 3 = 12).", "explanation": "There are 3 bags with 4 counters in each bag, so 4 + 4 + 4 = 12."},
+    {"id": "2", "knowledge_points": ["measurement.route-intervals"], "answer": "8 minutes.", "explanation": "Five consecutive stops have four intervals between the first and last. Each interval takes 2 minutes, so 4 x 2 = 8."}
+  ],
+  "student_html": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>Equal Groups and Intervals</title><style>body{color:#111}main{max-width:180mm;margin:auto}.question{margin-top:12mm}.work-line{border-bottom:1px solid #aaa;margin-top:8mm;height:12mm}</style></head><body><main><h1>Equal Groups and Intervals</h1><p class=\"meta\">Name: __________________ Date: __________________</p><section class=\"question\" data-question-id=\"1\"><h2>1. How many counters?</h2><p>There are 3 bags. Each bag has 4 counters. How many counters are there altogether? Write a multiplication equation.</p><div class=\"work-line\"></div><div class=\"work-line\"></div></section><section class=\"question\" data-question-id=\"2\"><h2>2. How long is the journey?</h2><p>A bus route has five consecutive stops: Park, Library, Market, Pool, and School. Travel between each pair of neighboring stops takes 2 minutes, with no waiting time. How long does the trip from Park to School take?</p><div class=\"work-line\"></div><div class=\"work-line\"></div></section></main></body></html>"
+}

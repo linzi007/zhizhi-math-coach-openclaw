@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import importlib.util
 import contextlib
+import datetime as dt
 import io
 import json
 import shutil
@@ -185,7 +186,7 @@ def write_smoke_workspace_files(workspace: Path) -> None:
         encoding="utf-8",
     )
     (workspace / "memory/active-context.md").write_text(
-        "# Active Context\n\n- Updated: 2026-06-29\n- Smoke active context\n",
+        f"# Active Context\n\n- Updated: {dt.date.today().isoformat()}\n- Smoke active context\n",
         encoding="utf-8",
     )
     (workspace / "curriculum/profile.md").write_text(

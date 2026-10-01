@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>看图数学小练习</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 12mm;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 18px;
+      line-height: 1.32;
+      color: #111;
+      background: #fff;
+    }
+
+    .sheet {
+      max-width: 186mm;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 5px;
+      text-align: center;
+      font-size: 25px;
+      line-height: 1.15;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 5px;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .line {
+      display: inline-block;
+      min-width: 25mm;
+      border-bottom: 1px solid #222;
+      height: 17px;
+      vertical-align: bottom;
+    }
+
+    .tip {
+      border: 1px solid #222;
+      padding: 4px 8px;
+      margin-bottom: 5px;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      margin: 5px 0 3px;
+      font-size: 17px;
+      line-height: 1.2;
+    }
+
+    .read-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .read-card {
+      border: 1px solid #bbb;
+      min-height: 20mm;
+      padding: 4px 6px;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .mental-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3px 10px;
+      margin-bottom: 4px;
+    }
+
+    .compact-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px 10px;
+      margin-bottom: 4px;
+    }
+
+    .item {
+      white-space: nowrap;
+      min-height: 20px;
+      line-height: 1.25;
+    }
+
+    .blank {
+      display: inline-block;
+      width: 15mm;
+      border-bottom: 1px solid #222;
+      height: 18px;
+      vertical-align: bottom;
+    }
+
+    .blank-wide {
+      display: inline-block;
+      width: 24mm;
+      border-bottom: 1px solid #222;
+      height: 18px;
+      vertical-align: bottom;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 5px 10px;
+    }
+
+    .geometry-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 7px;
+      margin-bottom: 4px;
+    }
+
+    .problem {
+      border: 1px solid #bbb;
+      min-height: 24mm;
+      padding: 5px 6px;
+      break-inside: avoid;
+    }
+
+    .problem.tall {
+      min-height: 30mm;
+    }
+
+    .geometry-diagram {
+      display: block;
+      width: 100%;
+      max-width: 78mm;
+      height: auto;
+      margin: 5px auto 3px;
+    }
+
+    .geometry-diagram text {
+      font-size: 12px;
+      dominant-baseline: middle;
+      text-anchor: middle;
+    }
+
+    .prompt {
+      font-size: 16px;
+      line-height: 1.25;
+    }
+
+    .work-line {
+      display: block;
+      margin-top: 4px;
+      height: 15px;
+      border-bottom: 1px solid #222;
+    }
+
+    .answer-line {
+      margin-top: 4px;
+      font-size: 16px;
+      line-height: 1.25;
+    }
+
+    .choice {
+      display: inline-block;
+      min-width: 11mm;
+      margin-right: 3mm;
+      border: 1px solid #999;
+      text-align: center;
+      line-height: 1.35;
+    }
+
+    .chain {
+      margin-top: 3px;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .dash {
+      display: block;
+      margin-top: 2px;
+      height: 17px;
+      border-bottom: 1px dashed #888;
+    }
+
+    .check-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 5px 10px;
+    }
+
+    .check-card {
+      border: 1px solid #bbb;
+      min-height: 22mm;
+      padding: 5px 6px;
+      line-height: 1.3;
+    }
+
+    .footer {
+      margin-top: 5px;
+      font-size: 14px;
+    }
+  </style>
+<style id="zhizhi-print-profile">
+/* Shared print contract. Question design and layout remain model-authored. */
+@page { size: A4; margin: 12mm; }
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif !important;
+  font-size: 14pt !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.02em !important;
+}
+h1 { font-size: 22pt !important; line-height: 1.25 !important; }
+h2, h3 { font-size: 14pt !important; line-height: 1.5 !important; }
+.question, .item, .prompt, .problem, .check-card, .read-card, .answer, .answer-line {
+  font-size: 14pt !important;
+  line-height: 1.5 !important;
+}
+.meta, .subtitle, .footer { font-size: 10.5pt !important; }
+[data-question-id], .problem, .check-card, .read-card, tr, figure {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+h1, h2, h3 { break-after: avoid; }
+.work-line { min-height: 8mm; }
+svg { max-width: 100%; }
+@media print {
+  html, body { margin: 0 !important; padding: 0 !important; background: white !important; }
+  main, .sheet { width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; }
+  .question { color: #111; }
+}
+
+</style>
+</head>
+<body>
+  <main class="sheet">
+    <h1>看图数学小练习</h1>
+    <section class="meta">
+      <div>姓名：<span class="line"></span></div>
+      <div>日期：<span class="line"></span></div>
+      <div>用时：<span class="line"></span></div>
+      <div>正确题数：<span class="line"></span></div>
+    </section>
+
+    <h2>看图作答</h2>
+    <section class="problem-grid">
+      <div class="problem tall">
+        <div class="prompt">1. 数一数图中各种图形分别有几个。</div>
+        <svg class="geometry-diagram" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="题目图形" fill="none" stroke="#111" stroke-width="1.5"><rect x="15" y="15" width="30" height="30"/><rect x="90" y="15" width="30" height="30"/><polygon points="180.0,15 195,45 165,45"/><rect x="240" y="15" width="48" height="30"/><circle cx="30.0" cy="85.0" r="15.0"/><rect x="90" y="70" width="30" height="30"/><rect x="165" y="70" width="48" height="30"/><rect x="240" y="70" width="30" height="30"/><rect x="15" y="125" width="48" height="30"/></svg>
+        <span class="work-line"></span>
+        <div class="answer-line">答：<span class="blank"></span></div>
+      </div>
+      <div class="problem tall">
+        <div class="prompt">2. 看钟面，写出现在的时间。</div>
+        <svg class="geometry-diagram" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" role="img" aria-label="题目图形" fill="none" stroke="#111" stroke-width="1.5"><circle cx="110.0" cy="110.0" r="98.0"/><line x1="110.0" y1="20.0" x2="110.0" y2="12.0"/><line x1="119.93020401042708" y1="15.520419940014037" x2="120.24378940023004" y2="12.536854253909212"/><line x1="129.75161062768714" y1="17.07597793028846" x2="130.37534570014043" y2="14.141535128087042"/><line x1="139.35661446562" y1="19.649630951960418" x2="140.28366544874484" y2="16.796461403074957"/><line x1="148.63998109220103" y1="23.213181523952912" x2="149.86019102142842" y2="20.472545151025116"/><line x1="155.0" y1="32.05771365940052" x2="159.0" y2="25.129510429125006"/><line x1="165.83959896778495" y1="33.14338553437999" x2="167.60295472466237" y2="30.716334551255144"/><line x1="173.56740760409153" y1="39.40124157964755" x2="175.5747994231681" y2="37.17180710321536"/><line x1="180.59875842035245" y1="46.432592395908465" x2="182.82819289678463" y2="44.4252005768319"/><line x1="186.85661446562" y1="54.16040103221505" x2="189.28366544874484" y2="52.39704527533763"/><line x1="187.94228634059948" y1="65.0" x2="194.87048957087498" y2="60.999999999999986"/><line x1="196.78681847604707" y1="71.36001890779897" x2="199.52745484897486" y2="70.13980897857157"/><line x1="200.35036904803957" y1="80.64338553437999" x2="203.20353859692506" y2="79.71633455125516"/><line x1="202.92402206971155" y1="90.24838937231287" x2="205.85846487191296" y2="89.6246542998596"/><line x1="204.47958005998595" y1="100.06979598957292" x2="207.4631457460908" y2="99.75621059976996"/><line x1="200.0" y1="109.99999999999997" x2="208.0" y2="109.99999999999997"/><line x1="204.47958005998598" y1="119.93020401042706" x2="207.4631457460908" y2="120.24378940023003"/><line x1="202.92402206971155" y1="129.75161062768714" x2="205.85846487191296" y2="130.37534570014043"/><line x1="200.3503690480396" y1="139.35661446562" x2="203.20353859692506" y2="140.28366544874484"/><line x1="196.78681847604707" y1="148.639981092201" x2="199.5274548489749" y2="149.86019102142842"/><line x1="187.94228634059948" y1="155.0" x2="194.870489570875" y2="159.0"/><line x1="186.85661446562" y1="165.83959896778492" x2="189.28366544874484" y2="167.60295472466237"/><line x1="180.59875842035245" y1="173.5674076040915" x2="182.82819289678466" y2="175.5747994231681"/><line x1="173.56740760409156" y1="180.59875842035242" x2="175.57479942316814" y2="182.82819289678463"/><line x1="165.83959896778495" y1="186.85661446562" x2="167.60295472466237" y2="189.28366544874484"/><line x1="155.0" y1="187.94228634059948" x2="159.0" y2="194.870489570875"/><line x1="148.639981092201" y1="196.78681847604707" x2="149.86019102142842" y2="199.5274548489749"/><line x1="139.35661446562" y1="200.35036904803957" x2="140.28366544874484" y2="203.20353859692506"/><line x1="129.75161062768714" y1="202.92402206971155" x2="130.37534570014043" y2="205.85846487191296"/><line x1="119.93020401042706" y1="204.47958005998598" x2="120.24378940023003" y2="207.4631457460908"/><line x1="110.00000000000006" y1="200.0" x2="110.00000000000006" y2="208.0"/><line x1="100.06979598957295" y1="204.47958005998598" x2="99.75621059977" y2="207.4631457460908"/><line x1="90.24838937231289" y1="202.92402206971155" x2="89.62465429985961" y2="205.85846487191296"/><line x1="80.64338553438" y1="200.3503690480396" x2="79.71633455125516" y2="203.20353859692506"/><line x1="71.36001890779897" y1="196.78681847604707" x2="70.13980897857158" y2="199.52745484897488"/><line x1="65.00000000000003" y1="187.94228634059948" x2="61.00000000000002" y2="194.870489570875"/><line x1="54.16040103221506" y1="186.85661446562" x2="52.397045275337646" y2="189.28366544874484"/><line x1="46.432592395908465" y1="180.59875842035245" x2="44.4252005768319" y2="182.82819289678463"/><line x1="39.401241579647575" y1="173.56740760409156" x2="37.171807103215386" y2="175.57479942316814"/><line x1="33.14338553438" y1="165.83959896778495" x2="30.71633455125516" y2="167.60295472466237"/><line x1="32.05771365940055" y1="155.00000000000006" x2="25.129510429125034" y2="159.00000000000006"/><line x1="23.213181523952954" y1="148.63998109220108" x2="20.472545151025145" y2="149.86019102142848"/><line x1="19.649630951960418" y1="139.35661446562003" x2="16.796461403074957" y2="140.28366544874487"/><line x1="17.075977930288474" y1="129.75161062768717" x2="14.141535128087057" y2="130.37534570014046"/><line x1="15.520419940014037" y1="119.93020401042715" x2="12.536854253909212" y2="120.24378940023011"/><line x1="20.0" y1="110.00000000000001" x2="12.0" y2="110.00000000000001"/><line x1="15.520419940014023" y1="100.06979598957297" x2="12.536854253909212" y2="99.75621059977001"/><line x1="17.075977930288474" y1="90.24838937231286" x2="14.141535128087057" y2="89.62465429985957"/><line x1="19.649630951960404" y1="80.64338553438002" x2="16.796461403074943" y2="79.71633455125517"/><line x1="23.213181523952898" y1="71.36001890779903" x2="20.472545151025088" y2="70.13980897857162"/><line x1="32.05771365940052" y1="65.0" x2="25.12951042912502" y2="60.999999999999986"/><line x1="33.14338553437999" y1="54.16040103221507" x2="30.716334551255144" y2="52.39704527533765"/><line x1="39.401241579647575" y1="46.43259239590844" x2="37.171807103215386" y2="44.42520057683187"/><line x1="46.43259239590848" y1="39.40124157964753" x2="44.4252005768319" y2="37.17180710321536"/><line x1="54.160401032215034" y1="33.14338553438" x2="52.39704527533761" y2="30.71633455125516"/><line x1="65.00000000000003" y1="32.057713659400505" x2="61.000000000000036" y2="25.12951042912499"/><line x1="71.36001890779899" y1="23.213181523952912" x2="70.13980897857158" y2="20.472545151025116"/><line x1="80.64338553437997" y1="19.649630951960418" x2="79.71633455125513" y2="16.796461403074957"/><line x1="90.2483893723129" y1="17.07597793028846" x2="89.62465429985963" y2="14.141535128087042"/><line x1="100.06979598957292" y1="15.520419940014037" x2="99.75621059976996" y2="12.536854253909212"/><text x="148" y="49.1821" font-size="14" text-anchor="middle" fill="#111" stroke="none">1</text><text x="175.818" y="77" font-size="14" text-anchor="middle" fill="#111" stroke="none">2</text><text x="186" y="115" font-size="14" text-anchor="middle" fill="#111" stroke="none">3</text><text x="175.818" y="153" font-size="14" text-anchor="middle" fill="#111" stroke="none">4</text><text x="148" y="180.818" font-size="14" text-anchor="middle" fill="#111" stroke="none">5</text><text x="110" y="191" font-size="14" text-anchor="middle" fill="#111" stroke="none">6</text><text x="72" y="180.818" font-size="14" text-anchor="middle" fill="#111" stroke="none">7</text><text x="44.1821" y="153" font-size="14" text-anchor="middle" fill="#111" stroke="none">8</text><text x="34" y="115" font-size="14" text-anchor="middle" fill="#111" stroke="none">9</text><text x="44.1821" y="77" font-size="14" text-anchor="middle" fill="#111" stroke="none">10</text><text x="72" y="49.1821" font-size="14" text-anchor="middle" fill="#111" stroke="none">11</text><text x="110" y="39" font-size="14" text-anchor="middle" fill="#111" stroke="none">12</text><line x1="110.0" y1="110.0" x2="110.0" y2="62.96" stroke-width="4"/><line x1="110.0" y1="110.0" x2="110.0" y2="39.44" stroke-width="2"/><circle cx="110.0" cy="110.0" r="3" fill="#111"/></svg>
+        <span class="work-line"></span>
+        <div class="answer-line">答：<span class="blank"></span></div>
+      </div>
+      <div class="problem tall">
+        <div class="prompt">3. 按从左到右的顺序，填写数轴上方框中的数。</div>
+        <svg class="geometry-diagram" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" role="img" aria-label="题目图形" fill="none" stroke="#111" stroke-width="1.5"><line x1="20" y1="50.0" x2="380" y2="50.0"/><line x1="25.0" y1="44.0" x2="25.0" y2="56.0"/><text x="25" y="75" font-size="14" text-anchor="middle" fill="#111" stroke="none">8</text><line x1="60.0" y1="44.0" x2="60.0" y2="56.0"/><text x="60" y="75" font-size="14" text-anchor="middle" fill="#111" stroke="none">□</text><line x1="95.0" y1="44.0" x2="95.0" y2="56.0"/><text x="95" y="75" font-size="14" text-anchor="middle" fill="#111" stroke="none">10</text><line x1="130.0" y1="44.0" x2="130.0" y2="56.0"/><text x="130" y="75" font-size="14" text-anchor="middle" fill="#111" stroke="none">□</text><line x1="165.0" y1="44.0" x2="165.0" y2="56.0"/><text x="165" y="75" font-size="14" text-anchor="middle" fill="#111" stroke="none">□</text><line x1="200.0" y1="44.0" x2="200.0" y2="56.0"/><text x="200" y="75" font-size="14" text-anchor="middle" fill="#111" stroke="none">13</text><line x1="235.0" y1="44.0" x2="235.0" y2="56.0"/><text x="235" y="75" font-size="14" text-anchor="middle" fill="#111" stroke="none">14</text><line x1="270.0" y1="44.0" x2="270.0" y2="56.0"/><text x="270" y="75" font-size="14" text-anchor="middle" fill="#111" stroke="none">15</text><line x1="305.0" y1="44.0" x2="305.0" y2="56.0"/><text x="305" y="75" font-size="14" text-anchor="middle" fill="#111" stroke="none">16</text><line x1="340.0" y1="44.0" x2="340.0" y2="56.0"/><text x="340" y="75" font-size="14" text-anchor="middle" fill="#111" stroke="none">17</text><line x1="375.0" y1="44.0" x2="375.0" y2="56.0"/><text x="375" y="75" font-size="14" text-anchor="middle" fill="#111" stroke="none">18</text></svg>
+        <span class="work-line"></span>
+        <div class="answer-line">答：<span class="blank"></span></div>
+      </div>
+      <div class="problem tall">
+        <div class="prompt">4. 数一数，图中涂色的小方格一共有多少个？</div>
+        <svg class="geometry-diagram" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 200" role="img" aria-label="题目图形" fill="none" stroke="#111" stroke-width="1.5"><rect x="66.25" y="15.0" width="42.5" height="42.5" fill="#b0b0b0" stroke="none"/><rect x="23.75" y="57.5" width="42.5" height="42.5" fill="#b0b0b0" stroke="none"/><rect x="66.25" y="57.5" width="42.5" height="42.5" fill="#b0b0b0" stroke="none"/><rect x="151.25" y="57.5" width="42.5" height="42.5" fill="#b0b0b0" stroke="none"/><rect x="23.75" y="100.0" width="42.5" height="42.5" fill="#b0b0b0" stroke="none"/><rect x="66.25" y="142.5" width="42.5" height="42.5" fill="#b0b0b0" stroke="none"/><rect x="108.75" y="142.5" width="42.5" height="42.5" fill="#b0b0b0" stroke="none"/><rect x="151.25" y="142.5" width="42.5" height="42.5" fill="#b0b0b0" stroke="none"/><rect x="193.75" y="142.5" width="42.5" height="42.5" fill="#b0b0b0" stroke="none"/><line x1="23.75" y1="15.0" x2="236.25" y2="15.0"/><line x1="23.75" y1="57.5" x2="236.25" y2="57.5"/><line x1="23.75" y1="100.0" x2="236.25" y2="100.0"/><line x1="23.75" y1="142.5" x2="236.25" y2="142.5"/><line x1="23.75" y1="185.0" x2="236.25" y2="185.0"/><line x1="23.75" y1="15.0" x2="23.75" y2="185.0"/><line x1="66.25" y1="15.0" x2="66.25" y2="185.0"/><line x1="108.75" y1="15.0" x2="108.75" y2="185.0"/><line x1="151.25" y1="15.0" x2="151.25" y2="185.0"/><line x1="193.75" y1="15.0" x2="193.75" y2="185.0"/><line x1="236.25" y1="15.0" x2="236.25" y2="185.0"/></svg>
+        <span class="work-line"></span>
+        <div class="answer-line">答：<span class="blank"></span></div>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>

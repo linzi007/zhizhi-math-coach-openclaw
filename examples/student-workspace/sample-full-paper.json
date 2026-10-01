@@ -1,0 +1,87 @@
+{
+  "date": "2026-10-01",
+  "source": "脱敏整卷批改示例（非真实学生）",
+  "source_type": "school",
+  "grade": "一年级",
+  "semester": "上学期",
+  "coverage": "partial",
+  "total_items": "unknown",
+  "overall": "示例：图形辨认正确，钟面半时辨认需复练，裁切题目待确认。",
+  "items": [
+    {
+      "item_no": "1",
+      "page": 1,
+      "question": "7 + 5 = ?",
+      "student_answer": "12",
+      "correct_answer": "12",
+      "result": "correct",
+      "recognition_confidence": "high",
+      "assisted": false,
+      "knowledge_points": [
+        {
+          "id": "arithmetic.addition-within-20",
+          "title": "20以内加法",
+          "result": "correct",
+          "confidence": "high"
+        }
+      ],
+      "explanation": "7加3得到10，再加2得到12。"
+    },
+    {
+      "item_no": "2",
+      "page": 1,
+      "question": "图中有几个三角形？",
+      "diagram_description": "3个分离的三角形与2个圆形，无重叠。",
+      "student_answer": "3",
+      "correct_answer": "3",
+      "result": "correct",
+      "recognition_confidence": "high",
+      "assisted": false,
+      "knowledge_points": [
+        {
+          "id": "geometry.shape-recognition",
+          "title": "平面图形辨认与计数",
+          "confidence": "high",
+          "result": "correct"
+        }
+      ],
+      "explanation": "只数三角形，逐个标记，共3个。"
+    },
+    {
+      "item_no": "3",
+      "page": 1,
+      "question": "看钟面写时间。",
+      "diagram_description": "分针指向6，时针位于3和4之间。",
+      "student_answer": "3时",
+      "correct_answer": "3时30分",
+      "result": "wrong",
+      "recognition_confidence": "high",
+      "assisted": false,
+      "knowledge_points": [
+        {
+          "id": "time.clock-reading",
+          "title": "认识钟表：整时与半时",
+          "confidence": "high",
+          "result": "wrong"
+        }
+      ],
+      "error_type": "概念理解",
+      "cause": "半时的分针位置不熟",
+      "confidence": "medium",
+      "evidence": "写出小时但未写30分；仅凭最终答案尚不能断定具体错因。",
+      "remediation": "对比3时和3时30分两个钟面，说出分针位置。",
+      "explanation": "分针指向6表示30分，时针走过3，读作3时30分。"
+    },
+    {
+      "item_no": "4",
+      "page": 1,
+      "question": "题干和图形下半部被裁切",
+      "student_answer": "未识别",
+      "correct_answer": "待确认",
+      "result": "need-confirmation",
+      "recognition_confidence": "low",
+      "knowledge_points": [],
+      "explanation": "需要补充完整图片，不能推断所测知识点。"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "version": 2,
+  "render_mode": "model_html",
+  "title": "看图、想一想，再动笔",
+  "date": "2026-10-01",
+  "grade": "一年级示例（已学整时半时）",
+  "topic": "读图、空间方向与条件筛选",
+  "strategy": "transfer_check",
+  "review_status": "model_reviewed",
+  "brief": {
+    "duration_minutes": 15,
+    "scope": [
+      "20以内加减法",
+      "平面图形",
+      "上下左右",
+      "整时与半时",
+      "简单重复规律"
+    ],
+    "focus": "在不同视觉表达中识别知识点，避免只重复原题数字",
+    "note": "脱敏演示入参，并非对真实学生当前学情的判断"
+  },
+  "questions": [
+    {
+      "id": "1",
+      "knowledge_points": [
+        "geometry.shape-recognition"
+      ],
+      "answer": "三角形3个，正方形2个。",
+      "explanation": "三角形的朝向和大小改变后仍有三条边；逐个标记避免遗漏。"
+    },
+    {
+      "id": "2",
+      "knowledge_points": [
+        "geometry.spatial-direction"
+      ],
+      "answer": "在从上往下第2行、从左往右第4列的格子画★。",
+      "explanation": "起点在第4行第1列，向右移动3格到第4列，再向上移动2格到第2行。起点不计为走过的一格。"
+    },
+    {
+      "id": "3",
+      "knowledge_points": [
+        "geometry.shape-decomposition"
+      ],
+      "answer": "圈出“三角形”。",
+      "explanation": "沿长方形的一条对角线剪开后，两部分各有三条边，都是三角形。"
+    },
+    {
+      "id": "4",
+      "knowledge_points": [
+        "word-problem.condition-selection",
+        "arithmetic.subtraction-within-20"
+      ],
+      "answer": "3 − 2 = 1，还剩1个蓝气球。",
+      "explanation": "图中蓝气球有3个。只用蓝气球的信息，红气球4个是无关条件。"
+    },
+    {
+      "id": "5",
+      "knowledge_points": [
+        "time.clock-reading"
+      ],
+      "answer": "圈右边的钟面。",
+      "explanation": "左边是下午2时30分，右边是下午3时整；同一天下午3时比2时30分晚。左边时针在2和3之间。"
+    },
+    {
+      "id": "6",
+      "knowledge_points": [
+        "pattern.repeating-shapes"
+      ],
+      "answer": "依次画正方形、圆形；每3个图形为一组。",
+      "explanation": "重复单位是圆形、三角形、正方形。图中已有一整组和下一组的前两个，因此接下来是正方形，再开始新的一组圆形。"
+    }
+  ],
+  "student_html": "<!doctype html>\n<html lang=\"zh-CN\"><head><meta charset=\"utf-8\"><title>看图、想一想，再动笔</title>\n<style>\n@page { size: A4; margin: 12mm; }\n* { box-sizing: border-box; }\nbody { margin: 0; color: #192626; font-family: \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 12pt; }\nmain { max-width: 186mm; margin: auto; }\nh1 { font-size: 23pt; letter-spacing: 1px; margin: 0 0 3mm; }\n.subtitle { font-size: 10pt; margin: 0 0 5mm; color: #475956; }\n.meta { display: flex; justify-content: space-between; border-bottom: 2px solid #284c47; padding-bottom: 4mm; margin-bottom: 4mm; font-size: 11pt; }\n.paper { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }\n.question { border: 1px solid #6f8581; border-radius: 3mm; padding: 3mm; break-inside: avoid; min-height: 65mm; }\nh2 { font-size: 12pt; line-height: 1.5; margin: 0 0 2mm; }\nsvg { display: block; width: 100%; height: 35mm; margin: 1mm auto; }\nsvg text { font-family: sans-serif; fill: #172924; }\n.answer { font-size: 11pt; line-height: 1.8; margin: 1mm 0 0; }\n.line { display: inline-block; min-width: 15mm; border-bottom: 1px solid #333; height: 5mm; }\n.work { height: 7mm; border-bottom: 1px dotted #73847f; }\n.footer { font-size: 10pt; margin-top: 4mm; }\n@media screen { body { background: #edf1ed; padding: 20px; } main { background: white; padding: 8mm; max-width: 202mm; } }\n</style></head><body><main>\n<h1>看图、想一想，再动笔</h1><p class=\"subtitle\">看清图形 · 说清方向 · 找到有用的信息</p>\n<div class=\"meta\"><span>姓名：____________</span><span>日期：____________</span><span>用时：______ 分钟</span></div>\n<div class=\"paper\">\n<section class=\"question\" data-question-id=\"1\"><h2>1. 找朋友。圈出所有三角形，再填一填。</h2>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 145\" role=\"img\" aria-label=\"不同形状和朝向的图形\">\n<g fill=\"none\" stroke=\"#203d37\" stroke-width=\"2.5\"><polygon points=\"38,15 65,65 12,65\"/><rect x=\"105\" y=\"20\" width=\"43\" height=\"43\"/><circle cx=\"222\" cy=\"42\" r=\"23\"/><polygon points=\"20,100 68,85 57,132\"/><polygon points=\"121,87 150,125 92,125\"/><rect x=\"200\" y=\"88\" width=\"44\" height=\"44\"/></g></svg>\n<p class=\"answer\">三角形有 <span class=\"line\"></span> 个。<br>正方形有 <span class=\"line\"></span> 个。</p></section>\n<section class=\"question\" data-question-id=\"2\"><h2>2. 从“起点”出发，向右走3格，再向上走2格。在终点格里画★。</h2>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 150\" role=\"img\" aria-label=\"有起点的四行五列方格\">\n<g stroke=\"#748781\" stroke-width=\"1\" fill=\"none\"><rect x=\"40\" y=\"10\" width=\"200\" height=\"128\"/>\n<path d=\"M80 10V138 M120 10V138 M160 10V138 M200 10V138 M40 42H240 M40 74H240 M40 106H240\"/></g>\n<circle cx=\"60\" cy=\"122\" r=\"12\" fill=\"#e3ece7\"/><text x=\"60\" y=\"126\" text-anchor=\"middle\" font-size=\"11\">起点</text>\n<text x=\"262\" y=\"24\" font-size=\"12\">上↑</text><text x=\"252\" y=\"130\" font-size=\"12\">右→</text></svg>\n<p class=\"answer\">先用手指走一遍，再画记号。</p></section>\n<section class=\"question\" data-question-id=\"3\"><h2>3. 沿虚线把长方形剪开，得到的两个图形都是什么？圈一圈。</h2>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 140\" role=\"img\" aria-label=\"画有对角虚线的长方形\">\n<rect x=\"45\" y=\"18\" width=\"205\" height=\"105\" fill=\"#f2f5f1\" stroke=\"#203d37\" stroke-width=\"2.5\"/>\n<path d=\"M45 18L250 123\" stroke=\"#203d37\" stroke-width=\"2.5\" stroke-dasharray=\"7 5\"/>\n</svg><p class=\"answer\">圆形　　三角形　　长方形</p></section>\n<section class=\"question\" data-question-id=\"4\"><h2>4. 蓝气球卖出了2个，还剩几个蓝气球？</h2>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 140\" role=\"img\" aria-label=\"按颜色分行摆放的气球\">\n<text x=\"10\" y=\"39\" font-size=\"15\">红气球</text><text x=\"10\" y=\"103\" font-size=\"15\">蓝气球</text>\n<g stroke=\"#963f32\" fill=\"#f6d7cc\"><circle cx=\"101\" cy=\"32\" r=\"17\"/><circle cx=\"147\" cy=\"32\" r=\"17\"/><circle cx=\"193\" cy=\"32\" r=\"17\"/><circle cx=\"239\" cy=\"32\" r=\"17\"/></g>\n<g stroke=\"#31566d\" fill=\"#d7e7ef\"><circle cx=\"101\" cy=\"96\" r=\"17\"/><circle cx=\"147\" cy=\"96\" r=\"17\"/><circle cx=\"193\" cy=\"96\" r=\"17\"/></g>\n<g stroke=\"#56726a\" fill=\"none\"><path d=\"M101 49v13 M147 49v13 M193 49v13 M239 49v13 M101 113v13 M147 113v13 M193 113v13\"/></g>\n</svg><p class=\"answer\">算式：<span class=\"line\" style=\"width:36mm\"></span><br>还剩 <span class=\"line\"></span> 个蓝气球。</p></section>\n<section class=\"question\" data-question-id=\"5\"><h2>5. 同一天下午，哪个钟面表示的时间更晚？圈出它。</h2>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 145\" role=\"img\" aria-label=\"两个待比较的钟面\">\n<g stroke=\"#203d37\" fill=\"none\" stroke-width=\"2\"><circle cx=\"75\" cy=\"72\" r=\"55\"/><circle cx=\"222\" cy=\"72\" r=\"55\"/>\n<path d=\"M75 72L75 112 M222 72L222 32\" stroke-width=\"2.5\"/><path d=\"M75 72L104 64 M222 72L252 72\" stroke-width=\"5\"/></g>\n<g text-anchor=\"middle\" font-size=\"13\"><text x=\"75\" y=\"32\">12</text><text x=\"120\" y=\"77\">3</text><text x=\"75\" y=\"119\">6</text><text x=\"31\" y=\"77\">9</text><text x=\"222\" y=\"32\">12</text><text x=\"267\" y=\"77\">3</text><text x=\"222\" y=\"119\">6</text><text x=\"178\" y=\"77\">9</text></g>\n<circle cx=\"75\" cy=\"72\" r=\"3\" fill=\"#203d37\"/><circle cx=\"222\" cy=\"72\" r=\"3\" fill=\"#203d37\"/>\n</svg><p class=\"answer\">我圈的是：左边 / 右边</p></section>\n<section class=\"question\" data-question-id=\"6\"><h2>6. 找规律。接下来应画什么？在方框里画出来。</h2>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 140\" role=\"img\" aria-label=\"图形排列与两个空框\">\n<g fill=\"none\" stroke=\"#203d37\" stroke-width=\"2\"><circle cx=\"28\" cy=\"40\" r=\"17\"/><polygon points=\"79,19 99,57 59,57\"/><rect x=\"116\" y=\"23\" width=\"34\" height=\"34\"/><circle cx=\"184\" cy=\"40\" r=\"17\"/><polygon points=\"237,19 257,57 217,57\"/>\n<rect x=\"83\" y=\"88\" width=\"45\" height=\"40\" stroke-dasharray=\"4 3\"/><rect x=\"169\" y=\"88\" width=\"45\" height=\"40\" stroke-dasharray=\"4 3\"/></g>\n<text x=\"18\" y=\"113\" font-size=\"13\">接着画：</text></svg>\n<p class=\"answer\">说一说：每几个图形为一组？</p></section>\n</div><p class=\"footer\">做完检查：题目问什么？我的记号和答案能让别人看明白吗？</p>\n</main></body></html>"
+}
